@@ -16,3 +16,9 @@ $signalSlotDispatcher->connect(
 	'EditDocumentInit',
 	true
 );
+
+
+
+if (TYPO3_MODE === 'BE') {
+	$GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][] = \SUDHAUS7\Datavault\Controller\ToolbarController::class;
+}
