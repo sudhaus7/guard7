@@ -1,0 +1,21 @@
+{
+    "name": "SUDHAUS7/datavault",
+    "description": "(Sudhaus7) Data Vault",
+    "version": "1.0.0",
+    "type": "typo3-cms-extension",
+    "authors": [
+        {
+            "name": "Frank Berger",
+            "role": "Developer",
+            "email": "fberger@sudhaus7.de"
+        }
+    ],
+    "require": {
+        "typo3/cms-core": ">=7.6,<9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SUDHAUS7\\Datavault\\": "Classes/"
+        }
+    }
+}
