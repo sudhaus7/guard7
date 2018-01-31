@@ -6,6 +6,6 @@ call_user_func(function () {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerPageTSConfigFile(
         'datavault',
         'Configuration/PageTSconfig/page.ts',
-        'Seitendefinitionen B-Factor Template'
+        'Seitendefinitionen Datavault'
     );
 });
