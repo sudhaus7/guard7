@@ -2,7 +2,7 @@
 
 tx_sudhaus7datavault {
     tt_address {
-        fields =  gender,name,first_name,middle_name,last_name,title,phone,email,mobile,www,address,company,position,zip,city
+        fields =  name,first_name,middle_name,last_name,title,phone,email,mobile,www,address,company,position,zip,city
         publicKeys {
             10 (
 -----BEGIN PUBLIC KEY-----

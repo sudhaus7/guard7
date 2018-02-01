@@ -47,7 +47,7 @@ class Encoder {
 			$pubkeys[$idx] = \openssl_get_publickey($key);
 		}
 
-		\openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method, $iv);
+		$ret = \openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method, $iv);
 		$this->content = '';
 		foreach ($pubkeys as $key) {
 			 \openssl_free_key($key);

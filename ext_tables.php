@@ -8,6 +8,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_pagerenderer.php'][
 
 
 /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
+/*
 $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 $signalSlotDispatcher->connect(
 	\TYPO3\CMS\Backend\Controller\EditDocumentController::class,
@@ -16,7 +17,7 @@ $signalSlotDispatcher->connect(
 	'EditDocumentInit',
 	true
 );
-
+*/
 
 
 if (TYPO3_MODE === 'BE') {

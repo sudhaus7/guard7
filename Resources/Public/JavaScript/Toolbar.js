@@ -16,6 +16,7 @@ define(['jquery','TYPO3/CMS/Backend/Modal'],function($,Modal) {
             $('#sudhaus7-datavault-controller-toolbarcontroller .clearKey').show();
             $('#sudhaus7-datavault-controller-toolbarcontroller .newkey-elem').hide();
             $('body').trigger('sudhaus7-datavault-privkey-activated');
+            //$('#sudhaus7-datavault-controller-toolbarcontroller [name="newkey"]').val('');
         }
 
     });

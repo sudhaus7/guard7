@@ -1,38 +1,6 @@
 define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYPO3/CMS/Backend/Modal'], function($,CryptoJS,forge,Modal) {
-    //console.log(CryptoJS,Forge);
-
-    //alert('x');
-
-    var openModal = function(callback) {
-        callback = callback || function(){};
-        var configurationStatic = {
-
-            content: 'Da Key bitte <br/>' +
-            '<textarea id="dakey"></textarea>',
-            buttons: [
-                {
-                    text: 'Key rein mach',
-                    name: 'save',
-
-                    icon: 'actions-document-save',
-                    active: true,
-                    btnClass: 'btn-primary',
-                    dataAttributes: {
-                        action: 'save'
-                    },
-                    trigger: function() {
-                        // console.log($('#dakey').val());
-                        callback($('#dakey',Modal.currentModal).val());
-                        //alert(document.getElementById('dakey').value);
-                        Modal.currentModal.trigger('modal-dismiss');
-                    }
-                }
-            ]
 
 
-        };
-        Modal.advanced(configurationStatic);
-    };
     var getCheckSum = function(key) {
         var a = key.trim().split("\n");
         var active = false;
@@ -88,7 +56,9 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
     var decode = function(privkey,row,callback) {
         callback = callback || function(){};
 
+
         getkeyconfig(privkey);
+
         if (!keyconfig.init) return;
 
         var msg = row.secretdata;
@@ -98,7 +68,9 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
         var b64iv = msgconfig.shift();
         var b64envkey = msgconfig.shift();
         var b64secret = msgconfig.shift();
+
         var iv = CryptoJS.enc.Base64.parse(b64iv);
+
         var envkeycoded = CryptoJS.enc.Base64.parse(b64envkey);
         var secret = CryptoJS.enc.Base64.parse(b64secret);
         var envkeyar = JSON.parse(envkeycoded.toString(CryptoJS.enc.Utf8));
@@ -122,12 +94,14 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
                 break;
         }
 
+
         if (runmethod && typeof CryptoJS[runmethod] == 'object' && envelope) {
 
             var theKey = keyconfig.privateKey.decrypt(forge.util.decode64(envelope), 'RSAES-PKCS1-V1_5');
             var decrypted = CryptoJS[runmethod].decrypt({
                 ciphertext: secret
             }, CryptoJS.enc.Latin1.parse(theKey),{iv:iv});
+            //console.log('post crypto'); return;
             callback( decrypted.toString(CryptoJS.enc.Utf8) );
             //document.querySelector('[name="output"]').value = decrypted.toString(CryptoJS.enc.Utf8);
         }
@@ -136,13 +110,15 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
     var unlockData = function () {
         var privkey = window.sessionStorage.getItem('privkey');
         sudhaus7datavaultdata.forEach(function(e) {
-            console.log('tick',e.fieldname);
             decode(privkey,e,function(data) {
 
-                var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
+                //var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
               //  console.log(name,data,e,privkey);
-                $('[data-formengine-input-name="'+name+'"]').val(data).prop('disabled',false);
-                $('[data-formengine-input-name="'+name+'"]').removeProp('disabled');
+              //  $('[data-formengine-input-name="'+name+'"]').val(data).prop('disabled',false);
+              //  $('[data-formengine-input-name="'+name+'"]').removeProp('disabled');
+
+                $('table[data-table="'+e.tablename+'"] tr[data-uid="'+e.tableuid+'"] td.col-title span').attr('title',data).text(data);
+
                 console.log('tock',e.fieldname);
             });
         });
@@ -150,8 +126,7 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
 
     var lockData = function () {
         sudhaus7datavaultdata.forEach(function(e) {
-            var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
-            $('[data-formengine-input-name="'+name+'"]').val('').prop('disabled',true);
+            $('table[data-table="'+e.tablename+'"] tr[data-uid="'+e.tableuid+'"] td.col-title span').attr('title',"🔒").text("🔒");
         });
         keyconfig = {
             init: false,
@@ -164,11 +139,6 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge','TYP
 
     if (sudhaus7datavaultdata) {
         //console.log(sudhaus7datavaultdata);
-        for (var i=0,l=sudhaus7datavaultdata.length;i<l;i++) {
-            var e = sudhaus7datavaultdata[i];
-            var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
-            $('[data-formengine-input-name="'+name+'"]').val('').attr('placeholder','🔒 Bitte Privaten Schlüssel angeben').prop('disabled','disabled');
-        }
         var privkey = window.sessionStorage.getItem('privkey');
         if (privkey) {
             unlockData();

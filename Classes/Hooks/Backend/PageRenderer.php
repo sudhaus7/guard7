@@ -15,8 +15,9 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Recordlist\RecordList;
 
-class PageRenderer implements SingletonInterface {
+class PageRenderer  {
 
 	var $editconf = [];
 
@@ -35,48 +36,111 @@ class PageRenderer implements SingletonInterface {
 
 		if ($GLOBALS['SOBE']) {
 			$class = get_class($GLOBALS['SOBE']);
+
+
 			if ($class == EditDocumentController::class) {
-				if (!empty($this->editconf)) {
+				$this->handleEditDocumentController($parameters, $pageRenderer);
+			}
 
-
-					//foreach ($this->editconf as )
-
-					//$pageTS = BackendUtility::getPagesTSconfig( );
-					//$a = 1;
-
-
-
-					foreach ($this->editconf as $table=>$config) {
-
-						$idlist = GeneralUtility::trimExplode( ',', array_keys($config)[0],true);
-						$id = array_shift($idlist);
-						$rec = BackendUtility::getRecord($table, $id, 'uid,pid');
-
-						$ts = BackendUtility::getPagesTSconfig( $rec['pid']);
-						if (isset($ts['tx_sudhaus7datavault.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.'])) {
-
-
-							$fields = GeneralUtility::trimExplode( ',', $ts['tx_sudhaus7datavault.'][$table.'.']['fields'],true);
-							/** @var Connection $connection */
-							$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-							                            ->getConnectionForTable('tx_sudhaus7datavault_data');
-
-							$result = $connection->select( ['tablename','tableuid','fieldname','secretdata'], 'tx_sudhaus7datavault_data',['tablename'=>$table,'tableuid'=>$id]);
-							$data =$result->fetchAll();
-							$pageRenderer->loadRequireJsModule('TYPO3/CMS/Datavault/Main');
-							$pageRenderer->addJsInlineCode(__METHOD__, 'var sudhaus7datavaultdata = '.json_encode($data).';');
-
-						}
-
-						//$record = BackendUtility::getRecord( $table, $uid)
-
-					}
-
-				}
+			if ($class == RecordList::class) {
+				$this->handleRecordList( $parameters, $pageRenderer);
 			}
 		}
 
 		//$pageRenderer->
 
+	}
+
+	private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer) {
+
+		/** @var RecordList $controller */
+		$controller =  $GLOBALS['SOBE'];
+
+		$ts = BackendUtility::getPagesTSconfig( $controller->id );
+		if ( isset( $ts['tx_sudhaus7datavault.'] ) && is_array($ts['tx_sudhaus7datavault.']) && !empty($ts['tx_sudhaus7datavault.'])) {
+			$data = [];
+			foreach($ts['tx_sudhaus7datavault.'] as $table=>$config) {
+				$table = trim($table,'.');
+				/** @var Connection $connection */
+				$connection = GeneralUtility::makeInstance( ConnectionPool::class )
+				                            ->getConnectionForTable( $table );
+
+				$res = $connection->select( [ 'uid' ],	$table, [ 'pid' => $controller->id, 'deleted' => 0] );
+				$uids = $res->fetchAll();
+				if (!empty($uids)) {
+					$idlist = [];
+					foreach ($uids as $a) $idlist[]=$a['uid'];
+
+					$fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
+					$fields.= ','. $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
+					$fields = trim($fields,',');
+					$fields = "'".str_replace(',',"','",$fields)."'";
+
+					$connection = GeneralUtility::makeInstance( ConnectionPool::class )
+					                            ->getConnectionForTable( 'tx_sudhaus7datavault_data' );
+					$query = $connection->createQueryBuilder();
+					$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
+					      ->from( 'tx_sudhaus7datavault_data');
+
+
+
+					$query->andWhere( $query->expr()->in('tableuid',$idlist));
+					$query->andWhere( $query->expr()->in('fieldname',$fields ));
+					$query->andWhere( $query->expr()->eq('tablename',$query->createNamedParameter($table)));
+					$result = $query->execute();
+					$subdata   = $result->fetchAll();
+					$data = array_merge($data,$subdata);
+
+				}
+
+			}
+			if (!empty($data)) {
+				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/List' );
+				$pageRenderer->addJsInlineCode( __METHOD__,
+					'var sudhaus7datavaultdata = ' . json_encode( $data ) . ';' );
+			}
+		}
+
+
+	}
+	private function handleEditDocumentController(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer) {
+		$this->editconf = $GLOBALS['SOBE']->editconf;
+		$this->controller =  $GLOBALS['SOBE'];
+		if (!empty($this->editconf)) {
+
+			foreach ($this->editconf as $table=>$config) {
+
+				if (\in_array( 'edit', $config)) {
+
+
+					$idlist = GeneralUtility::trimExplode( ',', array_keys( $config )[0], true );
+					$id     = array_shift( $idlist );
+					$rec    = BackendUtility::getRecord( $table, $id, 'uid,pid' );
+
+					$ts = BackendUtility::getPagesTSconfig( $rec['pid'] );
+					if ( isset( $ts['tx_sudhaus7datavault.'] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) ) {
+
+
+						$fields = GeneralUtility::trimExplode( ',',
+							$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'], true );
+						/** @var Connection $connection */
+						$connection = GeneralUtility::makeInstance( ConnectionPool::class )
+						                            ->getConnectionForTable( 'tx_sudhaus7datavault_data' );
+
+						$result = $connection->select( [ 'tablename', 'tableuid', 'fieldname', 'secretdata' ],
+							'tx_sudhaus7datavault_data', [ 'tablename' => $table, 'tableuid' => $id ] );
+						$data   = $result->fetchAll();
+						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/Main' );
+						$pageRenderer->addJsInlineCode( __METHOD__,
+							'var sudhaus7datavaultdata = ' . json_encode( $data ) . ';' );
+
+					}
+				}
+
+				//$record = BackendUtility::getRecord( $table, $uid)
+
+			}
+
+		}
 	}
 }
