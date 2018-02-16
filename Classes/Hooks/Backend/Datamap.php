@@ -10,6 +10,7 @@ namespace SUDHAUS7\Datavault\Hooks\Backend;
 
 
 use SUDHAUS7\Datavault\Tools\Keys;
+use SUDHAUS7\Datavault\Tools\Storage;
 use TYPO3\CMS\Core\Database\Connection;
 use SUDHAUS7\Datavault\Tools\Encoder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -66,9 +67,12 @@ class Datamap implements SingletonInterface {
 
 		if ($status == 'new') {
 		//	$pObj->substNEWwithIDs
+
+
 			$ts = BackendUtility::getPagesTSconfig( $fieldArray['pid']);
 			if (isset($ts['tx_sudhaus7datavault.'])) {
-				if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) ) {
+				if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) ) {
+					$pubkeys = Keys::collectPublicKeys($table, $fieldArray['pid'],false);
 
 					if (!isset($this->insertCache[$table])) $this->insertCache[$table] = [];
 					$this->insertCache[$table][$id] = [];
@@ -80,14 +84,12 @@ class Datamap implements SingletonInterface {
 							if (strlen($value) > 0) {
 								$fieldArray[ $fieldname ] = '&#128274;';
 								//$fieldArray[$fieldname] = '&#128274;'; // 🔒
-								$encoder                                          = new Encoder( $value,
-									$ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] );
+								$encoder                                          = new Encoder( $value, $pubkeys );
 								$this->insertCache[ $table ][ $id ][ $fieldname ] = $encoder->run();
 								unset( $encoder );
 							}
 						}
 					}
-
 				}
 			}
 
@@ -98,34 +100,12 @@ class Datamap implements SingletonInterface {
 			$ts = BackendUtility::getPagesTSconfig( $pObj->getPID( $table, $id));
 
 			if (isset($ts['tx_sudhaus7datavault.'])) {
-				if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])  && isset($ts['tx_sudhaus7datavault.'][$table.'.']['publicKeys.']) && is_array($ts['tx_sudhaus7datavault.'][$table.'.']['publicKeys.'])) {
+				if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])) {
+					$pubkeys = Keys::collectPublicKeys($table,  $pObj->getPID( $table, $id),false);
 					$vaultfields = GeneralUtility::trimExplode( ',', $ts['tx_sudhaus7datavault.'][$table.'.']['fields']);
-					/** @var Connection $connection */
-					$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-					                            ->getConnectionForTable('tx_sudhaus7datavault_data');
-
-					foreach ($fieldArray as $fieldname=>$value) {
-						if (in_array($fieldname,$vaultfields)) {
-
-							$fieldArray[$fieldname] = '&#128274;';
-							if ($value == '&#128274;' || $value == '🔒') {
-								continue;
-							}
-							//TODO : Check for type in TCA, this assumes text
-
-							$fieldArray[$fieldname] = '&#128274;'; // 🔒
-							$encoder = new Encoder( $value, $ts['tx_sudhaus7datavault.'][$table.'.']['publicKeys.']);
-							$encoded = $encoder->run();
-							unset($encoder);
-							$connection->delete( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$id,'fieldname'=>$fieldname]);
-							$connection->insert( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$id,'fieldname'=>$fieldname,'secretdata'=>$encoded]);
-						}
-					}
-
+					$fieldArray = Storage::lockRecord( $table, $id, $vaultfields, $fieldArray, $pubkeys);
 				}
 			}
-
-
 		}
 
 	}

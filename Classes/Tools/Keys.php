@@ -9,7 +9,48 @@
 namespace SUDHAUS7\Datavault\Tools;
 
 
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+
 class Keys {
+
+
+	public static function collectPublicKeys ($table=null,$pid=0,$checkFEuser=false,$aPubkeys=[]) {
+
+		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
+		$pubKeys = [];
+		if (!empty($aPubkeys)) {
+			foreach ($aPubkeys as $key) {
+				$pubKeys[ self::getChecksum( $key )] = $key;
+			}
+		}
+		if (!empty($confArr['masterkeypublic'])) {
+			$checksum = self::getChecksum( $confArr['masterkeypublic']);
+			$pubKeys[$checksum] = $confArr['masterkeypublic'];
+		}
+		if ($pid > 0) {
+			$ts = BackendUtility::getPagesTSconfig( $pid );
+			if (isset($ts['tx_sudhaus7datavault.'])) {
+				if (isset($ts['tx_sudhaus7datavault.']['generalPublicKeys.']) && !empty($ts['tx_sudhaus7datavault.']['generalPublicKeys.'])) {
+					foreach ($ts['tx_sudhaus7datavault.']['generalPublicKeys.'] as $key) {
+						$pubKeys[ self::getChecksum( $key )] = $key;
+					}
+				}
+				if ($table) {
+					if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) ) {
+						foreach ($ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] as $key) {
+							$pubKeys[ self::getChecksum( $key )] = $key;
+						}
+					}
+				}
+			}
+		}
+		if($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
+			if (isset($GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey']) && !empty($GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'])) {
+				$pubKeys[ self::getChecksum( $GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'] )] = $GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'];
+			}
+		}
+		return $pubKeys;
+	}
 
 
 	/**
@@ -33,6 +74,15 @@ class Keys {
 		}
 		return ['private'=>$privatekey,'public'=>$publickey];
 
+	}
+	public static function unlockKeyToPem($key,$password) {
+		if (!$privkey = openssl_pkey_get_private($key,$password)){
+			throw new \Exception("Can not read Private Key (password given)");
+		}
+		openssl_pkey_export($privkey,$out);
+		\openssl_free_key( $privkey);
+		return $out;
+		//return $privkey;
 	}
 
 	public static function getChecksum($key) {
