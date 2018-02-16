@@ -1,0 +1,3 @@
+# cat=basic//01; type=user[SUDHAUS7\Datavault\Hooks\Backend\ExttemplateTextarea->render]; label=The Public part of a Master key
+masterkeypublic =
+

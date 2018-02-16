@@ -26,6 +26,26 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         window.sessionStorage.removeItem('DatavaultPrivkey');
     };
 
+
+    DatavaultTools.createPrivateKey = function(password,fnc) {
+        fnc = fnc || function() {};
+        forge.pki.rsa.generateKeyPair(4096,{
+                workerScript:'/typo3conf/ext/datavault/Resources/Public/JavaScript/src/node_modules/node-forge/dist/prime.worker.min.js'
+            },
+            function(err,keypair) {
+                //console.log('xx',keypair);
+                if (password) {
+                    var tmp = forge.pki.encryptRsaPrivateKey(keypair.privateKey, password, {algorithm:'AES256'});
+                    keypair.privateKey = tmp;
+                }
+                fnc({
+                    privateKey: forge.pki.privateKeyToPem(keypair.privateKey,64),
+                    publicKey: forge.pki.publicKeyToPem(keypair.publicKey,64)
+                });
+        });
+
+    };
+
     DatavaultTools.setPrivateKey = function(privkey) {
         var keyconfig = {
             init: false,

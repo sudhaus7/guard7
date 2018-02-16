@@ -12,6 +12,28 @@ namespace SUDHAUS7\Datavault\Tools;
 class Keys {
 
 
+	/**
+	 * @param null $password
+	 *
+	 * @return array
+	 */
+	public static function createKey($password = null) : array {
+		$config = [
+			"digest_alg" => "sha512",
+			"private_key_bits" => 4096,
+			"private_key_type" => OPENSSL_KEYTYPE_RSA,
+		];
+
+		$res = \openssl_pkey_new($config);
+		\openssl_pkey_export($res, $privatekey);
+		$publickey = openssl_pkey_get_details($res);
+		$publickey = $publickey["key"];
+		if ($password) {
+			\openssl_pkey_export( $res, $privatekey, $password );
+		}
+		return ['private'=>$privatekey,'public'=>$publickey];
+
+	}
 
 	public static function getChecksum($key) {
 		$key = trim($key);

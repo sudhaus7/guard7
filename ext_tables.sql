@@ -21,3 +21,7 @@ CREATE TABLE tx_sudhaus7datavault_signatures (
   INDEX idxsignature(signature)
 );
 
+CREATE TABLE fe_users (
+  tx_datavault_publickey TEXT,
+  tx_datavault_privatekey TEXT
+);

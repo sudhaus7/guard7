@@ -1,0 +1,25 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
+      xmlns:s7="http://sudhaus7.de/ns/SUDHAUS7/Sudhaus7Viewhelpers/ViewHelpers" xmlns="http://www.w3.org/1999/xhtml"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      v:schemaLocation="https://fluidtypo3.org/schemas/vhs-master.xsd"
+      data-namespace-typo3-fluid="true">
+{namespace s7=SUDHAUS7\Sudhaus7Viewhelpers\ViewHelpers}
+{namespace be = TYPO3\CMS\Backend\ViewHelpers}
+{namespace core = TYPO3\CMS\Core\ViewHelpers}
+<f:be.pageRenderer
+    includeCssFiles="{
+		0:'{f:uri.resource(path:\'Css/styles.css\')}'
+	}"
+    includeRequireJsModules="{
+		0:'TYPO3/CMS/Viewpage/Main',
+		1:'TYPO3/CMS/Datavault/Backend'
+	}"
+/>
+
+    <div class="tx-bfactor-template">
+        <f:render section="main" />
+    </div>
+
+</html>

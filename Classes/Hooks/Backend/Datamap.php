@@ -9,12 +9,16 @@
 namespace SUDHAUS7\Datavault\Hooks\Backend;
 
 
+use SUDHAUS7\Datavault\Tools\Keys;
 use TYPO3\CMS\Core\Database\Connection;
 use SUDHAUS7\Datavault\Tools\Encoder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Generic\Backend;
+use TYPO3\CMS\Rsaauth\RsaAuthService;
+use TYPO3\CMS\Rsaauth\RsaEncryptionDecoder;
 
 class Datamap implements SingletonInterface {
 
@@ -37,9 +41,28 @@ class Datamap implements SingletonInterface {
 
 	}
 
+	public function processDatamap_preProcessFieldArray(&$incomingFieldArray, $table, $id, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObjhis) {
+
+		if ($table=='fe_users') {
+			if (strpos($id,'NEW') !== false) {
+				$password                                      = $incomingFieldArray['password'];
+				$keypair                                       = Keys::createKey( $password );
+				$incomingFieldArray['tx_datavault_publickey']  = $keypair['public'];
+				$incomingFieldArray['tx_datavault_privatekey'] = $keypair['private'];
+			} else if (strpos($incomingFieldArray['password'],'rsa:')===false) {
+				$tmprec = BackendUtility::getRecord( 'fe_users', $id);
+				if ($tmprec['password'] != $incomingFieldArray['password']) {
+					$password                                      = $incomingFieldArray['password'];
+					$keypair                                       = Keys::createKey( $password );
+					$incomingFieldArray['tx_datavault_publickey']  = $keypair['public'];
+					$incomingFieldArray['tx_datavault_privatekey'] = $keypair['private'];
+				}
+			}
+		}
+
+	}
+
 	public function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj) {
-
-
 
 		if ($status == 'new') {
 		//	$pObj->substNEWwithIDs
@@ -67,6 +90,7 @@ class Datamap implements SingletonInterface {
 
 				}
 			}
+
 		}
 
 		if ($status == 'update') {

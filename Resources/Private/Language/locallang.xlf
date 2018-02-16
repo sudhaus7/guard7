@@ -5,6 +5,19 @@
             <generator>OwnScript</generator>
         </header>
         <body>
+
+            <trans-unit id="fe_users.tx_datavault_publickey" xml:space="preserve">
+				<source>Public Key</source>
+			</trans-unit>
+            <trans-unit id="fe_users.tx_datavault_privatekey" xml:space="preserve">
+				<source>Private Key</source>
+			</trans-unit>
+            <trans-unit id="module.action.createkey" xml:space="preserve">
+				<source>Generate a new Key</source>
+			</trans-unit>
+            <trans-unit id="module.createkey.button" xml:space="preserve">
+				<source>Generate a new Key now</source>
+			</trans-unit>
         </body>
     </file>
 </xliff>
