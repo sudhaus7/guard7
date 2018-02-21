@@ -25,24 +25,39 @@ class Datamap implements SingletonInterface {
 
 	protected $insertCache = [];
 
+	/**
+	 * @param $status
+	 * @param $table
+	 * @param $id
+	 * @param $fieldArray
+	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+	 */
 	public function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj) {
 
 		if ($status == 'new') {
 			if (isset($this->insertCache[$table]) && isset($this->insertCache[$table][$id]) && is_array($this->insertCache[$table][$id])) {
 				$newid = $pObj->substNEWwithIDs[$id];
+				/** @var Connection $connection */
 				$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 				                            ->getConnectionForTable('tx_sudhaus7datavault_data');
+				foreach ($this->insertCache[$table][$id] as $data) {
 
-				foreach ($this->insertCache[$table][$id] as $fieldname=>$encoded) {
-					$connection->insert( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$newid,'fieldname'=>$fieldname,'secretdata'=>$encoded]);
+					$connection->insert( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$newid,'fieldname'=>$data['fieldname'],'secretdata'=>$data['encoded']]);
+					$insertid = $connection->lastInsertId();
+					Storage::updateKeyLog( $insertid, $data['pubkeys']);
+
 				}
 			}
-
 		}
-
 	}
 
-	public function processDatamap_preProcessFieldArray(&$incomingFieldArray, $table, $id, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObjhis) {
+	/**
+	 * @param $incomingFieldArray
+	 * @param $table
+	 * @param $id
+	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+	 */
+	public function processDatamap_preProcessFieldArray(&$incomingFieldArray, $table, $id, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj) {
 
 		if ($table=='fe_users') {
 			if (strpos($id,'NEW') !== false) {
@@ -53,6 +68,10 @@ class Datamap implements SingletonInterface {
 			} else if (strpos($incomingFieldArray['password'],'rsa:')===false) {
 				$tmprec = BackendUtility::getRecord( 'fe_users', $id);
 				if ($tmprec['password'] != $incomingFieldArray['password']) {
+
+					$signature_old = Keys::getChecksum( $tmprec['tx_datavault_publickey'] );
+					Storage::markForReencode( $signature_old);
+
 					$password                                      = $incomingFieldArray['password'];
 					$keypair                                       = Keys::createKey( $password );
 					$incomingFieldArray['tx_datavault_publickey']  = $keypair['public'];
@@ -63,6 +82,16 @@ class Datamap implements SingletonInterface {
 
 	}
 
+	/**
+	 * @param $status
+	 * @param $table
+	 * @param $id
+	 * @param $fieldArray
+	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+	 *
+	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+	 */
 	public function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj) {
 
 		if ($status == 'new') {
@@ -84,8 +113,8 @@ class Datamap implements SingletonInterface {
 							if (strlen($value) > 0) {
 								$fieldArray[ $fieldname ] = '&#128274;';
 								//$fieldArray[$fieldname] = '&#128274;'; // 🔒
-								$encoder                                          = new Encoder( $value, $pubkeys );
-								$this->insertCache[ $table ][ $id ][ $fieldname ] = $encoder->run();
+								$encoder  = new Encoder( $value, $pubkeys );
+								$this->insertCache[ $table ][ $id ][] = ['fieldname'=>$fieldname,'encoded'=>$encoder->run(),'pubkeys'=>$pubkeys];
 								unset( $encoder );
 							}
 						}

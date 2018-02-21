@@ -14,6 +14,29 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Storage {
 
+
+	public static function markForReencode($signature) {
+		/** @var Connection $connection */
+		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
+		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
+		$res = $connection->select( 'parent', 'tx_sudhaus7datavault_signatures',['signature'=>$signature]);
+		$list = $res->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($list as $row) {
+			$connection->update( 'tx_sudhaus7datavault_data', ['needsreencode'=>1], ['uid'=>$row['parent']]);
+		}
+
+	}
+
+	public static function updateKeyLog($tx_sudhaus7datavault_data_uid,$pubkeys) {
+		/** @var Connection $connection */
+		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
+		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
+		$connection->delete('tx_sudhaus7datavault_signatures',['parent'=>$tx_sudhaus7datavault_data_uid]);
+		foreach($pubkeys as $checksum=>$key) {
+			$connection->insert('tx_sudhaus7datavault_signatures',['parent'=>$tx_sudhaus7datavault_data_uid,'signature'=>$checksum]);
+		}
+	}
+
 	/**
 	 * @param $table
 	 * @param $uid
@@ -39,6 +62,9 @@ class Storage {
 				unset($encoder);
 				$connection->delete( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$uid,'fieldname'=>$fieldname]);
 				$connection->insert( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$uid,'fieldname'=>$fieldname,'secretdata'=>$encoded]);
+				$insertid = $connection->lastInsertId();
+				self::updateKeyLog( $insertid, $pubKeys);
+
 			}
 		}
 		return $data;

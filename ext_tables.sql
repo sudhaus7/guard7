@@ -6,6 +6,7 @@ CREATE TABLE tx_sudhaus7datavault_data (
   tableuid  int(11) NOT NULL DEFAULT '0',
   fieldname varchar(64) NOT NULL DEFAULT '',
   secretdata LONGTEXT,
+  needsreencode int(3) NOT NULL DEFAULT '0',
 
   PRIMARY KEY (uid),
   UNIQUE idxmain (tablename,tableuid,fieldname)
@@ -20,6 +21,7 @@ CREATE TABLE tx_sudhaus7datavault_signatures (
   INDEX idxparent(parent),
   INDEX idxsignature(signature)
 );
+
 
 CREATE TABLE fe_users (
   tx_datavault_publickey TEXT,

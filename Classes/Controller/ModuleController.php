@@ -52,9 +52,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		    ->setTitle( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey');
 		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
 
-
-
-
 	}
 	public function createkeyAction() {
 		$iconFactory = $this->view->getModuleTemplate()->getIconFactory();

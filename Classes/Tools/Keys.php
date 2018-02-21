@@ -10,14 +10,37 @@ namespace SUDHAUS7\Datavault\Tools;
 
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class Keys {
 
 
+	/**
+	 * @param null $table
+	 * @param int $pid
+	 * @param bool $checkFEuser
+	 * @param array $aPubkeys
+	 *
+	 * @return array
+	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+	 */
 	public static function collectPublicKeys ($table=null,$pid=0,$checkFEuser=false,$aPubkeys=[]) {
+
+		$keysFromSignalslot = [];
+		/** @var Dispatcher $signalSlotDispatcher */
+		$signalSlotDispatcher = GeneralUtility::makeInstance( Dispatcher::class);
+		list($keysFromSignalslot) = $signalSlotDispatcher->dispatch( __CLASS__, __FUNCTION__,[$keysFromSignalslot,$table,$pid]);
+
 
 		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
 		$pubKeys = [];
+		if (!empty($keysFromSignalslot)) {
+			foreach ($keysFromSignalslot as $key) {
+				$pubKeys[ self::getChecksum( $key )] = $key;
+			}
+		}
 		if (!empty($aPubkeys)) {
 			foreach ($aPubkeys as $key) {
 				$pubKeys[ self::getChecksum( $key )] = $key;
