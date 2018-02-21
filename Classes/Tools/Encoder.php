@@ -27,7 +27,13 @@ class Encoder {
 	 */
 	protected $method = 'RC4';
 
-	public function __construct($content,$pubKeys = [],$method='RC4') {
+	public function __construct($content,$pubKeys = [],$method=null) {
+
+
+		if ($method === null) {
+			$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
+			$method = $confArr['defaultmethod'];
+		}
 		if (is_array($content)) $content=\json_encode( $content );
 		if (\is_object( $content)) throw new \Exception('No support for Objects');
 		$this->content = $content;
@@ -99,7 +105,9 @@ class Encoder {
 	 * @param string $method
 	 */
 	public function setMethod( string $method ) {
-		$valid = ['RC4','AES128','AES256','DES'];
+
+		//$valid = ['RC4','AES128','AES256','DES'];
+		$valid = openssl_get_cipher_methods(true);
 		if (\in_array( $method, $valid)) $this->method = $method;
 	}
 
@@ -112,7 +120,11 @@ class Encoder {
 	 *
 	 * @return array
 	 */
-	public static function encodeArray($row,$fields,$publicKeys,$method='RC4') {
+	public static function encodeArray($row,$fields,$publicKeys,$method=null) {
+		if ($method === null ) {
+			$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
+			$method = $confArr['defaultmethod'];
+		}
 		$checksums = null;
 		foreach ($fields as $field) {
 			if (isset($row[$field]) && !empty($row[$field])) {
