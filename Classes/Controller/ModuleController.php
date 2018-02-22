@@ -11,6 +11,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Lang\LanguageService;
 
 class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController {
 
@@ -47,9 +48,10 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 		$btn = $buttonBar->makeLinkButton();
 		$btn->setHref( $this->uriBuilder->uriFor('createkey'))
-		    ->setShowLabelText( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey')
-		    ->setIcon( $iconFactory->getIcon('actions-document-add', Icon::SIZE_SMALL))
-		    ->setTitle( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey');
+
+		    ->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'))
+		    ->setIcon( $iconFactory->getIcon('cdnkey', Icon::SIZE_SMALL))
+		    ->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'));
 		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
 
 	}
@@ -64,5 +66,13 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		    ->setIcon( $iconFactory->getIcon('actions-document-add', Icon::SIZE_SMALL))
 		    ->setTitle('Back');
 		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
+	}
+	/**
+	 * Returns the language service
+	 * @return LanguageService
+	 */
+	protected function getLanguageService()
+	{
+		return $GLOBALS['LANG'];
 	}
 }

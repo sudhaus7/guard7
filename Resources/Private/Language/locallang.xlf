@@ -18,6 +18,12 @@
             <trans-unit id="module.createkey.button" xml:space="preserve">
 				<source>Generate a new Key now</source>
 			</trans-unit>
+            <trans-unit id="module.createkey.button.2048" xml:space="preserve">
+				<source>Generate a new Keypair with 2048 bytes</source>
+			</trans-unit>
+            <trans-unit id="module.createkey.button.4096" xml:space="preserve">
+				<source>Generate a new Keypair with 4096 bytes (more secure, but slower)</source>
+			</trans-unit>
         </body>
     </file>
 </xliff>

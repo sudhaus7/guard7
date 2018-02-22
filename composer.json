@@ -1,7 +1,7 @@
 {
     "name": "SUDHAUS7/datavault",
     "description": "(Sudhaus7) Data Vault",
-    "version": "1.0.0",
+    "version": "8.0.0",
     "type": "typo3-cms-extension",
     "authors": [
         {
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "typo3/cms-core": ">=7.6,<9.0"
+        "typo3/cms-core": ">=8.0,<9.0"
     },
     "autoload": {
         "psr-4": {

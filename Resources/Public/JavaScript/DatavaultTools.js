@@ -27,23 +27,30 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
     };
 
 
-    DatavaultTools.createPrivateKey = function(password,fnc) {
-        fnc = fnc || function() {};
-        forge.pki.rsa.generateKeyPair(4096,{
+    DatavaultTools.createPrivateKey = function(password,bytes) {
+        bytes = bytes || 2048;
+        return new Promise(function(resolve,reject){
+            resolve = resolve || function(){};
+            reject = reject || function(){};
+            forge.pki.rsa.generateKeyPair(bytes,{
                 workerScript:'/typo3conf/ext/datavault/Resources/Public/JavaScript/src/node_modules/node-forge/dist/prime.worker.min.js'
             },
             function(err,keypair) {
-                //console.log('xx',keypair);
-                if (password) {
-                    var tmp = forge.pki.encryptRsaPrivateKey(keypair.privateKey, password, {algorithm:'AES256'});
-                    keypair.privateKey = tmp;
+                try {
+                    //console.log('xx',keypair);
+                    if (password) {
+                        var tmp = forge.pki.encryptRsaPrivateKey(keypair.privateKey, password, {algorithm: 'AES256'});
+                        keypair.privateKey = tmp;
+                    }
+                    resolve({
+                        privateKey: forge.pki.privateKeyToPem(keypair.privateKey, 64),
+                        publicKey: forge.pki.publicKeyToPem(keypair.publicKey, 64)
+                    });
+                } catch(e) {
+                    reject(e);
                 }
-                fnc({
-                    privateKey: forge.pki.privateKeyToPem(keypair.privateKey,64),
-                    publicKey: forge.pki.publicKeyToPem(keypair.publicKey,64)
-                });
+            });
         });
-
     };
 
     DatavaultTools.setPrivateKey = function(privkey) {

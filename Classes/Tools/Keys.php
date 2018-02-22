@@ -18,6 +18,7 @@ class Keys {
 
 	/**
 	 * @param null $table
+	 * @param mixed $uid
 	 * @param int $pid
 	 * @param bool $checkFEuser
 	 * @param array $aPubkeys
@@ -26,13 +27,15 @@ class Keys {
 	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
 	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
 	 */
-	public static function collectPublicKeys ($table=null,$pid=0,$checkFEuser=false,$aPubkeys=[]) {
+	public static function collectPublicKeys ($table=null,$uid=0,$pid=0,$checkFEuser=false,$aPubkeys=[]) {
+
 
 		$keysFromSignalslot = [];
 		/** @var Dispatcher $signalSlotDispatcher */
 		$signalSlotDispatcher = GeneralUtility::makeInstance( Dispatcher::class);
-		list($keysFromSignalslot) = $signalSlotDispatcher->dispatch( __CLASS__, __FUNCTION__,[$keysFromSignalslot,$table,$pid]);
 
+		// Signal Name for example: collectPublicKeys_fe_users
+		list($keysFromSignalslot) = $signalSlotDispatcher->dispatch( __CLASS__, __FUNCTION__.'_'.$table,[$keysFromSignalslot,$uid,$pid]);
 
 		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
 		$pubKeys = [];

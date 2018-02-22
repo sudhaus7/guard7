@@ -28,6 +28,40 @@ $signalSlotDispatcher->connect(
 );
 */
 
+/** @var \TYPO3\CMS\Core\Imaging\IconRegistry $iconRegistry */
+$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+$iconRegistry->registerIcon(
+	'cdnkey',
+	\TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
+	[
+		'name'     => 'cdnkey',
+		//'spinning' => true
+	]
+);
+$iconRegistry->registerIcon(
+	'key',
+	\TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
+	[
+		'name'     => 'key',
+		//'spinning' => true
+	]
+);
+$iconRegistry->registerIcon(
+	'lock',
+	\TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
+	[
+		'name'     => 'lock',
+		//'spinning' => true
+	]
+);
+$iconRegistry->registerIcon(
+	'lock-open',
+	\TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
+	[
+		'name'     => 'lock-open',
+		//'spinning' => true
+	]
+);
 
 if (TYPO3_MODE === 'BE') {
 	$GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][] = \SUDHAUS7\Datavault\Controller\ToolbarController::class;

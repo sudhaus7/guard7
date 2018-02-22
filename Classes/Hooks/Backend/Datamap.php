@@ -11,9 +11,10 @@ namespace SUDHAUS7\Datavault\Hooks\Backend;
 
 use SUDHAUS7\Datavault\Tools\Keys;
 use SUDHAUS7\Datavault\Tools\Storage;
-use TYPO3\CMS\Core\Database\Connection;
+
 use SUDHAUS7\Datavault\Tools\Encoder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -96,12 +97,18 @@ class Datamap implements SingletonInterface {
 
 		if ($status == 'new') {
 		//	$pObj->substNEWwithIDs
-
-
 			$ts = BackendUtility::getPagesTSconfig( $fieldArray['pid']);
 			if (isset($ts['tx_sudhaus7datavault.'])) {
 				if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) ) {
-					$pubkeys = Keys::collectPublicKeys($table, $fieldArray['pid'],false);
+
+
+					$extraPubkeys = [];
+					if ($table == 'fe_users' && !empty($fieldArray['tx_datavault_publickey'])) {
+						$extraPubkeys[] = $fieldArray['tx_datavault_publickey'];
+					}
+
+
+					$pubkeys = Keys::collectPublicKeys($table, 0, $fieldArray['pid'],false,$extraPubkeys);
 
 					if (!isset($this->insertCache[$table])) $this->insertCache[$table] = [];
 					$this->insertCache[$table][$id] = [];
@@ -126,11 +133,12 @@ class Datamap implements SingletonInterface {
 
 		if ($status == 'update') {
 
-			$ts = BackendUtility::getPagesTSconfig( $pObj->getPID( $table, $id));
+			$pid =  $pObj->getPID( $table, $id);
+			$ts = BackendUtility::getPagesTSconfig($pid);
 
 			if (isset($ts['tx_sudhaus7datavault.'])) {
 				if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])) {
-					$pubkeys = Keys::collectPublicKeys($table,  $pObj->getPID( $table, $id),false);
+					$pubkeys = Keys::collectPublicKeys($table, $id, $pid,false);
 					$vaultfields = GeneralUtility::trimExplode( ',', $ts['tx_sudhaus7datavault.'][$table.'.']['fields']);
 					$fieldArray = Storage::lockRecord( $table, $id, $vaultfields, $fieldArray, $pubkeys);
 				}

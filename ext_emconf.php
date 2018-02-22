@@ -7,5 +7,5 @@ $EM_CONF[$_EXTKEY] = [
     'state' => 'beta',
     'author' => 'Frank Berger',
     'author_email' => 'fberger@sudhaus7.de',
-    'version' => '1.0.0',
+    'version' => '8.0.0',
 ];

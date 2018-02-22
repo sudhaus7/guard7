@@ -31,6 +31,7 @@ class Storage {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
+
 		$connection->delete('tx_sudhaus7datavault_signatures',['parent'=>$tx_sudhaus7datavault_data_uid]);
 		foreach($pubkeys as $checksum=>$key) {
 			$connection->insert('tx_sudhaus7datavault_signatures',['parent'=>$tx_sudhaus7datavault_data_uid,'signature'=>$checksum]);
@@ -96,50 +97,80 @@ class Storage {
 	}
 
 
-	public static function lockFile($filepath,$pubKeys) {
-		try {
-			$encoded = self::encodeFile( $filepath, $pubKeys );
-			@unlink( $filepath );
-			\file_put_contents( $filepath . '.s7sec', $encoded );
-		} catch (\Exception $e) {
-			return false;
+	private static function sanitizePath($path) {
+		str_replace('../','',$path);
+		$path = \realpath( $path);
+		if (strpos($path,PATH_site)===0) {
+			return $path;
 		}
-		return true;
+		return null;
+	}
+
+	public static function lockFile($filepath,$pubKeys) {
+		$filepath = self::sanitizePath( $filepath);
+		if (is_file($filepath)) {
+			try {
+				$encoded = self::encodeFile( $filepath, $pubKeys );
+				if ($encoded !== null) {
+					@unlink( $filepath );
+					\file_put_contents( $filepath . '.s7sec', $encoded );
+					return true;
+				}
+			} catch ( \Exception $e ) {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	public static function unlockFile($filepath,$privateKey,$password) {
-		try {
-			$data = self::decodeFile( $filepath, $privateKey,$password);
-			@unlink($filepath);
-			\file_put_contents( dirname($filepath).'/'.$data['filename'], \base64_decode( $data['secure']));
-		} catch (\Exception $e) {
-			return false;
+		$filepath = self::sanitizePath( $filepath);
+		if (is_file($filepath)) {
+			try {
+				$data = self::decodeFile( $filepath, $privateKey, $password );
+				if ($data !== null) {
+					@unlink( $filepath );
+					\file_put_contents( dirname( $filepath ) . '/' . $data['filename'],
+						\base64_decode( $data['secure'] ) );
+					return true;
+				}
+			} catch ( \Exception $e ) {
+				return false;
+			}
 		}
-		return true;
+		return false;
 	}
 
 	public static function encodeFile($filepath,$pubKeys) {
-		$identifier = str_replace(PATH_site,'',$filepath);
-		$identifier = str_replace('fileadmin/','',$identifier);
+		$filepath = self::sanitizePath( $filepath);
+		$encoded = null;
+		if (is_file($filepath)) {
+			$identifier = str_replace( PATH_site, '', $filepath );
+			$identifier = str_replace( 'fileadmin/', '', $identifier );
 
-		$data = [
-			'checksum'=>\sha1_file( $filepath),
-			'secure'=>base64_encode(\file_get_contents( $filepath)),
-			'filename'=>basename($filepath),
-			'identifier'=>$identifier,
-			'identifier_hash'=>\sha1( $identifier)
-		];
+			$data = [
+				'checksum'        => \sha1_file( $filepath ),
+				'secure'          => base64_encode( \file_get_contents( $filepath ) ),
+				'filename'        => basename( $filepath ),
+				'identifier'      => $identifier,
+				'identifier_hash' => \sha1( $identifier )
+			];
 
-		$encoder = new Encoder( \json_encode( $data), $pubKeys);
-		$encoded = $encoder->run();
+			$encoder = new Encoder( \json_encode( $data ), $pubKeys );
+			$encoded = $encoder->run();
+		}
 		return $encoded;
 
 	}
 
 	public static function decodeFile($filepath,$privatekey,$password=null) {
-		$enc = \file_get_contents( $filepath);
-		$json = Decoder::decode( $enc, $privatekey, $password);
-		$data =\json_decode( $json, true);
+		$filepath = self::sanitizePath( $filepath);
+		$data = null;
+		if (is_file($filepath)) {
+			$enc  = \file_get_contents( $filepath );
+			$json = Decoder::decode( $enc, $privatekey, $password );
+			$data = \json_decode( $json, true );
+		}
 		return $data;
 	}
 

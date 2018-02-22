@@ -8,7 +8,8 @@
 
 namespace SUDHAUS7\Datavault\Hooks\Backend;
 
-
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -25,6 +26,20 @@ class SignalHandler {
 		$mypagerenderer->editconf = $cntrl->editconf;
 		$mypagerenderer->controller = $cntrl;
 
+	}
+
+
+	public function FeuserFetchkey($keys,$uid,$pid) {
+		if (substr($uid,0,3)!='NEW' && $uid > 0) {
+			/** @var Connection $connection */
+			$connection = GeneralUtility::makeInstance(ConnectionPool::class)
+			                            ->getConnectionForTable('fe_users');
+			$row = $connection->select( ['tx_datavault_publickey'], 'fe_users',['uid'=>$uid])->fetch(\PDO::FETCH_ASSOC);
+			if ($row && !empty($row['tx_datavault_publickey'])) {
+				$keys[]=$row['tx_datavault_publickey'];
+			}
+		}
+		return [$keys,$uid,$pid];
 	}
 
 }
