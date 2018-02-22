@@ -50,7 +50,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$btn->setHref( $this->uriBuilder->uriFor('createkey'))
 
 		    ->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'))
-		    ->setIcon( $iconFactory->getIcon('cdnkey', Icon::SIZE_SMALL))
+		    ->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
 		    ->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'));
 		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
 
@@ -63,7 +63,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$btn = $buttonBar->makeLinkButton();
 		$btn->setHref( $this->uriBuilder->uriFor('index'))
 		    ->setShowLabelText( 'Back')
-		    ->setIcon( $iconFactory->getIcon('actions-document-add', Icon::SIZE_SMALL))
+			->setIcon( $iconFactory->getIcon('actions-view-go-back', Icon::SIZE_SMALL))
 		    ->setTitle('Back');
 		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
 	}
