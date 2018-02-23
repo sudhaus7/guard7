@@ -30,7 +30,7 @@ class Userchangepassword {
 		                            ->getConnectionForTable('fe_users');
 		$user = $params['user'];
 		$signature_old = Keys::getChecksum( $user['tx_datavault_publickey'] );
-		Storage::markForReencode( $signature_old);
+		Storage::markForReencode( $signature_old );
 
 		$password                                      = $params['newPassword'];
 		$keypair                                       = Keys::createKey( $password );

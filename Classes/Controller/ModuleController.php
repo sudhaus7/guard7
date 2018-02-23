@@ -7,6 +7,7 @@
  */
 
 namespace SUDHAUS7\Datavault\Controller;
+use SUDHAUS7\Datavault\Domain\Repository\DataRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
@@ -26,12 +27,20 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	 * @var string
 	 */
 	protected $moduleName = 'system_Sudhaus7DatavaultModule';
+
 	/**
 	 * BackendTemplateContainer
 	 *
 	 * @var BackendTemplateView
 	 */
 	protected $view;
+
+	/**
+	 * @var \SUDHAUS7\Datavault\Domain\Repository\DataRepository
+	 * @inject
+	 */
+	protected $dataRepository;
+
 	/**
 	 * ModuleController constructor.
 	 */
@@ -46,13 +55,27 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$docHeader = $this->view->getModuleTemplate()->getDocHeaderComponent();
 		$buttonBar = $docHeader->getButtonBar();
 
-		$btn = $buttonBar->makeLinkButton();
-		$btn->setHref( $this->uriBuilder->uriFor('createkey'))
 
-		    ->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'))
-		    ->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
-		    ->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'));
-		$buttonBar->addButton( $btn, ButtonBar::BUTTON_POSITION_LEFT);
+		$buttonBar->addButton( $buttonBar->makeLinkButton()
+			->setHref( $this->uriBuilder->uriFor('createkey'))
+			->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'))
+			->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
+			->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey')),
+			ButtonBar::BUTTON_POSITION_LEFT);
+
+		$buttonBar->addButton( $buttonBar->makeLinkButton()
+		                                 ->setHref( $this->uriBuilder->uriFor('listrencode'))
+		                                 ->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.listrencode'))
+		                                 ->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
+		                                 ->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.listrencode')),
+			ButtonBar::BUTTON_POSITION_LEFT);
+
+
+
+
+		$this->view->assign('reenocenum',$this->dataRepository->findByNeedsreencode(1)->count());
+
+
 
 	}
 	public function createkeyAction() {

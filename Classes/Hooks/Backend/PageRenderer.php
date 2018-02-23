@@ -77,10 +77,10 @@ class PageRenderer  {
 					$fields = "'".str_replace(',',"','",$fields)."'";
 
 					$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-					                            ->getConnectionForTable( 'tx_sudhaus7datavault_data' );
+					                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
 					$query = $connection->createQueryBuilder();
 					$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
-					      ->from( 'tx_sudhaus7datavault_data');
+					      ->from( 'tx_datavault_domain_model_data');
 
 
 
@@ -125,10 +125,10 @@ class PageRenderer  {
 							$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'], true );
 						/** @var Connection $connection */
 						$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-						                            ->getConnectionForTable( 'tx_sudhaus7datavault_data' );
+						                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
 
 						$result = $connection->select( [ 'tablename', 'tableuid', 'fieldname', 'secretdata' ],
-							'tx_sudhaus7datavault_data', [ 'tablename' => $table, 'tableuid' => $id ] );
+							'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $id ] );
 						$data   = $result->fetchAll();
 						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/Main' );
 						$pageRenderer->addJsInlineCode( __METHOD__,

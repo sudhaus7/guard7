@@ -7,7 +7,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_pagerenderer.php']['render-preProcess'][] = SUDHAUS7\Datavault\Hooks\Backend\PageRenderer::class.'->addJSCSS';
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule('SUDHAUS7.' . $_EXTKEY, 'system',	'datavault',	'top',
-	array('Module' => 'index,createkey'),
+	array('Module' => 'index,createkey,listrencode'),
 	array(
 		'access' => 'user,group',
 		'icon'   => 'EXT:' . $_EXTKEY . '/Resources/Public/Icons/locked.svg',

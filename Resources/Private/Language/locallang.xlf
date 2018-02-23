@@ -15,6 +15,9 @@
             <trans-unit id="module.action.createkey" xml:space="preserve">
 				<source>Generate a new Key</source>
 			</trans-unit>
+            <trans-unit id="module.action.listrencode" xml:space="preserve">
+				<source>Generate a new Key</source>
+			</trans-unit>
             <trans-unit id="module.createkey.button" xml:space="preserve">
 				<source>Generate a new Key now</source>
 			</trans-unit>

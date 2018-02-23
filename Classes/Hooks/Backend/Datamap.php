@@ -40,10 +40,10 @@ class Datamap implements SingletonInterface {
 				$newid = $pObj->substNEWwithIDs[$id];
 				/** @var Connection $connection */
 				$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-				                            ->getConnectionForTable('tx_sudhaus7datavault_data');
+				                            ->getConnectionForTable('tx_datavault_domain_model_data');
 				foreach ($this->insertCache[$table][$id] as $data) {
 
-					$connection->insert( 'tx_sudhaus7datavault_data', ['tablename'=>$table,'tableuid'=>$newid,'fieldname'=>$data['fieldname'],'secretdata'=>$data['encoded']]);
+					$connection->insert( 'tx_datavault_domain_model_data', ['tablename'=>$table,'tableuid'=>$newid,'fieldname'=>$data['fieldname'],'secretdata'=>$data['encoded']]);
 					$insertid = $connection->lastInsertId();
 					Storage::updateKeyLog( $insertid, $data['pubkeys']);
 

@@ -1,6 +1,8 @@
-CREATE TABLE tx_sudhaus7datavault_data (
+CREATE TABLE tx_datavault_domain_model_data (
   uid int(11) NOT NULL auto_increment,
   pid int(11) NOT NULL DEFAULT '0',
+  tstamp int(11) NOT NULL DEFAULT '0',
+
 
   tablename varchar(64) NOT NULL DEFAULT '',
   tableuid  int(11) NOT NULL DEFAULT '0',
