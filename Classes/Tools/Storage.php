@@ -19,7 +19,7 @@ class Storage {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
-		$res = $connection->select( 'parent', 'tx_sudhaus7datavault_signatures',['signature'=>$signature]);
+		$res = $connection->select( ['parent'], 'tx_sudhaus7datavault_signatures',['signature'=>$signature]);
 		$list = $res->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($list as $row) {
 			$connection->update( 'tx_datavault_domain_model_data', ['needsreencode'=>1], ['uid'=>$row['parent']]);
@@ -72,7 +72,7 @@ class Storage {
 	}
 
 
-	public static function unlockRecord($table,$data,$privateKey,$uid=0) {
+	public static function unlockRecord($table,$data,$privateKey,$uid=0,$password=null) {
 
 		if ($uid==0) {
 			$uid = $data['uid'];
@@ -83,10 +83,10 @@ class Storage {
 		                            ->getConnectionForTable('tx_datavault_domain_model_data');
 		foreach ($data as $fieldname=>$value) {
 			if ($value == '&#128274;' || $value == '🔒') {
-				$row = $connection->select( 'secretdata', 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid, 'fieldname'=>$fieldname],[],[],0,1 )->fetch(\PDO::FETCH_ASSOC);
+				$row = $connection->select( ['secretdata'], 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid, 'fieldname'=>$fieldname],[],[],0,1 )->fetch(\PDO::FETCH_ASSOC);
 				if ($row && $row['secretdata']) {
 					try {
-						$data[ $fieldname ] = Decoder::decode( $row['secretdata'], $privateKey );
+						$data[ $fieldname ] = Decoder::decode( $row['secretdata'], $privateKey, $password );
 					} catch (\Exception $e) {
 
 					}

@@ -132,10 +132,8 @@ class Datamap implements SingletonInterface {
 		}
 
 		if ($status == 'update') {
-
 			$pid =  $pObj->getPID( $table, $id);
 			$ts = BackendUtility::getPagesTSconfig($pid);
-
 			if (isset($ts['tx_sudhaus7datavault.'])) {
 				if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])) {
 					$pubkeys = Keys::collectPublicKeys($table, $id, $pid,false);
@@ -144,6 +142,5 @@ class Datamap implements SingletonInterface {
 				}
 			}
 		}
-
 	}
 }
