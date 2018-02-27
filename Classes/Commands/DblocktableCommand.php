@@ -76,7 +76,5 @@ class DblocktableCommand extends Command {
 				}
 			}
 		}
-
 	}
-
 }

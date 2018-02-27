@@ -43,14 +43,47 @@ class PageRenderer  {
 			}
 
 			if ($class == RecordList::class) {
-				$this->handleRecordList( $parameters, $pageRenderer);
+				$this->handleRecordListLight( $parameters, $pageRenderer);
+
 			}
 		}
 
 		//$pageRenderer->
 
 	}
+	public function postRender( array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer ) {
+		if ($GLOBALS['SOBE']) {
+			$class = get_class($GLOBALS['SOBE']);
 
+			if ($class == RecordList::class) {
+
+		//		$this->handleRecordList( $parameters, $pageRenderer);
+			}
+		}
+	}
+
+	private function handleRecordListLight(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer) {
+
+		/** @var RecordList $controller */
+		$controller =  $GLOBALS['SOBE'];
+
+		$ts = BackendUtility::getPagesTSconfig( $controller->id );
+		if ( isset( $ts['tx_sudhaus7datavault.'] ) && is_array($ts['tx_sudhaus7datavault.']) && !empty($ts['tx_sudhaus7datavault.'])) {
+			$data = [];
+			$tmp = array_keys($ts['tx_sudhaus7datavault.']);
+			foreach ($tmp as $t) {
+				$data[]=trim($t,'.');
+			}
+
+			if (!empty($data)) {
+				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/List' );
+				$pageRenderer->addJsInlineCode( __METHOD__,
+					'var sudhaus7datavaulttables = ' . json_encode( $data ) . ';' );
+			}
+		}
+
+
+	}
 	private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer) {
 
 		/** @var RecordList $controller */
@@ -65,7 +98,7 @@ class PageRenderer  {
 				$connection = GeneralUtility::makeInstance( ConnectionPool::class )
 				                            ->getConnectionForTable( $table );
 
-				$res = $connection->select( [ 'uid' ],	$table, [ 'pid' => $controller->id, 'deleted' => 0] );
+				$res = $connection->select( [ 'uid' ],	$table, [ 'pid' => $controller->id] );
 				$uids = $res->fetchAll();
 				if (!empty($uids)) {
 					$idlist = [];

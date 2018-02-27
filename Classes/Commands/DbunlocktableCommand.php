@@ -66,7 +66,6 @@ class DbunlocktableCommand extends Command {
 		if (isset($ts['tx_sudhaus7datavault.'])) {
 			if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) ) {
 				$res  = $connection->select( [ '*' ], $table, [ 'pid' => $pid ] );
-
 				while($row = $res->fetch(\PDO::FETCH_ASSOC)) {
 					$fieldArray = [];
 					$vaultfields = GeneralUtility::trimExplode( ',',	$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] );
@@ -77,9 +76,7 @@ class DbunlocktableCommand extends Command {
 					$connection->update( $table, $fieldArray, ['uid'=>$row['uid']]);
 					$output->writeln( ['unlocking '.$row['username']]);
 				}
-
 			}
 		}
-
 	}
 }

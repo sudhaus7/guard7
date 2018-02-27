@@ -11,7 +11,11 @@ use SUDHAUS7\Datavault\Domain\Repository\DataRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Lang\LanguageService;
 
 class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController {
@@ -98,4 +102,42 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	{
 		return $GLOBALS['LANG'];
 	}
+
+
+	/**
+	 * @param array $params
+	 * @param \TYPO3\CMS\Core\Http\AjaxRequestHandler|null $ajaxObj
+	 */
+	public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = NULL) {
+
+		/** @var ServerRequest $request */
+		$request = $params['request'];
+		$get = $request->getQueryParams();
+		$table = $get['table'];
+		$idlist = $get['uids'];
+		$a = 1;
+		/** @var Connection $connection */
+		$connection = GeneralUtility::makeInstance( ConnectionPool::class )
+		                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
+
+		$query = $connection->createQueryBuilder();
+		$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
+		      ->from( 'tx_datavault_domain_model_data');
+
+		$fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
+		$fields.= ','. $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
+		$fields = trim($fields,',');
+		$fields = "'".str_replace(',',"','",$fields)."'";
+
+		$query->andWhere( $query->expr()->in('tableuid',$idlist));
+		$query->andWhere( $query->expr()->in('fieldname',$fields ));
+		$query->andWhere( $query->expr()->eq('tablename',$query->createNamedParameter($table)));
+
+		$result = $query->execute();
+		$data   = $result->fetchAll();
+
+
+		$ajaxObj->addContent('data', \json_encode( $data ));
+	}
+
 }
