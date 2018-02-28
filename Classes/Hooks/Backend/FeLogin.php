@@ -9,7 +9,9 @@
 namespace SUDHAUS7\Datavault\Hooks\Backend;
 
 
+use SUDHAUS7\Datavault\KeyNotReadableException;
 use SUDHAUS7\Datavault\Tools\Keys;
+use SUDHAUS7\Datavault\WrongKeyPassException;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class FeLogin {
@@ -29,8 +31,10 @@ class FeLogin {
 					$GLOBALS['TSFE']->fe_user->setKey('user','tx_datavault_privatekey',$privkey);
 					$GLOBALS['TSFE']->fe_user->storeSessionData('datavault');
 					//$pObj->fe_user->setAndSaveSessionData( 'tx_datavault_privatekey', $privkey);
-				} catch(\Exception $e) {
-					$x=1;
+				} catch(WrongKeyPassException $e) {
+
+				} catch (KeyNotReadableException $e) {
+
 				}
 
 			}
