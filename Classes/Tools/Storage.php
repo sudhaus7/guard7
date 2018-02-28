@@ -8,6 +8,8 @@
 
 namespace SUDHAUS7\Datavault\Tools;
 
+use SUDHAUS7\Datavault\UnlockException;
+use SUDHAUS7\Datavault\WrongkeypassException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -71,6 +73,36 @@ class Storage {
 		return $data;
 	}
 
+	/**
+	 * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+	 * @param $table
+	 */
+	public static function unlockModel (&$obj,$table,$privateKey,$password=null) {
+		$uid = $obj->getUid();
+		/** @var Connection $connection */
+		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
+		                            ->getConnectionForTable('tx_datavault_domain_model_data');
+		$res = $connection->select( ['*'], 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid]);
+		while ($row = $res->fetch(\PDO::FETCH_ASSOC)) {
+			$setter = 'set'.GeneralUtility::underscoredToUpperCamelCase( $row['fieldname']);
+			$getter = 'get'.GeneralUtility::underscoredToUpperCamelCase( $row['fieldname']);
+			if (\method_exists( $obj, $getter)) {
+				$value = $obj->$getter();
+				if ($value == '&#128274;' || $value == '🔒') {
+					try {
+
+						$newvalue = Decoder::decode( $row['secretdata'], $privateKey, $password );
+
+						if (\method_exists( $obj, $setter)) {
+							$obj->$setter($newvalue);
+						}
+					} catch (\Exception $e) {
+						//$data[ $fieldname ] = '🔒';
+					}
+				}
+			}
+		}
+	}
 
 	public static function unlockRecord($table,$data,$privateKey,$uid=0,$password=null) {
 
@@ -86,9 +118,12 @@ class Storage {
 				$row = $connection->select( ['secretdata'], 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid, 'fieldname'=>$fieldname],[],[],0,1 )->fetch(\PDO::FETCH_ASSOC);
 				if ($row && $row['secretdata']) {
 					try {
+						//$privateKey='xxx';
 						$data[ $fieldname ] = Decoder::decode( $row['secretdata'], $privateKey, $password );
-					} catch (\Exception $e) {
+					} catch (WrongkeypassException $e) {
 
+					} catch (UnlockException $e) {
+						//$data[ $fieldname ] = '🔒';
 					}
 				}
 			}
@@ -112,7 +147,8 @@ class Storage {
 			try {
 				$encoded = self::encodeFile( $filepath, $pubKeys );
 				if ($encoded !== null) {
-					@unlink( $filepath );
+					//@unlink( $filepath );
+					\file_put_contents( $filepath, 'encoded');
 					\file_put_contents( $filepath . '.s7sec', $encoded );
 					return true;
 				}
@@ -124,7 +160,8 @@ class Storage {
 	}
 
 	public static function unlockFile($filepath,$privateKey,$password) {
-		$filepath = self::sanitizePath( $filepath);
+		$filepath = self::sanitizePath( $filepath).'.s7sec';
+
 		if (is_file($filepath)) {
 			try {
 				$data = self::decodeFile( $filepath, $privateKey, $password );
@@ -147,10 +184,11 @@ class Storage {
 		if (is_file($filepath)) {
 			$identifier = str_replace( PATH_site, '', $filepath );
 			$identifier = str_replace( 'fileadmin/', '', $identifier );
-
+			$buf = \file_get_contents( $filepath );
+			if ($buf == 'encoded') throw new \Exception('already encoded');
 			$data = [
 				'checksum'        => \sha1_file( $filepath ),
-				'secure'          => base64_encode( \file_get_contents( $filepath ) ),
+				'secure'          => base64_encode( $buf ),
 				'filename'        => basename( $filepath ),
 				'identifier'      => $identifier,
 				'identifier_hash' => \sha1( $identifier )
@@ -163,6 +201,15 @@ class Storage {
 
 	}
 
+	/**
+	 * @param $filepath
+	 * @param $privatekey
+	 * @param null $password
+	 *
+	 * @return mixed|null
+	 * @throws UnlockException
+	 * @throws WrongkeypassException
+	 */
 	public static function decodeFile($filepath,$privatekey,$password=null) {
 		$filepath = self::sanitizePath( $filepath);
 		$data = null;

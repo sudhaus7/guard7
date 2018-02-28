@@ -35,6 +35,12 @@ class DblocktableCommand extends Command {
 			't',
 			InputOption::VALUE_REQUIRED,
 			'Table to lock'
+		)
+		->addOption(
+			'includeFiles',
+			'includeFiles',
+			InputOption::VALUE_NONE,
+			'Lock referenced files as well'
 		);
 
 	}
@@ -51,6 +57,20 @@ class DblocktableCommand extends Command {
 	{
 		$table = $input->getOption('table');
 		$pid = (int)$input->getOption('pid');
+		$lockFiles = $input->hasOption( 'includeFiles');
+
+		$filerefconfig = [];
+
+		if ($lockFiles) {
+			foreach($GLOBALS['TCA'][$table]['columns'] as $col=>$config) {
+
+
+				if ($config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table']=='sys_file_reference') {
+					$filerefconfig[] = $col;
+				}
+			}
+		}
+
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 		                            ->getConnectionForTable($table);
@@ -73,6 +93,19 @@ class DblocktableCommand extends Command {
 					$fieldArray  = Storage::lockRecord( $table,  $row['uid'], $vaultfields, $fieldArray, $pubkeys );
 					$connection->update( $table, $fieldArray, ['uid'=>$row['uid']]);
 					$output->writeln( ['locking '.$row['username']]);
+
+					if ($lockFiles) {
+						foreach ($filerefconfig as $reffield) {
+							//if ($row[$reffield] > 0) {
+
+							$resref = $connection->select( ['*'], 'sys_file_reference',['tablenames'=>$table,'fieldname'=>$reffield,'uid_foreign'=>$row['uid']]);
+							while($ref = $resref->fetch(\PDO::FETCH_ASSOC)) {
+								$sysfile = $connection->select(['*'],'sys_file',['uid'=>$ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
+								$ret = Storage::lockFile( PATH_site.'/fileadmin'.$sysfile['identifier'], $pubkeys);
+								$output->writeln( ['locking file '.$sysfile['identifier']]);
+							}
+						}
+					}
 				}
 			}
 		}

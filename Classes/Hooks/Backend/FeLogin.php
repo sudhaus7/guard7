@@ -26,9 +26,11 @@ class FeLogin {
 				try {
 					$privkey = Keys::unlockKeyToPem( $pObj->fe_user->user['tx_datavault_privatekey'],
 						$GLOBALS['datavault_temp_pass'] );
-					$pObj->fe_user->setSessionData( 'tx_datavault_privatekey', $privkey);
+					$GLOBALS['TSFE']->fe_user->setKey('user','tx_datavault_privatekey',$privkey);
+					$GLOBALS['TSFE']->fe_user->storeSessionData('datavault');
+					//$pObj->fe_user->setAndSaveSessionData( 'tx_datavault_privatekey', $privkey);
 				} catch(\Exception $e) {
-
+					$x=1;
 				}
 
 			}

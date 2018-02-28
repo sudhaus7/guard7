@@ -8,7 +8,6 @@
 
 namespace SUDHAUS7\Datavault\Frontend;
 
-
 use SUDHAUS7\Datavault\Tools\Keys;
 use SUDHAUS7\Datavault\Tools\Storage;
 use TYPO3\CMS\Core\Database\Connection;

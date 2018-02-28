@@ -48,6 +48,12 @@ class DbunlocktableCommand extends Command {
 				'p',
 				InputOption::VALUE_OPTIONAL,
 				'Password for masterkey'
+			)
+			->addOption(
+				'includeFiles',
+				'includeFiles',
+				InputOption::VALUE_NONE,
+				'Unlock referenced files as well'
 			);
 	}
 
@@ -58,6 +64,15 @@ class DbunlocktableCommand extends Command {
 		$keyfile = $input->getOption('keyfile');
 		$key = \file_get_contents( $keyfile );
 		$password = $input->hasOption( 'password') ? $input->getOption( 'password') : null;
+		$lockFiles = $input->hasOption( 'includeFiles');
+		$filerefconfig = [];
+		if ($lockFiles) {
+			foreach($GLOBALS['TCA'][$table]['columns'] as $col=>$config) {
+				if ($config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table']=='sys_file_reference') {
+					$filerefconfig[] = $col;
+				}
+			}
+		}
 
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -75,6 +90,19 @@ class DbunlocktableCommand extends Command {
 					$fieldArray = Storage::unlockRecord( $table, $fieldArray, $key,$row['uid'],$password);
 					$connection->update( $table, $fieldArray, ['uid'=>$row['uid']]);
 					$output->writeln( ['unlocking '.$row['username']]);
+
+					if ($lockFiles) {
+						foreach ($filerefconfig as $reffield) {
+							//if ($row[$reffield] > 0) {
+
+							$resref = $connection->select( ['*'], 'sys_file_reference',['tablenames'=>$table,'fieldname'=>$reffield,'uid_foreign'=>$row['uid']]);
+							while($ref = $resref->fetch(\PDO::FETCH_ASSOC)) {
+								$sysfile = $connection->select(['*'],'sys_file',['uid'=>$ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
+								$ret = Storage::unlockFile( PATH_site.'/fileadmin'.$sysfile['identifier'], $key,$password);
+								$output->writeln( ['unlocking file '.$sysfile['identifier']]);
+							}
+						}
+					}
 				}
 			}
 		}

@@ -16,6 +16,7 @@ if (!defined('TYPO3_MODE')) die();
 	'className' => \SUDHAUS7\Datavault\Services\Datavault::class,
 ]);
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][$_EXTKEY]=\SUDHAUS7\Datavault\Hooks\Backend\FeLogin::class.'->handle';
+
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][$_EXTKEY] = \SUDHAUS7\Datavault\Frontend\Userchangepassword::class.'->handle';
 
 

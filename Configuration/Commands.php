@@ -13,6 +13,9 @@ return [
 	'datavault:db:unlock' => [
 		'class' => SUDHAUS7\Datavault\Commands\DbunlocktableCommand::class
 	],
+	//'datavault:file:lock' => [
+	//	'class' => SUDHAUS7\Datavault\Commands\FilelockCommand::class
+	//],
 /*	'datavault:db:listdirty' => [
 		'class' => SUDHAUS7\Datavault\Commands\DblistdirtyCommand::class
 	],

@@ -9,6 +9,7 @@
 namespace SUDHAUS7\Datavault\Hooks\Backend;
 
 
+use SUDHAUS7\Sudhaus7Base\Tools\Globals;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;

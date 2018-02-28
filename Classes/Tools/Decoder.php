@@ -9,8 +9,13 @@
 namespace SUDHAUS7\Datavault\Tools;
 
 
-use TYPO3\CMS\Core\Exception;
+use SUDHAUS7\Datavault\UnlockException;
+use SUDHAUS7\Datavault\WrongkeypassException;
 
+/**
+ * Class Decoder
+ * @package SUDHAUS7\Datavault\Tools
+ */
 class Decoder {
 	/**
 	 * @param $data
@@ -18,24 +23,22 @@ class Decoder {
 	 * @param null $password
 	 *
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws UnlockException
+	 * @throws WrongkeypassException
 	 */
 	public static function decode($data,$key,$password=null) {
-		if ($password) {
-			if (!$privkey = openssl_pkey_get_private($key,$password)){
-				throw new \Exception("Can not read Private Key (password given)");
-			}
-		} else {
-			if (!$privkey = openssl_pkey_get_private($key)){
-				throw new \Exception("Can not read Private Key");
-			}
-		}
+		$privkey = Keys::unlockKey( $key, $password);
 		list($method,$b64_iv,$b64_envkeys,$b64_secret) = explode(':',$data);
 		$keyhash = Keys::getChecksum( openssl_pkey_get_details($privkey)['key']);
 		$iv = base64_decode( $b64_iv);
 		$envkeys = json_decode( base64_decode( $b64_envkeys ),true);
 		$envkey = base64_decode( $envkeys[$keyhash]);
-		\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv);
+
+		if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
+			\openssl_free_key( $privkey );
+			throw new UnlockException('Data not unlockable');
+		}
+		\openssl_free_key( $privkey );
 		return $open;
 
 	}
