@@ -6,7 +6,7 @@
  * Time: 15:56
  */
 
-namespace SUDHAUS7\Datavault\Frontend;
+namespace SUDHAUS7\Datavault\Hooks\Frontend;
 
 use SUDHAUS7\Datavault\Tools\Keys;
 use SUDHAUS7\Datavault\Tools\Storage;
@@ -24,6 +24,7 @@ class Userchangepassword {
 	 * @param $params
 	 */
 	public function handle($params) {
+
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 		                            ->getConnectionForTable('fe_users');
@@ -31,8 +32,8 @@ class Userchangepassword {
 		$signature_old = Keys::getChecksum( $user['tx_datavault_publickey'] );
 		Storage::markForReencode( $signature_old );
 
-		$password                                      = $params['newPassword'];
-		$keypair                                       = Keys::createKey( $password );
+		$password = $params['newPassword'];
+		$keypair = Keys::createKey( $password );
 		$data = [];
 		$data['tx_datavault_publickey']  = $keypair['public'];
 		$data['tx_datavault_privatekey'] = $keypair['private'];

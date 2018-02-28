@@ -17,7 +17,7 @@ if (!defined('TYPO3_MODE')) die();
 ]);
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][$_EXTKEY]=\SUDHAUS7\Datavault\Hooks\Backend\FeLogin::class.'->handle';
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][$_EXTKEY] = \SUDHAUS7\Datavault\Frontend\Userchangepassword::class.'->handle';
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][$_EXTKEY] = \SUDHAUS7\Datavault\Hooks\Frontend\Userchangepassword::class.'->handle';
 
 
 /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
