@@ -10,7 +10,7 @@ namespace SUDHAUS7\Datavault\Tools;
 
 
 use SUDHAUS7\Datavault\UnlockException;
-use SUDHAUS7\Datavault\WrongkeypassException;
+use SUDHAUS7\Datavault\WrongKeyPassException;
 
 /**
  * Class Decoder
@@ -24,7 +24,7 @@ class Decoder {
 	 *
 	 * @return mixed
 	 * @throws UnlockException
-	 * @throws WrongkeypassException
+	 * @throws WrongKeyPassException
 	 */
 	public static function decode($data,$key,$password=null) {
 		$privkey = Keys::unlockKey( $key, $password);

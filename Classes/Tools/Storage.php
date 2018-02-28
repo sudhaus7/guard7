@@ -9,7 +9,7 @@
 namespace SUDHAUS7\Datavault\Tools;
 
 use SUDHAUS7\Datavault\UnlockException;
-use SUDHAUS7\Datavault\WrongkeypassException;
+use SUDHAUS7\Datavault\WrongKeyPassException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -120,7 +120,7 @@ class Storage {
 					try {
 						//$privateKey='xxx';
 						$data[ $fieldname ] = Decoder::decode( $row['secretdata'], $privateKey, $password );
-					} catch (WrongkeypassException $e) {
+					} catch (WrongKeyPassException $e) {
 
 					} catch (UnlockException $e) {
 						//$data[ $fieldname ] = '🔒';
@@ -208,7 +208,7 @@ class Storage {
 	 *
 	 * @return mixed|null
 	 * @throws UnlockException
-	 * @throws WrongkeypassException
+	 * @throws WrongKeyPassException
 	 */
 	public static function decodeFile($filepath,$privatekey,$password=null) {
 		$filepath = self::sanitizePath( $filepath);

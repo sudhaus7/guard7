@@ -9,11 +9,11 @@
 namespace SUDHAUS7\Datavault\Tools;
 
 
-use SUDHAUS7\Datavault\KeynotreadableException;
+use SUDHAUS7\Datavault\KeyNotReadableException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use SUDHAUS7\Datavault\WrongkeypassException;
+use SUDHAUS7\Datavault\WrongKeyPassException;
 
 class Keys {
 
@@ -109,11 +109,11 @@ class Keys {
 	 * @param $password
 	 *
 	 * @return mixed
-	 * @throws KeynotreadableException
+	 * @throws KeyNotReadableException
 	 */
 	public static function lockPrivatePemKey($key,$password) {
 		if (!$privkey = openssl_pkey_get_private($key)){
-			throw new KeynotreadableException("Can not read Private Key");
+			throw new KeyNotReadableException("Can not read Private Key");
 		}
 		$ret = self::lockPrivateKey( $privkey, $password);
 		\openssl_free_key( $privkey);
@@ -129,8 +129,8 @@ class Keys {
 	 * @param $password
 	 *
 	 * @return mixed
-	 * @throws KeynotreadableException
-	 * @throws WrongkeypassException
+	 * @throws KeyNotReadableException
+	 * @throws WrongKeyPassException
 	 */
 	public static function unlockKeyToPem($key,$password) {
 		$privkey = self::unlockKey( $key, $password);
@@ -145,17 +145,17 @@ class Keys {
 	 * @param $password
 	 *
 	 * @return bool|resource
-	 * @throws WrongkeypassException
-	 * @throws KeynotreadableException
+	 * @throws WrongKeyPassException
+	 * @throws KeyNotReadableException
 	 */
 	public static function unlockKey($key,$password) {
 		if ($password) {
 			if (!$privkey = openssl_pkey_get_private($key,$password)){
-				throw new WrongkeypassException("Can not read Private Key (password given)");
+				throw new WrongKeyPassException("Can not read Private Key (password given)");
 			}
 		} else {
 			if (!$privkey = openssl_pkey_get_private($key)){
-				throw new KeynotreadableException("Can not read Private Key");
+				throw new KeyNotReadableException("Can not read Private Key");
 			}
 		}
 		return $privkey;
