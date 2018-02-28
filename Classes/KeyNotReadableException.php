@@ -8,7 +8,10 @@
 
 namespace SUDHAUS7\Datavault;
 
-
+/**
+ * Class KeyNotReadableException
+ * @package SUDHAUS7\Datavault
+ */
 class KeyNotReadableException extends \Exception {
 
 }
