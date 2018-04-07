@@ -6,11 +6,11 @@
  * Time: 12:01
  */
 
-namespace SUDHAUS7\Datavault;
+namespace SUDHAUS7\Guard7;
 
 /**
  * Class KeyNotReadableException
- * @package SUDHAUS7\Datavault
+ * @package SUDHAUS7\Guard7
  */
 class KeyNotReadableException extends \Exception {
 

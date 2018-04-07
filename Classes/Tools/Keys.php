@@ -6,14 +6,14 @@
  * Time: 15:22
  */
 
-namespace SUDHAUS7\Datavault\Tools;
+namespace SUDHAUS7\Guard7\Tools;
 
 
-use SUDHAUS7\Datavault\KeyNotReadableException;
+use SUDHAUS7\Guard7\KeyNotReadableException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use SUDHAUS7\Datavault\WrongKeyPassException;
+use SUDHAUS7\Guard7\WrongKeyPassException;
 
 class Keys {
 
@@ -39,7 +39,7 @@ class Keys {
 		// Signal Name for example: collectPublicKeys_fe_users
 		list($keysFromSignalslot) = $signalSlotDispatcher->dispatch( __CLASS__, __FUNCTION__.'_'.$table,[$keysFromSignalslot,$uid,$pid]);
 
-		$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
+		$confArr = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'] );
 		$pubKeys = [];
 		if (!empty($keysFromSignalslot)) {
 			foreach ($keysFromSignalslot as $key) {
@@ -57,15 +57,15 @@ class Keys {
 		}
 		if ($pid > 0) {
 			$ts = BackendUtility::getPagesTSconfig( $pid );
-			if (isset($ts['tx_sudhaus7datavault.'])) {
-				if (isset($ts['tx_sudhaus7datavault.']['generalPublicKeys.']) && !empty($ts['tx_sudhaus7datavault.']['generalPublicKeys.'])) {
-					foreach ($ts['tx_sudhaus7datavault.']['generalPublicKeys.'] as $key) {
+			if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
+				if ( isset( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) && ! empty( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) ) {
+					foreach ( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] as $key ) {
 						$pubKeys[ self::getChecksum( $key )] = $key;
 					}
 				}
 				if ($table) {
-					if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] ) ) {
-						foreach ($ts['tx_sudhaus7datavault.'][ $table . '.' ]['publicKeys.'] as $key) {
+					if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) ) {
+						foreach ( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] as $key ) {
 							$pubKeys[ self::getChecksum( $key )] = $key;
 						}
 					}
@@ -73,8 +73,8 @@ class Keys {
 			}
 		}
 		if($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
-			if (isset($GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey']) && !empty($GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'])) {
-				$pubKeys[ self::getChecksum( $GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'] )] = $GLOBALS['TSFE']->fe_user->user['tx_datavault_publickey'];
+			if ( isset( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) && ! empty( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) ) {
+				$pubKeys[ self::getChecksum( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) ] = $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'];
 			}
 		}
 		return $pubKeys;

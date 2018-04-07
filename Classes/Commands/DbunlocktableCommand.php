@@ -6,9 +6,10 @@
  * Time: 16:28
  */
 
-namespace SUDHAUS7\Datavault\Commands;
-use SUDHAUS7\Datavault\Tools\Keys;
-use SUDHAUS7\Datavault\Tools\Storage;
+namespace SUDHAUS7\Guard7\Commands;
+
+use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7\Tools\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,32 +25,32 @@ class DbunlocktableCommand extends Command {
 
 	public function configure() {
 		$this->setDescription( 'Lock all Datafields for a table and pid')
-			->setHelp('call it like this typo3/sysext/core/bin/typo3 datavault:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem')
-			->addOption(
+		     ->setHelp( 'call it like this typo3/sysext/core/bin/typo3 guard7:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem' )
+		     ->addOption(
 				'pid',
 				'pid',
 				InputOption::VALUE_REQUIRED,
 				'UID of a Folder'
 			)
-			->addOption(
+		     ->addOption(
 				'table',
 				't',
 				InputOption::VALUE_REQUIRED,
 				'Table to lock'
 			)
-			->addOption(
+		     ->addOption(
 				'keyfile',
 				'keyfile',
 				InputOption::VALUE_REQUIRED,
 				'File with a Masterkey (PEM)'
 			)
-			->addOption(
+		     ->addOption(
 				'password',
 				'p',
 				InputOption::VALUE_OPTIONAL,
 				'Password for masterkey'
 			)
-			->addOption(
+		     ->addOption(
 				'includeFiles',
 				'includeFiles',
 				InputOption::VALUE_NONE,
@@ -78,12 +79,13 @@ class DbunlocktableCommand extends Command {
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 		                            ->getConnectionForTable($table);
 		$ts = BackendUtility::getPagesTSconfig($pid);
-		if (isset($ts['tx_sudhaus7datavault.'])) {
-			if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) ) {
+		if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
+			if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] ) ) {
 				$res  = $connection->select( [ '*' ], $table, [ 'pid' => $pid ] );
 				while($row = $res->fetch(\PDO::FETCH_ASSOC)) {
-					$fieldArray = [];
-					$vaultfields = GeneralUtility::trimExplode( ',',	$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] );
+					$fieldArray  = [];
+					$vaultfields = GeneralUtility::trimExplode( ',',
+						$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] );
 					foreach($vaultfields as $f) {
 						$fieldArray[$f]=$row[$f];
 					}

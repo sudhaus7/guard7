@@ -6,7 +6,7 @@
  * Time: 16:39
  */
 
-namespace SUDHAUS7\Datavault\Hooks\Backend;
+namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -34,9 +34,10 @@ class SignalHandler {
 			/** @var Connection $connection */
 			$connection = GeneralUtility::makeInstance(ConnectionPool::class)
 			                            ->getConnectionForTable('fe_users');
-			$row = $connection->select( ['tx_datavault_publickey'], 'fe_users',['uid'=>$uid])->fetch(\PDO::FETCH_ASSOC);
-			if ($row && !empty($row['tx_datavault_publickey'])) {
-				$keys[]=$row['tx_datavault_publickey'];
+			$row        = $connection->select( [ 'tx_guard7_publickey' ], 'fe_users', [ 'uid' => $uid ] )
+			                         ->fetch( \PDO::FETCH_ASSOC );
+			if ( $row && ! empty( $row['tx_guard7_publickey'] ) ) {
+				$keys[] = $row['tx_guard7_publickey'];
 			}
 		}
 		return [$keys,$uid,$pid];

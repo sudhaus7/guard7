@@ -6,7 +6,7 @@
  * Time: 17:59
  */
 
-namespace SUDHAUS7\Datavault\Domain\Model;
+namespace SUDHAUS7\Guard7\Domain\Model;
 
 
 class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {

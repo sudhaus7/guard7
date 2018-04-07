@@ -6,10 +6,10 @@
  * Time: 15:58
  */
 
-namespace SUDHAUS7\Datavault\Tools;
+namespace SUDHAUS7\Guard7\Tools;
 
-use SUDHAUS7\Datavault\UnlockException;
-use SUDHAUS7\Datavault\WrongKeyPassException;
+use SUDHAUS7\Guard7\UnlockException;
+use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -20,23 +20,24 @@ class Storage {
 	public static function markForReencode($signature) {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
-		$res = $connection->select( ['parent'], 'tx_sudhaus7datavault_signatures',['signature'=>$signature]);
+		                            ->getConnectionForTable( 'tx_guard7_signatures' );
+		$res        = $connection->select( [ 'parent' ], 'tx_guard7_signatures', [ 'signature' => $signature ] );
 		$list = $res->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($list as $row) {
-			$connection->update( 'tx_datavault_domain_model_data', ['needsreencode'=>1], ['uid'=>$row['parent']]);
+			$connection->update( 'tx_guard7_domain_model_data', [ 'needsreencode' => 1 ], [ 'uid' => $row['parent'] ] );
 		}
 
 	}
 
-	public static function updateKeyLog($tx_datavault_domain_model_data_uid,$pubkeys) {
+	public static function updateKeyLog( $tx_guard7_domain_model_data_uid, $pubkeys ) {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('tx_sudhaus7datavault_signatures');
+		                            ->getConnectionForTable( 'tx_guard7_signatures' );
 
-		$connection->delete('tx_sudhaus7datavault_signatures',['parent'=>$tx_datavault_domain_model_data_uid]);
+		$connection->delete( 'tx_guard7_signatures', [ 'parent' => $tx_guard7_domain_model_data_uid ] );
 		foreach($pubkeys as $checksum=>$key) {
-			$connection->insert('tx_sudhaus7datavault_signatures',['parent'=>$tx_datavault_domain_model_data_uid,'signature'=>$checksum]);
+			$connection->insert( 'tx_guard7_signatures',
+				[ 'parent' => $tx_guard7_domain_model_data_uid, 'signature' => $checksum ] );
 		}
 	}
 
@@ -52,7 +53,7 @@ class Storage {
 	public static function lockRecord($table,$uid,$fields,$data,$pubKeys) {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('tx_datavault_domain_model_data');
+		                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 		foreach ($data as $fieldname=>$value) {
 			if ( in_array( $fieldname, $fields ) ) {
 				$data[$fieldname] = '&#128274;';
@@ -63,8 +64,14 @@ class Storage {
 				$encoder = new Encoder( $value, $pubKeys);
 				$encoded = $encoder->run();
 				unset($encoder);
-				$connection->delete( 'tx_datavault_domain_model_data', ['tablename'=>$table,'tableuid'=>$uid,'fieldname'=>$fieldname]);
-				$connection->insert( 'tx_datavault_domain_model_data', ['tablename'=>$table,'tableuid'=>$uid,'fieldname'=>$fieldname,'secretdata'=>$encoded]);
+				$connection->delete( 'tx_guard7_domain_model_data',
+					[ 'tablename' => $table, 'tableuid' => $uid, 'fieldname' => $fieldname ] );
+				$connection->insert( 'tx_guard7_domain_model_data', [
+					'tablename'  => $table,
+					'tableuid'   => $uid,
+					'fieldname'  => $fieldname,
+					'secretdata' => $encoded,
+				] );
 				$insertid = $connection->lastInsertId();
 				self::updateKeyLog( $insertid, $pubKeys);
 
@@ -81,8 +88,9 @@ class Storage {
 		$uid = $obj->getUid();
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('tx_datavault_domain_model_data');
-		$res = $connection->select( ['*'], 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid]);
+		                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
+		$res        = $connection->select( [ '*' ], 'tx_guard7_domain_model_data',
+			[ 'tablename' => $table, 'tableuid' => $uid ] );
 		while ($row = $res->fetch(\PDO::FETCH_ASSOC)) {
 			$setter = 'set'.GeneralUtility::underscoredToUpperCamelCase( $row['fieldname']);
 			$getter = 'get'.GeneralUtility::underscoredToUpperCamelCase( $row['fieldname']);
@@ -112,10 +120,12 @@ class Storage {
 
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('tx_datavault_domain_model_data');
+		                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 		foreach ($data as $fieldname=>$value) {
 			if ($value == '&#128274;' || $value == '🔒') {
-				$row = $connection->select( ['secretdata'], 'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $uid, 'fieldname'=>$fieldname],[],[],0,1 )->fetch(\PDO::FETCH_ASSOC);
+				$row = $connection->select( [ 'secretdata' ], 'tx_guard7_domain_model_data',
+					[ 'tablename' => $table, 'tableuid' => $uid, 'fieldname' => $fieldname ], [], [], 0, 1 )
+				                  ->fetch( \PDO::FETCH_ASSOC );
 				if ($row && $row['secretdata']) {
 					try {
 						//$privateKey='xxx';

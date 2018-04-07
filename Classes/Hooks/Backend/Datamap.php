@@ -6,13 +6,13 @@
  * Time: 14:38
  */
 
-namespace SUDHAUS7\Datavault\Hooks\Backend;
+namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 
-use SUDHAUS7\Datavault\Tools\Keys;
-use SUDHAUS7\Datavault\Tools\Storage;
+use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7\Tools\Storage;
 
-use SUDHAUS7\Datavault\Tools\Encoder;
+use SUDHAUS7\Guard7\Tools\Encoder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -40,10 +40,15 @@ class Datamap implements SingletonInterface {
 				$newid = $pObj->substNEWwithIDs[$id];
 				/** @var Connection $connection */
 				$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-				                            ->getConnectionForTable('tx_datavault_domain_model_data');
+				                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 				foreach ($this->insertCache[$table][$id] as $data) {
 
-					$connection->insert( 'tx_datavault_domain_model_data', ['tablename'=>$table,'tableuid'=>$newid,'fieldname'=>$data['fieldname'],'secretdata'=>$data['encoded']]);
+					$connection->insert( 'tx_guard7_domain_model_data', [
+						'tablename'  => $table,
+						'tableuid'   => $newid,
+						'fieldname'  => $data['fieldname'],
+						'secretdata' => $data['encoded'],
+					] );
 					$insertid = $connection->lastInsertId();
 					Storage::updateKeyLog( $insertid, $data['pubkeys']);
 
@@ -62,21 +67,21 @@ class Datamap implements SingletonInterface {
 
 		if ($table=='fe_users') {
 			if (strpos($id,'NEW') !== false) {
-				$password                                      = $incomingFieldArray['password'];
-				$keypair                                       = Keys::createKey( $password );
-				$incomingFieldArray['tx_datavault_publickey']  = $keypair['public'];
-				$incomingFieldArray['tx_datavault_privatekey'] = $keypair['private'];
+				$password                                   = $incomingFieldArray['password'];
+				$keypair                                    = Keys::createKey( $password );
+				$incomingFieldArray['tx_guard7_publickey']  = $keypair['public'];
+				$incomingFieldArray['tx_guard7_privatekey'] = $keypair['private'];
 			} else if (strpos($incomingFieldArray['password'],'rsa:')===false) {
 				$tmprec = BackendUtility::getRecord( 'fe_users', $id);
 				if ($tmprec['password'] != $incomingFieldArray['password']) {
 
-					$signature_old = Keys::getChecksum( $tmprec['tx_datavault_publickey'] );
+					$signature_old = Keys::getChecksum( $tmprec['tx_guard7_publickey'] );
 					Storage::markForReencode( $signature_old);
 
-					$password                                      = $incomingFieldArray['password'];
-					$keypair                                       = Keys::createKey( $password );
-					$incomingFieldArray['tx_datavault_publickey']  = $keypair['public'];
-					$incomingFieldArray['tx_datavault_privatekey'] = $keypair['private'];
+					$password                                   = $incomingFieldArray['password'];
+					$keypair                                    = Keys::createKey( $password );
+					$incomingFieldArray['tx_guard7_publickey']  = $keypair['public'];
+					$incomingFieldArray['tx_guard7_privatekey'] = $keypair['private'];
 				}
 			}
 		}
@@ -98,13 +103,13 @@ class Datamap implements SingletonInterface {
 		if ($status == 'new') {
 		//	$pObj->substNEWwithIDs
 			$ts = BackendUtility::getPagesTSconfig( $fieldArray['pid']);
-			if (isset($ts['tx_sudhaus7datavault.'])) {
-				if ( isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] ) ) {
+			if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
+				if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] ) ) {
 
 
 					$extraPubkeys = [];
-					if ($table == 'fe_users' && !empty($fieldArray['tx_datavault_publickey'])) {
-						$extraPubkeys[] = $fieldArray['tx_datavault_publickey'];
+					if ( $table == 'fe_users' && ! empty( $fieldArray['tx_guard7_publickey'] ) ) {
+						$extraPubkeys[] = $fieldArray['tx_guard7_publickey'];
 					}
 
 
@@ -114,7 +119,7 @@ class Datamap implements SingletonInterface {
 					$this->insertCache[$table][$id] = [];
 
 					$vaultfields = GeneralUtility::trimExplode( ',',
-						$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] );
+						$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] );
 					foreach ($fieldArray as $fieldname=>$value) {
 						if ( in_array( $fieldname, $vaultfields ) ) {
 							if (strlen($value) > 0) {
@@ -134,11 +139,12 @@ class Datamap implements SingletonInterface {
 		if ($status == 'update') {
 			$pid =  $pObj->getPID( $table, $id);
 			$ts = BackendUtility::getPagesTSconfig($pid);
-			if (isset($ts['tx_sudhaus7datavault.'])) {
-				if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])) {
-					$pubkeys = Keys::collectPublicKeys($table, $id, $pid,false);
-					$vaultfields = GeneralUtility::trimExplode( ',', $ts['tx_sudhaus7datavault.'][$table.'.']['fields']);
-					$fieldArray = Storage::lockRecord( $table, $id, $vaultfields, $fieldArray, $pubkeys);
+			if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
+				if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] ) ) {
+					$pubkeys     = Keys::collectPublicKeys($table, $id, $pid,false);
+					$vaultfields = GeneralUtility::trimExplode( ',',
+						$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] );
+					$fieldArray  = Storage::lockRecord( $table, $id, $vaultfields, $fieldArray, $pubkeys);
 				}
 			}
 		}

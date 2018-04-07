@@ -6,13 +6,13 @@
  * Time: 16:48
  */
 
-namespace SUDHAUS7\Datavault\Services;
+namespace SUDHAUS7\Guard7\Services;
 
 
-class Datavault extends \TYPO3\CMS\Sv\AuthenticationService {
+class Guard7 extends \TYPO3\CMS\Sv\AuthenticationService {
 
 	public function processLoginData(array &$loginData, $passwordTransmissionStrategy) {
-		$GLOBALS['datavault_temp_pass'] = $loginData['uident_text'];
+		$GLOBALS['guard7_temp_pass'] = $loginData['uident_text'];
 	}
 
 	public function init() {

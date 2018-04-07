@@ -1,14 +1,13 @@
-define(['jquery','TYPO3/CMS/Datavault/DatavaultTools'], function($,DatavaultTools) {
+define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
     var unlockData = function () {
-        if (DatavaultTools.hasPrivateKey()) {
-            if (sudhaus7datavaulttables && sudhaus7datavaulttables.length > 0) {
+        if (Guard7Tools.hasPrivateKey()) {
+            if (sudhaus7guard7tables && sudhaus7guard7tables.length > 0) {
 
-                var ajaxUrl = TYPO3.settings.ajaxUrls['DatavaultBackend::getListData'];
+                var ajaxUrl = TYPO3.settings.ajaxUrls['Guard7Backend::getListData'];
 
 
-
-                sudhaus7datavaulttables.forEach(function (tablename) {
+                sudhaus7guard7tables.forEach(function (tablename) {
 
                     var uids=[];
                     $('table[data-table="' + tablename + '"] tr[data-uid]').each(function(i,tr) {
@@ -17,10 +16,10 @@ define(['jquery','TYPO3/CMS/Datavault/DatavaultTools'], function($,DatavaultTool
                         }
                     });
                     if (uids.length > 0) {
-                        $.getJSON(ajaxUrl, {'table': tablename,'uids':uids}, function (sudhaus7datavaultdata) {
-                            var privkey = DatavaultTools.getPrivateKey();
-                            sudhaus7datavaultdata.forEach(function (e) {
-                                DatavaultTools.decode(privkey, e, function (data) {
+                        $.getJSON(ajaxUrl, {'table': tablename, 'uids': uids}, function (sudhaus7guard7data) {
+                            var privkey = Guard7Tools.getPrivateKey();
+                            sudhaus7guard7data.forEach(function (e) {
+                                Guard7Tools.decode(privkey, e, function (data) {
                                     $('table[data-table="' + e.tablename + '"] tr[data-uid="' + e.tableuid + '"] td.col-title span').attr('title', data).text(data);
                                 });
                             });
@@ -35,21 +34,21 @@ define(['jquery','TYPO3/CMS/Datavault/DatavaultTools'], function($,DatavaultTool
     };
 
     var lockData = function () {
-        sudhaus7datavaulttables.forEach(function(e) {
+        sudhaus7guard7tables.forEach(function (e) {
             $('table[data-table="'+e+'"] tr[data-uid] td.col-title span').attr('title',"🔒").text("🔒");
         });
     };
 
-    if (sudhaus7datavaulttables) {
-        if (DatavaultTools.hasPrivateKey()) {
+    if (sudhaus7guard7tables) {
+        if (Guard7Tools.hasPrivateKey()) {
             unlockData();
         }
     }
 
-    top.TYPO3.jQuery('body').on('sudhaus7-datavault-privkey-activated',function() {
+    top.TYPO3.jQuery('body').on('sudhaus7-guard7-privkey-activated', function () {
         unlockData();
     });
-    top.TYPO3.jQuery('body').on('sudhaus7-datavault-privkey-removed',function() {
+    top.TYPO3.jQuery('body').on('sudhaus7-guard7-privkey-removed', function () {
         lockData();
     });
 

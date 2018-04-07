@@ -2,31 +2,31 @@
 
 call_user_func(
 	function () {
-		//$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
+		//$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
 
 
-		$languageFilePrefix = 'LLL:EXT:datavault/Resources/Private/Language/locallang.xlf:';
+		$languageFilePrefix = 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:';
 		$tempColumns = [
-			'tx_datavault_publickey'=>[
+			'tx_guard7_publickey'  => [
 
-				'exclude'=>0,
-				'label'=>$languageFilePrefix.'fe_users.tx_datavault_publickey',
-				'config'=>[
+				'exclude' =>0,
+				'label'   => $languageFilePrefix . 'fe_users.tx_guard7_publickey',
+				'config'  =>[
 					'type'=>'text',
 				],
 			],
-			'tx_datavault_privatekey'=>[
+			'tx_guard7_privatekey' => [
 
-				'exclude'=>0,
-				'label'=>$languageFilePrefix.'fe_users.tx_datavault_privatekey',
-				'config'=>[
+				'exclude' =>0,
+				'label'   => $languageFilePrefix . 'fe_users.tx_guard7_privatekey',
+				'config'  =>[
 					'type'=>'text',
 				],
 			],
 
 		];
 		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns("fe_users",$tempColumns);
-		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('fe_users','tx_datavault_publickey');
-		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('fe_users','tx_datavault_privatekey');
+		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes( 'fe_users', 'tx_guard7_publickey' );
+		\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes( 'fe_users', 'tx_guard7_privatekey' );
 	}
 );

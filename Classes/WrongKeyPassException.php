@@ -6,13 +6,13 @@
  * Time: 10:00
  */
 
-namespace SUDHAUS7\Datavault;
+namespace SUDHAUS7\Guard7;
 
 
 /**
  * Class WrongkeypassException
  * thrown when the password to a locked private key does not match
- * @package SUDHAUS7\Datavault
+ * @package SUDHAUS7\Guard7
  */
 class WrongKeyPassException extends \Exception {
 

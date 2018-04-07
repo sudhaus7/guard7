@@ -6,8 +6,9 @@
  * Time: 13:34
  */
 
-namespace SUDHAUS7\Datavault\Controller;
-use SUDHAUS7\Datavault\Domain\Repository\DataRepository;
+namespace SUDHAUS7\Guard7\Controller;
+
+use SUDHAUS7\Guard7\Domain\Repository\DataRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
@@ -30,7 +31,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	/**
 	 * @var string
 	 */
-	protected $moduleName = 'system_Sudhaus7DatavaultModule';
+	protected $moduleName = 'system_Sudhaus7Guard7Module';
 
 	/**
 	 * BackendTemplateContainer
@@ -40,7 +41,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 	protected $view;
 
 	/**
-	 * @var \SUDHAUS7\Datavault\Domain\Repository\DataRepository
+	 * @var \SUDHAUS7\Guard7\Domain\Repository\DataRepository
 	 * @inject
 	 */
 	protected $dataRepository;
@@ -61,17 +62,21 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 
 
 		$buttonBar->addButton( $buttonBar->makeLinkButton()
-			->setHref( $this->uriBuilder->uriFor('createkey'))
-			->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey'))
-			->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
-			->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.createkey')),
+		                                 ->setHref( $this->uriBuilder->uriFor('createkey'))
+		                                 ->setShowLabelText( $this->getLanguageService()
+		                                                          ->sL( 'LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey' ) )
+		                                 ->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
+		                                 ->setTitle( $this->getLanguageService()
+		                                                  ->sL( 'LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey' ) ),
 			ButtonBar::BUTTON_POSITION_LEFT);
 
 		$buttonBar->addButton( $buttonBar->makeLinkButton()
 		                                 ->setHref( $this->uriBuilder->uriFor('listrencode'))
-		                                 ->setShowLabelText( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.listrencode'))
+		                                 ->setShowLabelText( $this->getLanguageService()
+		                                                          ->sL( 'LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode' ) )
 		                                 ->setIcon( $iconFactory->getIcon('key', Icon::SIZE_SMALL))
-		                                 ->setTitle( $this->getLanguageService()->sL( 'LLL:EXT:datavault/Resources/Private/Language/locallang.xml:module.action.listrencode')),
+		                                 ->setTitle( $this->getLanguageService()
+		                                                  ->sL( 'LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode' ) ),
 			ButtonBar::BUTTON_POSITION_LEFT);
 
 
@@ -118,11 +123,11 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
 		$a = 1;
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-		                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
+		                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 
 		$query = $connection->createQueryBuilder();
 		$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
-		      ->from( 'tx_datavault_domain_model_data');
+		      ->from( 'tx_guard7_domain_model_data' );
 
 		$fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
 		$fields.= ','. $GLOBALS['TCA'][$table]['ctrl']['label_alt'];

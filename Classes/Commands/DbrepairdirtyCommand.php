@@ -6,7 +6,7 @@
  * Time: 16:54
  */
 
-namespace SUDHAUS7\Datavault\Commands;
+namespace SUDHAUS7\Guard7\Commands;
 
 
 class DbrepairdirtyCommand {

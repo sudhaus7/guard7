@@ -6,15 +6,15 @@
  * Time: 15:29
  */
 
-namespace SUDHAUS7\Datavault\Tools;
+namespace SUDHAUS7\Guard7\Tools;
 
 
-use SUDHAUS7\Datavault\UnlockException;
-use SUDHAUS7\Datavault\WrongKeyPassException;
+use SUDHAUS7\Guard7\UnlockException;
+use SUDHAUS7\Guard7\WrongKeyPassException;
 
 /**
  * Class Decoder
- * @package SUDHAUS7\Datavault\Tools
+ * @package SUDHAUS7\Guard7\Tools
  */
 class Decoder {
 	/**

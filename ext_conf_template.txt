@@ -1,6 +1,5 @@
-
-# cat=basic//01; type=user[SUDHAUS7\Datavault\Hooks\Backend\ExttemplateMethods->render]; label=Default encoding algorithm  - check openssl_get_cipher_methods()
+# cat=basic//01; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateMethods->render]; label=Default encoding algorithm  - check openssl_get_cipher_methods()
 defaultmethod = RC4
 
-# cat=basic//02; type=user[SUDHAUS7\Datavault\Hooks\Backend\ExttemplateTextarea->render]; label=The Public part of a Master key
+# cat=basic//02; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateTextarea->render]; label=The Public part of a Master key
 masterkeypublic =

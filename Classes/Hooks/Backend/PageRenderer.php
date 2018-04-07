@@ -6,7 +6,7 @@
  * Time: 16:25
  */
 
-namespace SUDHAUS7\Datavault\Hooks\Backend;
+namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 
 use SUDHAUS7\Sudhaus7Base\Tools\Globals;
@@ -69,17 +69,17 @@ class PageRenderer  {
 		$controller =  $GLOBALS['SOBE'];
 
 		$ts = BackendUtility::getPagesTSconfig( $controller->id );
-		if ( isset( $ts['tx_sudhaus7datavault.'] ) && is_array($ts['tx_sudhaus7datavault.']) && !empty($ts['tx_sudhaus7datavault.'])) {
+		if ( isset( $ts['tx_sudhaus7guard7.'] ) && is_array( $ts['tx_sudhaus7guard7.'] ) && ! empty( $ts['tx_sudhaus7guard7.'] ) ) {
 			$data = [];
-			$tmp = array_keys($ts['tx_sudhaus7datavault.']);
+			$tmp  = array_keys( $ts['tx_sudhaus7guard7.'] );
 			foreach ($tmp as $t) {
 				$data[]=trim($t,'.');
 			}
 
 			if (!empty($data)) {
-				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/List' );
+				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/List' );
 				$pageRenderer->addJsInlineCode( __METHOD__,
-					'var sudhaus7datavaulttables = ' . json_encode( $data ) . ';' );
+					'var sudhaus7guard7tables = ' . json_encode( $data ) . ';' );
 			}
 		}
 
@@ -91,9 +91,9 @@ class PageRenderer  {
 		$controller =  $GLOBALS['SOBE'];
 
 		$ts = BackendUtility::getPagesTSconfig( $controller->id );
-		if ( isset( $ts['tx_sudhaus7datavault.'] ) && is_array($ts['tx_sudhaus7datavault.']) && !empty($ts['tx_sudhaus7datavault.'])) {
+		if ( isset( $ts['tx_sudhaus7guard7.'] ) && is_array( $ts['tx_sudhaus7guard7.'] ) && ! empty( $ts['tx_sudhaus7guard7.'] ) ) {
 			$data = [];
-			foreach($ts['tx_sudhaus7datavault.'] as $table=>$config) {
+			foreach ( $ts['tx_sudhaus7guard7.'] as $table => $config ) {
 				$table = trim($table,'.');
 				/** @var Connection $connection */
 				$connection = GeneralUtility::makeInstance( ConnectionPool::class )
@@ -111,10 +111,10 @@ class PageRenderer  {
 					$fields = "'".str_replace(',',"','",$fields)."'";
 
 					$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-					                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
+					                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 					$query = $connection->createQueryBuilder();
 					$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
-					      ->from( 'tx_datavault_domain_model_data');
+					      ->from( 'tx_guard7_domain_model_data' );
 
 
 
@@ -129,9 +129,9 @@ class PageRenderer  {
 
 			}
 			if (!empty($data)) {
-				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/List' );
+				$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/List' );
 				$pageRenderer->addJsInlineCode( __METHOD__,
-					'var sudhaus7datavaultdata = ' . json_encode( $data ) . ';' );
+					'var sudhaus7guard7data = ' . json_encode( $data ) . ';' );
 			}
 		}
 
@@ -152,21 +152,21 @@ class PageRenderer  {
 					$rec    = BackendUtility::getRecord( $table, $id, 'uid,pid' );
 
 					$ts = BackendUtility::getPagesTSconfig( $rec['pid'] );
-					if ( isset( $ts['tx_sudhaus7datavault.'] ) && isset( $ts['tx_sudhaus7datavault.'][ $table . '.' ] ) ) {
+					if ( isset( $ts['tx_sudhaus7guard7.'] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) ) {
 
 
 						$fields = GeneralUtility::trimExplode( ',',
-							$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'], true );
+							$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'], true );
 						/** @var Connection $connection */
 						$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-						                            ->getConnectionForTable( 'tx_datavault_domain_model_data' );
+						                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
 
 						$result = $connection->select( [ 'tablename', 'tableuid', 'fieldname', 'secretdata' ],
-							'tx_datavault_domain_model_data', [ 'tablename' => $table, 'tableuid' => $id ] );
+							'tx_guard7_domain_model_data', [ 'tablename' => $table, 'tableuid' => $id ] );
 						$data   = $result->fetchAll();
-						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Datavault/Main' );
+						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/Main' );
 						$pageRenderer->addJsInlineCode( __METHOD__,
-							'var sudhaus7datavaultdata = ' . json_encode( $data ) . ';' );
+							'var sudhaus7guard7data = ' . json_encode( $data ) . ';' );
 
 					}
 				}

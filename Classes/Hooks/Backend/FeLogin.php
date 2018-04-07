@@ -6,12 +6,12 @@
  * Time: 17:07
  */
 
-namespace SUDHAUS7\Datavault\Hooks\Backend;
+namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 
-use SUDHAUS7\Datavault\KeyNotReadableException;
-use SUDHAUS7\Datavault\Tools\Keys;
-use SUDHAUS7\Datavault\WrongKeyPassException;
+use SUDHAUS7\Guard7\KeyNotReadableException;
+use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class FeLogin {
@@ -22,15 +22,15 @@ class FeLogin {
 		/** @var TypoScriptFrontendController $pObj */
 		$pObj = $ar['pObj'];
 
-		if (isset($GLOBALS['datavault_temp_pass'])) {
+		if ( isset( $GLOBALS['guard7_temp_pass'] ) ) {
 
-			if (!empty($pObj->fe_user->user['tx_datavault_privatekey'])) {
+			if ( ! empty( $pObj->fe_user->user['tx_guard7_privatekey'] ) ) {
 				try {
-					$privkey = Keys::unlockKeyToPem( $pObj->fe_user->user['tx_datavault_privatekey'],
-						$GLOBALS['datavault_temp_pass'] );
-					$GLOBALS['TSFE']->fe_user->setKey('user','tx_datavault_privatekey',$privkey);
-					$GLOBALS['TSFE']->fe_user->storeSessionData('datavault');
-					//$pObj->fe_user->setAndSaveSessionData( 'tx_datavault_privatekey', $privkey);
+					$privkey = Keys::unlockKeyToPem( $pObj->fe_user->user['tx_guard7_privatekey'],
+						$GLOBALS['guard7_temp_pass'] );
+					$GLOBALS['TSFE']->fe_user->setKey( 'user', 'tx_guard7_privatekey', $privkey );
+					$GLOBALS['TSFE']->fe_user->storeSessionData( 'guard7' );
+					//$pObj->fe_user->setAndSaveSessionData( 'tx_guard7_privatekey', $privkey);
 				} catch(WrongKeyPassException $e) {
 
 				} catch (KeyNotReadableException $e) {
@@ -38,7 +38,7 @@ class FeLogin {
 				}
 
 			}
-			unset($GLOBALS['datavault_temp_pass']);
+			unset( $GLOBALS['guard7_temp_pass'] );
 
 		}
 

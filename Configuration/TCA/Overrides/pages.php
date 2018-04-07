@@ -4,8 +4,8 @@ if (!defined('TYPO3_MODE')) die();
 
 call_user_func(function () {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerPageTSConfigFile(
-        'datavault',
+	    'guard7',
         'Configuration/PageTSconfig/page.ts',
-        'Seitendefinitionen Datavault'
+	    'Seitendefinitionen Guard7'
     );
 });

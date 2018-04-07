@@ -6,9 +6,10 @@
  * Time: 16:28
  */
 
-namespace SUDHAUS7\Datavault\Commands;
-use SUDHAUS7\Datavault\Tools\Keys;
-use SUDHAUS7\Datavault\Tools\Storage;
+namespace SUDHAUS7\Guard7\Commands;
+
+use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7\Tools\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,20 +24,20 @@ class DblocktableCommand extends Command {
 
 	public function configure() {
 		$this->setDescription( 'Lock all Datafields for a table and pid')
-		->setHelp('call it like this typo3/sysext/core/bin/typo3 datavault:db:lock --pid=123 --table=fe_users')
-		->addOption(
+		     ->setHelp( 'call it like this typo3/sysext/core/bin/typo3 guard7:db:lock --pid=123 --table=fe_users' )
+		     ->addOption(
 			'pid',
 			'pid',
 			InputOption::VALUE_REQUIRED,
 			'UID of a Folder'
 		)
-		->addOption(
+		     ->addOption(
 			'table',
 			't',
 			InputOption::VALUE_REQUIRED,
 			'Table to lock'
 		)
-		->addOption(
+		     ->addOption(
 			'includeFiles',
 			'includeFiles',
 			InputOption::VALUE_NONE,
@@ -78,15 +79,16 @@ class DblocktableCommand extends Command {
 
 
 		$ts = BackendUtility::getPagesTSconfig($pid);
-		if (isset($ts['tx_sudhaus7datavault.'])) {
-			if (isset($ts['tx_sudhaus7datavault.'][$table.'.']) && isset($ts['tx_sudhaus7datavault.'][$table.'.']['fields'])) {
+		if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
+			if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] ) ) {
 				$res = $connection->select(['*'],$table,['pid'=>$pid]);
 
 				while($row = $res->fetch(\PDO::FETCH_ASSOC)) {
 					$pubkeys     = Keys::collectPublicKeys( $table, $row['uid'], $pid, false );
 
-					$fieldArray = [];
-					$vaultfields = GeneralUtility::trimExplode( ',',	$ts['tx_sudhaus7datavault.'][ $table . '.' ]['fields'] );
+					$fieldArray  = [];
+					$vaultfields = GeneralUtility::trimExplode( ',',
+						$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'] );
 					foreach($vaultfields as $f) {
 						$fieldArray[$f]=$row[$f];
 					}

@@ -6,10 +6,10 @@
         </header>
         <body>
 
-            <trans-unit id="fe_users.tx_datavault_publickey" xml:space="preserve">
+            <trans-unit id="fe_users.tx_guard7_publickey" xml:space="preserve">
 				<source>Public Key</source>
 			</trans-unit>
-            <trans-unit id="fe_users.tx_datavault_privatekey" xml:space="preserve">
+            <trans-unit id="fe_users.tx_guard7_privatekey" xml:space="preserve">
 				<source>Private Key</source>
 			</trans-unit>
             <trans-unit id="module.action.createkey" xml:space="preserve">

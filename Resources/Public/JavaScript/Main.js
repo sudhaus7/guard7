@@ -1,13 +1,13 @@
-define(['jquery','TYPO3/CMS/Datavault/DatavaultTools'], function($,DatavaultTools) {
+define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
 
 
     var unlockData = function () {
-        if(DatavaultTools.hasPrivateKey()) {
-            var privkey = DatavaultTools.getPrivateKey();
-            sudhaus7datavaultdata.forEach(function (e) {
+        if (Guard7Tools.hasPrivateKey()) {
+            var privkey = Guard7Tools.getPrivateKey();
+            sudhaus7guard7data.forEach(function (e) {
                 console.log('tick', e.fieldname);
-                DatavaultTools.decode(privkey, e, function (data) {
+                Guard7Tools.decode(privkey, e, function (data) {
 
                     var name = 'data[' + e.tablename + '][' + e.tableuid + '][' + e.fieldname + ']';
                     //  console.log(name,data,e,privkey);
@@ -20,31 +20,31 @@ define(['jquery','TYPO3/CMS/Datavault/DatavaultTools'], function($,DatavaultTool
     };
 
     var lockData = function () {
-        sudhaus7datavaultdata.forEach(function(e) {
+        sudhaus7guard7data.forEach(function (e) {
             var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
             $('[data-formengine-input-name="'+name+'"]').val('').prop('disabled',true);
         });
     };
 
-    if (sudhaus7datavaultdata) {
-        //console.log(sudhaus7datavaultdata);
-        for (var i=0,l=sudhaus7datavaultdata.length;i<l;i++) {
-            var e = sudhaus7datavaultdata[i];
+    if (sudhaus7guard7data) {
+        //console.log(sudhaus7guard7data);
+        for (var i = 0, l = sudhaus7guard7data.length; i < l; i++) {
+            var e = sudhaus7guard7data[i];
             var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
             $('[data-formengine-input-name="'+name+'"]').val('').attr('placeholder','🔒 Bitte Privaten Schlüssel angeben').prop('disabled','disabled');
         }
 
-        if (DatavaultTools.hasPrivateKey()) {
+        if (Guard7Tools.hasPrivateKey()) {
             unlockData();
         }
     }
 
-    top.TYPO3.jQuery('body').on('sudhaus7-datavault-privkey-activated',function() {
+    top.TYPO3.jQuery('body').on('sudhaus7-guard7-privkey-activated', function () {
         console.log('pre unlock');
         unlockData();
         console.log('post unlock');
     });
-    top.TYPO3.jQuery('body').on('sudhaus7-datavault-privkey-removed',function() {
+    top.TYPO3.jQuery('body').on('sudhaus7-guard7-privkey-removed', function () {
         lockData();
     });
 

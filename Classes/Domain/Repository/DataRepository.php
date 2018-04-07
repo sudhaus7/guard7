@@ -6,7 +6,7 @@
  * Time: 17:59
  */
 
-namespace SUDHAUS7\Datavault\Domain\Repository;
+namespace SUDHAUS7\Guard7\Domain\Repository;
 
 
 use TYPO3\CMS\Extbase\Persistence\Generic\Typo3QuerySettings;

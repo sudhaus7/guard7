@@ -1,9 +1,9 @@
-define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], function($,CryptoJS,forge) {
+define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], function ($, CryptoJS, forge) {
 
-    var DatavaultTools = {};
+    var Guard7Tools = {};
 
 
-    DatavaultTools.getCheckSum = function(key) {
+    Guard7Tools.getCheckSum = function (key) {
         var a = key.trim().split("\n");
         var active = false;
         var data = '';
@@ -22,18 +22,18 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         return  CryptoJS.SHA1(data).toString(CryptoJS.enc.UtF8);
     };
 
-    DatavaultTools.clearPrivateKey = function() {
-        window.sessionStorage.removeItem('DatavaultPrivkey');
+    Guard7Tools.clearPrivateKey = function () {
+        window.sessionStorage.removeItem('Guard7Privkey');
     };
 
 
-    DatavaultTools.createPrivateKey = function(password,bytes) {
+    Guard7Tools.createPrivateKey = function (password, bytes) {
         bytes = bytes || 2048;
         return new Promise(function(resolve,reject){
             resolve = resolve || function(){};
             reject = reject || function(){};
             forge.pki.rsa.generateKeyPair(bytes,{
-                workerScript:'/typo3conf/ext/datavault/Resources/Public/JavaScript/src/node_modules/node-forge/dist/prime.worker.min.js'
+                    workerScript: '/typo3conf/ext/guard7/Resources/Public/JavaScript/src/node_modules/node-forge/dist/prime.worker.min.js'
             },
             function(err,keypair) {
                 try {
@@ -53,7 +53,7 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         });
     };
 
-    DatavaultTools.setPrivateKey = function(privkey) {
+    Guard7Tools.setPrivateKey = function (privkey) {
         var keyconfig = {
             init: false,
             privatekey:null,
@@ -74,14 +74,14 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         }
         keyconfig.publicKey = forge.pki.setRsaPublicKey(keyconfig.privateKey.n, keyconfig.privateKey.e);
         keyconfig.publicPem = forge.pki.publicKeyToPem(keyconfig.publicKey);
-        keyconfig.checksumpubkey = DatavaultTools.getCheckSum(keyconfig.publicPem);
+        keyconfig.checksumpubkey = Guard7Tools.getCheckSum(keyconfig.publicPem);
         keyconfig.init = true;
-        window.sessionStorage.setItem('DatavaultPrivkey',JSON.stringify(keyconfig));
+        window.sessionStorage.setItem('Guard7Privkey', JSON.stringify(keyconfig));
     };
 
 
-    DatavaultTools.getPrivateKey = function() {
-        var keyconfig =  window.sessionStorage.getItem('DatavaultPrivkey');
+    Guard7Tools.getPrivateKey = function () {
+        var keyconfig = window.sessionStorage.getItem('Guard7Privkey');
         if (keyconfig) {
 
             var keyconfig = JSON.parse(keyconfig);
@@ -91,8 +91,8 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         return {init:false};
     };
 
-    DatavaultTools.hasPrivateKey = function() {
-        var keyconfig =  window.sessionStorage.getItem('DatavaultPrivkey');
+    Guard7Tools.hasPrivateKey = function () {
+        var keyconfig = window.sessionStorage.getItem('Guard7Privkey');
         if (keyconfig) {
             var privkey = JSON.parse(keyconfig);
             return privkey.init;
@@ -100,7 +100,7 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
         return false;
     };
 
-    DatavaultTools.decode = function(privatekeyconfig,row,callback) {
+    Guard7Tools.decode = function (privatekeyconfig, row, callback) {
 
         if (!privatekeyconfig.init) return;
 
@@ -150,7 +150,7 @@ define(['jquery','TYPO3/CMS/Datavault/Cryptojs','TYPO3/CMS/Datavault/Forge'], fu
     };
 
 
-    window.DatavaultTools = DatavaultTools;
-    return DatavaultTools;
+    window.Guard7Tools = Guard7Tools;
+    return Guard7Tools;
 
 });

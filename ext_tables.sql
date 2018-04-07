@@ -1,4 +1,4 @@
-CREATE TABLE tx_datavault_domain_model_data (
+CREATE TABLE tx_guard7_domain_model_data (
   uid int(11) NOT NULL auto_increment,
   pid int(11) NOT NULL DEFAULT '0',
   tstamp int(11) NOT NULL DEFAULT '0',
@@ -14,7 +14,7 @@ CREATE TABLE tx_datavault_domain_model_data (
   UNIQUE idxmain (tablename,tableuid,fieldname)
 );
 
-CREATE TABLE tx_sudhaus7datavault_signatures (
+CREATE TABLE tx_guard7_signatures (
   uid int(11) NOT NULL auto_increment,
   pid int(11) NOT NULL DEFAULT '0',
   parent int(11) NOT NULL DEFAULT '0',
@@ -26,6 +26,6 @@ CREATE TABLE tx_sudhaus7datavault_signatures (
 
 
 CREATE TABLE fe_users (
-  tx_datavault_publickey TEXT,
-  tx_datavault_privatekey TEXT
+  tx_guard7_publickey  TEXT,
+  tx_guard7_privatekey TEXT
 );

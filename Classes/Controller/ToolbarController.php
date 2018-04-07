@@ -6,7 +6,7 @@
  * Time: 22:39
  */
 
-namespace SUDHAUS7\Datavault\Controller;
+namespace SUDHAUS7\Guard7\Controller;
 
 
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -32,8 +32,8 @@ class ToolbarController implements ToolbarItemInterface {
 	public function __construct() {
 		$this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 		$pageRenderer = $this->getPageRenderer();
-		$pageRenderer->loadRequireJsModule('TYPO3/CMS/Datavault/Toolbar');
-		$pageRenderer->addCssFile('../'.ExtensionManagementUtility::siteRelPath('datavault') . 'Resources/Public/Css/styles.css');
+		$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/Toolbar' );
+		$pageRenderer->addCssFile( '../' . ExtensionManagementUtility::siteRelPath( 'guard7' ) . 'Resources/Public/Css/styles.css' );
 
 	}
 	public function checkAccess() {
@@ -41,8 +41,8 @@ class ToolbarController implements ToolbarItemInterface {
 	}
 
 	public function getItem() {
-		$opendocsMenu = array();
-		$opendocsMenu[] = '<span class="t3-icon fa fa-lock" title="Datavault">'  . '</span>';
+		$opendocsMenu   = array();
+		$opendocsMenu[] = '<span class="t3-icon fa fa-lock" title="Guard7">' . '</span>';
 		return implode(LF, $opendocsMenu);
 	}
 

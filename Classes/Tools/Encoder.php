@@ -6,7 +6,7 @@
  * Time: 15:29
  */
 
-namespace SUDHAUS7\Datavault\Tools;
+namespace SUDHAUS7\Guard7\Tools;
 
 
 class Encoder {
@@ -31,8 +31,8 @@ class Encoder {
 
 
 		if ($method === null) {
-			$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
-			$method = $confArr['defaultmethod'];
+			$confArr = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'] );
+			$method  = $confArr['defaultmethod'];
 		}
 		if (is_array($content)) $content=\json_encode( $content );
 		if (\is_object( $content)) throw new \Exception('No support for Objects');
@@ -122,8 +122,8 @@ class Encoder {
 	 */
 	public static function encodeArray($row,$fields,$publicKeys,$method=null) {
 		if ($method === null ) {
-			$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['datavault']);
-			$method = $confArr['defaultmethod'];
+			$confArr = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'] );
+			$method  = $confArr['defaultmethod'];
 		}
 		$checksums = null;
 		foreach ($fields as $field) {

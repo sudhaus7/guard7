@@ -6,7 +6,7 @@
  * Time: 13:26
  */
 
-namespace SUDHAUS7\Datavault\Hooks\Backend;
+namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;

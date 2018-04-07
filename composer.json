@@ -1,6 +1,6 @@
 {
-    "name": "SUDHAUS7/datavault",
-    "description": "(Sudhaus7) Data Vault",
+    "name": "SUDHAUS7/guard7",
+    "description": "(Sudhaus7) Plugin and framework for encrypting and decrypting data in Typo3, inkluding a RSA public and private key management.",
     "version": "8.0.0",
     "type": "typo3-cms-extension",
     "authors": [
@@ -8,16 +8,25 @@
             "name": "Frank Berger",
             "role": "Developer",
             "email": "fberger@sudhaus7.de"
+        },
+        {
+            "name": "Markus Hofmann",
+            "role": "Developer",
+            "email": "mhofmann@sudhaus7.de"
         }
     ],
     "require": {
         "typo3/cms-core": ">=8.0,<9.0"
     },
+    ,
+    "replace": {
+        "datavault": "self.version",
+        "sudhaus7_datavault": "self.version",
+        "sudhaus7_guard7": "self.version"
+    },
     "autoload": {
         "psr-4": {
-            "SUDHAUS7\\Datavault\\": "Classes/"
+            "SUDHAUS7\\Guard7\\": "Classes/"
         }
     }
 }
-
-
