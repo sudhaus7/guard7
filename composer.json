@@ -18,7 +18,6 @@
     "require": {
         "typo3/cms-core": ">=8.0,<9.0"
     },
-    ,
     "replace": {
         "datavault": "self.version",
         "sudhaus7_datavault": "self.version",
