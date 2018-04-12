@@ -10,8 +10,7 @@ namespace SUDHAUS7\Guard7\Hooks\Frontend;
 
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -24,10 +23,9 @@ class Userchangepassword {
 	 * @param $params
 	 */
 	public function handle($params) {
-
-		/** @var Connection $connection */
-		$connection    = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('fe_users');
+        
+        /** @var DatabaseConnection $connection */
+        $connection = $GLOBALS['TYPO3_DB'];
 		$user          = $params['user'];
 		$signature_old = Keys::getChecksum( $user['tx_guard7_publickey'] );
 		Storage::markForReencode( $signature_old );
@@ -37,7 +35,7 @@ class Userchangepassword {
 		$data                         = [];
 		$data['tx_guard7_publickey']  = $keypair['public'];
 		$data['tx_guard7_privatekey'] = $keypair['private'];
-		$connection->update( 'fe_users', $data, ['uid'=>$user['uid']]);
+		$connection->exec_UPDATEquery( 'fe_users', 'uid='.$user['uid'], $data);
 
 	}
 }

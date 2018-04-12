@@ -55,6 +55,7 @@ class DblocktableCommand extends Command {
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
     public function execute(InputInterface $input, OutputInterface $output) {
+        echo 'x';exit;
         $table = $input->getOption('table');
         $pid = (int)$input->getOption('pid');
         $lockFiles = $input->hasOption('includeFiles');

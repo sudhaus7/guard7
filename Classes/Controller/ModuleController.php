@@ -11,8 +11,8 @@ namespace SUDHAUS7\Guard7\Controller;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -119,30 +119,19 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $table = $get['table'];
         $idlist = $get['uids'];
         $a = 1;
-        /** @var Connection $connection */
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('tx_guard7_domain_model_data');
-        
-        $query = $connection->createQueryBuilder();
-        $query->select(...[
-            'tablename',
-            'tableuid',
-            'fieldname',
-            'secretdata'
-        ])
-            ->from('tx_guard7_domain_model_data');
-        
+        /** @var DatabaseConnection $connection */
+        $connection = $GLOBALS['TYPO3_DB'];
+    
         $fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
         $fields .= ',' . $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
         $fields = trim($fields, ',');
         $fields = "'" . str_replace(',', "','", $fields) . "'";
-        
-        $query->andWhere($query->expr()->in('tableuid', $idlist));
-        $query->andWhere($query->expr()->in('fieldname', $fields));
-        $query->andWhere($query->expr()->eq('tablename', $query->createNamedParameter($table)));
-        
-        $result = $query->execute();
-        $data = $result->fetchAll();
+        $where = [
+            'tableuid in ('.implode(',',$idlist).')',
+            'fieldname in ("'.implode('","',$fields).'")',
+            'tablename = "'.$table.'"',
+        ];
+        $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata', 'tx_guard7_domain_model_data', implode(' AND ',$where));
         
         
         $ajaxObj->addContent('data', \json_encode($data));

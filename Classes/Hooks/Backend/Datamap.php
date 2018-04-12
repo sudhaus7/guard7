@@ -14,13 +14,11 @@ use SUDHAUS7\Guard7\Tools\Storage;
 
 use SUDHAUS7\Guard7\Tools\Encoder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\Backend;
-use TYPO3\CMS\Rsaauth\RsaAuthService;
-use TYPO3\CMS\Rsaauth\RsaEncryptionDecoder;
+
 
 class Datamap implements SingletonInterface {
 
@@ -38,18 +36,17 @@ class Datamap implements SingletonInterface {
 		if ($status == 'new') {
 			if (isset($this->insertCache[$table]) && isset($this->insertCache[$table][$id]) && is_array($this->insertCache[$table][$id])) {
 				$newid = $pObj->substNEWwithIDs[$id];
-				/** @var Connection $connection */
-				$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-				                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
+				/** @var DatabaseConnection $connection */
+				$connection = $GLOBALS['TYPO3_DB'];
 				foreach ($this->insertCache[$table][$id] as $data) {
 
-					$connection->insert( 'tx_guard7_domain_model_data', [
+					$connection->exec_INSERTquery( 'tx_guard7_domain_model_data', [
 						'tablename'  => $table,
 						'tableuid'   => $newid,
 						'fieldname'  => $data['fieldname'],
 						'secretdata' => $data['encoded'],
 					] );
-					$insertid = $connection->lastInsertId();
+					$insertid = $connection->sql_insert_id();
 					Storage::updateKeyLog( $insertid, $data['pubkeys']);
 
 				}

@@ -9,11 +9,10 @@
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 
-use SUDHAUS7\Sudhaus7Base\Tools\Globals;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Recordlist\RecordList;
@@ -95,12 +94,11 @@ class PageRenderer  {
 			$data = [];
 			foreach ( $ts['tx_sudhaus7guard7.'] as $table => $config ) {
 				$table = trim($table,'.');
-				/** @var Connection $connection */
-				$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-				                            ->getConnectionForTable( $table );
-
-				$res = $connection->select( [ 'uid' ],	$table, [ 'pid' => $controller->id] );
-				$uids = $res->fetchAll();
+                /** @var DatabaseConnection $connection */
+                $connection = $GLOBALS['TYPO3_DB'];
+                
+                $uids = $connection->exec_SELECTgetRows( 'uid' ,	$table,  'pid='.$controller->id );
+				
 				if (!empty($uids)) {
 					$idlist = [];
 					foreach ($uids as $a) $idlist[]=$a['uid'];
@@ -109,20 +107,18 @@ class PageRenderer  {
 					$fields.= ','. $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
 					$fields = trim($fields,',');
 					$fields = "'".str_replace(',',"','",$fields)."'";
-
-					$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-					                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
-					$query = $connection->createQueryBuilder();
-					$query->select(...[ 'tablename', 'tableuid', 'fieldname', 'secretdata' ])
-					      ->from( 'tx_guard7_domain_model_data' );
-
-
-
-					$query->andWhere( $query->expr()->in('tableuid',$idlist));
-					$query->andWhere( $query->expr()->in('fieldname',$fields ));
-					$query->andWhere( $query->expr()->eq('tablename',$query->createNamedParameter($table)));
-					$result = $query->execute();
-					$subdata   = $result->fetchAll();
+                    
+                    
+                    /** @var DatabaseConnection $connection */
+                    $connection = $GLOBALS['TYPO3_DB'];
+                    $where = [
+                        'tableuid in ('.implode(',',$idlist).')',
+                        'fieldname in ("'.implode('","',$fields).'")',
+                        'tablename = "'.$table.'"',
+                    ];
+                    $subdata = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata', 'tx_guard7_domain_model_data', implode(' AND ',$where));
+					
+					
 					$data = array_merge($data,$subdata);
 
 				}
@@ -157,13 +153,11 @@ class PageRenderer  {
 
 						$fields = GeneralUtility::trimExplode( ',',
 							$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'], true );
-						/** @var Connection $connection */
-						$connection = GeneralUtility::makeInstance( ConnectionPool::class )
-						                            ->getConnectionForTable( 'tx_guard7_domain_model_data' );
+                        
+                        /** @var DatabaseConnection $connection */
+                        $connection = $GLOBALS['TYPO3_DB'];
 
-						$result = $connection->select( [ 'tablename', 'tableuid', 'fieldname', 'secretdata' ],
-							'tx_guard7_domain_model_data', [ 'tablename' => $table, 'tableuid' => $id ] );
-						$data   = $result->fetchAll();
+                        $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata' , 'tx_guard7_domain_model_data', sprintf('tablename = "%s" and tableuid=%d',$table,$id));
 						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/Main' );
 						$pageRenderer->addJsInlineCode( __METHOD__,
 							'var sudhaus7guard7data = ' . json_encode( $data ) . ';' );

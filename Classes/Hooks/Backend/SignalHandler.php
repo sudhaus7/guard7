@@ -8,10 +8,9 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SignalHandler {
@@ -31,11 +30,9 @@ class SignalHandler {
 
 	public function FeuserFetchkey($keys,$uid,$pid) {
 		if (substr($uid,0,3)!='NEW' && $uid > 0) {
-			/** @var Connection $connection */
-			$connection = GeneralUtility::makeInstance(ConnectionPool::class)
-			                            ->getConnectionForTable('fe_users');
-			$row        = $connection->select( [ 'tx_guard7_publickey' ], 'fe_users', [ 'uid' => $uid ] )
-			                         ->fetch( \PDO::FETCH_ASSOC );
+            /** @var DatabaseConnection $connection */
+            $connection = $GLOBALS['TYPO3_DB'];
+            $row = $connection->exec_SELECTgetSingleRow('tx_guard7_publickey', 'fe_users', 'uid='.$uid);
 			if ( $row && ! empty( $row['tx_guard7_publickey'] ) ) {
 				$keys[] = $row['tx_guard7_publickey'];
 			}
