@@ -16,8 +16,8 @@ return [
 		'label'             => 'title',
 		'tstamp'            => 'tstamp',
 		'searchFields'      => 'tablename,',
-		'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath( 'sudhaus7_newspage' ) . 'Configuration/TCA/tx_guard7_domain_model_data.php',
-		'iconfile'          => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath( 'sudhaus7_newspage' ) . 'Resources/Public/Icons/tx_guard7_domain_model_data.png',
+		'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath( 'guard7' ) . 'Configuration/TCA/tx_guard7_domain_model_data.php',
+		'iconfile'          => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath( 'guard7' ) . 'Resources/Public/Icons/tx_guard7_domain_model_data.png',
 	],
 	'interface' => [
 		'showRecordFieldList' => 'tablename, tableuid, fieldname,secretdata,needsreencode',
