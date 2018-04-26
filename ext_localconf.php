@@ -32,25 +32,7 @@ $signalSlotDispatcher->connect(
 	false
 );
 
-
-// Register the Scheduler as a possible key for CLI calls
-// Using cliKeys is deprecated as of TYPO3 v8 and will be removed in TYPO3 v9, use Configuration/Commands.php instead
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['guard7_tablelock']   = [
-	function ($input, $output) {
-		$app = new \Symfony\Component\Console\Application( 'Guard7 DB', TYPO3_version );
-		$app->add( new \SUDHAUS7\Guard7\Commands\DblocktableCommand() );
-		$app->setDefaultCommand('lock');
-		$app->run($input, $output);
-	}
-];
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['guard7_tableunlock'] = [
-	function ($input, $output) {
-		$app = new \Symfony\Component\Console\Application( 'Guard7 DB', TYPO3_version );
-		$app->add( new \SUDHAUS7\Guard7\Commands\DbunlocktableCommand() );
-		$app->setDefaultCommand('unlock');
-		$app->run($input, $output);
-	}
-];
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \SUDHAUS7\Guard7\Command\Guard7CommandController::class;
 
 
 if ( TYPO3_MODE === 'BE' ) {

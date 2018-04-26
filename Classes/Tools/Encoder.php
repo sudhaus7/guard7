@@ -9,6 +9,8 @@
 namespace SUDHAUS7\Guard7\Tools;
 
 
+use SUDHAUS7\Guard7\SealException;
+
 class Encoder {
 
 	/**
@@ -44,7 +46,11 @@ class Encoder {
 	public function setContent($content) {
 		$this->content = $content;
 	}
-
+    
+    /**
+     * @return string
+     * @throws SealException
+     */
 	public function run() {
 		$signatures = array_keys($this->pubkeys);
 		$pubkeys = array_values($this->pubkeys);
@@ -52,13 +58,17 @@ class Encoder {
 		foreach ($pubkeys as $idx=>$key) {
 			$pubkeys[$idx] = \openssl_get_publickey($key);
 		}
-
+  
 		$ret = \openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method, $iv);
+		if (!$ret > 0) {
+		    throw new SealException("Seal failed");
+        }
 		$this->content = '';
 		foreach ($pubkeys as $key) {
 			 \openssl_free_key($key);
 		}
 		$envelope = [];
+	
 		foreach ($ekeys as $k=>$ekey) {
 			$envelope[$signatures[$k]]=base64_encode($ekey);
 		}

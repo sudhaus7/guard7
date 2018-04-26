@@ -128,7 +128,8 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $fields = "'" . str_replace(',', "','", $fields) . "'";
         $where = [
             'tableuid in ('.implode(',',$idlist).')',
-            'fieldname in ("'.implode('","',$fields).'")',
+            //'fieldname in ("'.implode('","',$fields).'")',
+            'fieldname in ('.$fields.')',
             'tablename = "'.$table.'"',
         ];
         $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata', 'tx_guard7_domain_model_data', implode(' AND ',$where));

@@ -56,7 +56,7 @@ class Storage {
 		foreach ($data as $fieldname=>$value) {
 			if ( in_array( $fieldname, $fields ) ) {
 				$data[$fieldname] = '&#128274;';
-				if ($value == '&#128274;' || $value == '🔒') {
+				if ($value == '&#128274;' || $value == '🔒' || empty($value)) {
 					continue;
 				}
 				$fieldArray[$fieldname] = '&#128274;'; // 🔒
