@@ -1,6 +1,11 @@
 define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
-    if (window.sessionStorage.getItem('privkey')) {
+    if (Guard7Tools.hasPrivateKey()) {
+        var keyconfig = window.sessionStorage.getItem('Guard7Privkey');
+        if (keyconfig) {
+            var keyconfig = JSON.parse(keyconfig);
+            $('#sudhaus7-guard7-controller-toolbarcontroller [name="newkey"]').val(keyconfig.privateKeypem);
+        }
         $('#sudhaus7-guard7-controller-toolbarcontroller > a > span').removeClass('fa-lock').addClass('fa-unlock');
         $('#sudhaus7-guard7-controller-toolbarcontroller .clearKey').show();
         $('#sudhaus7-guard7-controller-toolbarcontroller .newkey-elem').hide();
