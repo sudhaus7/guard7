@@ -8,7 +8,7 @@ work in progress !!!
 
 Working:
 
-- Assymetric encryption / decryption of arbitrary text-fields in tables with several public keys.
+- Asymetric encryption / decryption of arbitrary text-fields in tables with several public keys.
 
 - Public/Private Key management for FE Users
 
