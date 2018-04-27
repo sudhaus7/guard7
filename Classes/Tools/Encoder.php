@@ -119,7 +119,7 @@ class Encoder {
 	/**
 	 * @param \string $method
 	 */
-	public function setMethod( \string $method ) {
+	public function setMethod( $method ) {
         
         if (PHP_MAJOR_VERSION < 7) {
             $valid = ['RC4','DES'];
