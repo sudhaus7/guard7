@@ -33,7 +33,6 @@ class Decoder {
 		
 		$envkeys = json_decode( base64_decode( $b64_envkeys ),true);
 		$envkey = base64_decode( $envkeys[$keyhash]);
-        var_dump(PHP_MAJOR_VERSION);
         if (PHP_MAJOR_VERSION < 7) {
             if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method)) {
                 \openssl_free_key( $privkey );
@@ -41,7 +40,6 @@ class Decoder {
             }
         } else {
             $iv = base64_decode( $b64_iv);
-            var_dump([$b64_secret,$open,$envkey,$privkey,$method,$iv]);
             if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
                 \openssl_free_key( $privkey );
                 throw new UnlockException('Data not unlockable');

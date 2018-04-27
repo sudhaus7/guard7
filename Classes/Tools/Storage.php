@@ -123,14 +123,14 @@ class Storage {
 				$row = $connection->exec_SELECTgetSingleRow( 'secretdata' , 'tx_guard7_domain_model_data', sprintf('tablename="%s" and tableuid=%d and fieldname="%s"',$table,$uid,$fieldname));
 				
 				if ($row && $row['secretdata']) {
-					//try {
+					try {
 						//$privateKey='xxx';
 						$data[ $fieldname ] = Decoder::decode( $row['secretdata'], $privateKey, $password );
-					//} catch (WrongKeyPassException $e) {
+					} catch (WrongKeyPassException $e) {
 
-					//} catch (UnlockException $e) {
+					} catch (UnlockException $e) {
 						//$data[ $fieldname ] = '🔒';
-					//}
+					}
 				}
 			}
 		}
