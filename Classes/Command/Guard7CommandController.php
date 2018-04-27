@@ -14,19 +14,17 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
-
-
 class Guard7CommandController extends  CommandController {
     /**
      * Lock all data of a table
      *
-     * @param int $pid 'UID of a Folder
+     * @param int $pid UID of a Folder
      * @param string $table Table to lock
      * @param null $includeFiles Lock referenced files as well
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    public function locktableCommand ($pid,$table,$includeFiles=false) {
+    public function locktableCommand ($pid=0,$table,$includeFiles=false) {
         $filerefconfig = [];
     
         if ( $includeFiles ) {
@@ -37,44 +35,76 @@ class Guard7CommandController extends  CommandController {
             }
         }
     
+        $this->output("\nStart locking\n");
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
-        
-        $ts = BackendUtility::getPagesTSconfig($pid);
-        if ( isset($ts['tx_sudhaus7guard7.']) ) {
-            if ( isset($ts['tx_sudhaus7guard7.'][$table . '.']) && isset($ts['tx_sudhaus7guard7.'][$table . '.']['fields']) ) {
-                $res = $connection->exec_SELECTquery('*', $table, 'pid='.$pid);
+
+        if ($pid && $pid>0) {
+            $count = $connection->exec_SELECTgetSingleRow('count(uid) as xcount', $table, 'pid='.$pid);
+            $res = $connection->exec_SELECTquery('*', $table, 'pid=' . $pid);
+        } else {
+            $count = $connection->exec_SELECTgetSingleRow('count(uid) as xcount', $table, '1=1');
+            $res = $connection->exec_SELECTquery('*', $table,'1=1');
+        }
+        $counter = 1;
+        while ( $row = $connection->sql_fetch_assoc($res) ) {
+            
+            $config = $this->getConfig($row['pid'], $table);
+            $this->output("\rLocking Record ".$counter." of ".$count['xcount']);
+            if ($config) {
                 
-                while ( $row = $connection->sql_fetch_assoc($res) ) {
-                    $pubkeys = Keys::collectPublicKeys($table, $row['uid'], $pid, false);
+                $keys = [];
+                if (isset($config['publicKeys.']) && !empty($config['publicKeys.'])) $keys = \array_values($config['publicKeys.']);
+                $pubkeys = Keys::collectPublicKeys($table, $row['uid'], $row['pid'], false,$keys);
+    
+                $fieldArray = [];
+                $vaultfields = GeneralUtility::trimExplode(',', $config['fields']);
+                foreach ( $vaultfields as $f ) {
+                    $fieldArray[$f] = $row[$f];
+                }
+                $fieldArray = Storage::lockRecord($table, $row['uid'], $vaultfields, $fieldArray, $pubkeys);
+    
+                $connection->exec_UPDATEquery($table, 'uid=' . $row['uid'], $fieldArray);
+                $this->output->outputLine('locking ' . $row['username']);
+    
+                if ( $includeFiles ) {
+                    foreach ( $filerefconfig as $reffield ) {
+                        //if ($row[$reffield] > 0) {
             
-                    $fieldArray = [];
-                    $vaultfields = GeneralUtility::trimExplode(',',
-                        $ts['tx_sudhaus7guard7.'][$table . '.']['fields']);
-                    foreach ( $vaultfields as $f ) {
-                        $fieldArray[$f] = $row[$f];
-                    }
-                    $fieldArray = Storage::lockRecord($table, $row['uid'], $vaultfields, $fieldArray, $pubkeys);
-                    
-                    $connection->exec_UPDATEquery($table, 'uid='.$row['uid'], $fieldArray);
-                    $this->output->outputLine('locking ' . $row['username']);
+                        $resref = $connection->exec_SELECTquery('*', 'sys_file_reference', sprintf('tablenames="%s" and fieldname="%s" and uid_foreign="%d"', $table, $reffield, $row['uid']));
             
-                    if ( $includeFiles ) {
-                        foreach ( $filerefconfig as $reffield ) {
-                            //if ($row[$reffield] > 0) {
-                    
-                            $resref = $connection->exec_SELECTquery('*', 'sys_file_reference', sprintf('tablenames="%s" and fieldname="%s" and uid_foreign="%d"',$table,$reffield,$row['uid']));
-                            
-                            while ( $ref = $connection->sql_fetch_assoc($resref) ) {
-                                $sysfile = $connection->exec_SELECTgetSingleRow('*', 'sys_file', 'uid='.$ref['uid_local']);
-                                $ret = Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
-                                $this->output->outputLine('locking file ' . $sysfile['identifier']);
-                            }
+                        while ( $ref = $connection->sql_fetch_assoc($resref) ) {
+                            $sysfile = $connection->exec_SELECTgetSingleRow('*', 'sys_file', 'uid=' . $ref['uid_local']);
+                            $ret = Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
+                            $this->output->outputLine('locking file ' . $sysfile['identifier']);
                         }
                     }
                 }
+                $counter++;
+            }
+            
+    
+        }
+    }
+    
+    var $configcache = [];
+    
+    /**
+     * @param $pid
+     * @param $table
+     * @return bool|mixed
+     */
+    private function getConfig($pid,$table) {
+        if (!isset($this->configcache[$pid])) {
+            $ts = BackendUtility::getPagesTSconfig($pid);
+            if ( isset($ts['tx_sudhaus7guard7.']) ) {
+                $this->configcache[$pid]=$ts['tx_sudhaus7guard7.'];
             }
         }
+        if (isset($this->configcache[$table.'.'])  && isset($ts['tx_sudhaus7guard7.'][$table . '.']['fields'])) {
+            return $this->configcache[$table.'.'];
+        }
+        return false;
     }
     
     /**
@@ -86,7 +116,7 @@ class Guard7CommandController extends  CommandController {
      * @param string $password Password for masterkey
      * @param bool $includeFiles Unlock referenced files as well
      */
-    public function unlocktableCommand ($pid,$table,$keyfile,$password='',$includeFiles=false) {
+    public function unlocktableCommand ($pid=0,$table,$keyfile,$password='',$includeFiles=false) {
         $key = \file_get_contents($keyfile);
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
@@ -98,36 +128,44 @@ class Guard7CommandController extends  CommandController {
                 }
             }
         }
-
-        $ts = BackendUtility::getPagesTSconfig($pid);
-        if ( isset($ts['tx_sudhaus7guard7.']) ) {
-            if ( isset($ts['tx_sudhaus7guard7.'][$table . '.']) && isset($ts['tx_sudhaus7guard7.'][$table . '.']['fields']) ) {
-                $res = $connection->exec_SELECTquery('*', $table, 'pid='.$pid);
-                while ( $row = $connection->sql_fetch_assoc($res) ) {
-                    $fieldArray = [];
-                    $vaultfields = GeneralUtility::trimExplode(',',
-                        $ts['tx_sudhaus7guard7.'][$table . '.']['fields']);
-                    foreach ( $vaultfields as $f ) {
-                        $fieldArray[$f] = $row[$f];
-                    }
-                    $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
-                    $connection->exec_UPDATEquery($table, 'uid='.$row['uid'], $fieldArray);
-                    //$this->output->outputLine('unlocking ' . $row['']);
-                
-                    if ( $includeFiles ) {
-                        foreach ( $filerefconfig as $reffield ) {
-                            //if ($row[$reffield] > 0) {
-                            $resref = $connection->exec_SELECTquery('*', 'sys_file_reference', sprintf('tablenames="%s" and fieldname="%s" and uid_foreign="%d"',$table,$reffield,$row['uid']));
     
-                            while ( $ref = $connection->sql_fetch_assoc($resref) ) {
-                                $sysfile = $connection->exec_SELECTgetSingleRow('*', 'sys_file', 'uid='.$ref['uid_local']);
-                                $ret = Storage::unlockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $key, $password);
-                                $this->output->outputLine('unlocking file ' . $sysfile['identifier']);
-                            }
+        $this->output("\nStart unlocking\n");
+        if ($pid && $pid > 0) {
+            $count = $connection->exec_SELECTgetSingleRow('count(uid) as xcount', $table, 'pid='.$pid);
+            $res = $connection->exec_SELECTquery('*', $table, 'pid=' . $pid);
+        } else {
+            $count = $connection->exec_SELECTgetSingleRow('count(uid) as xcount', $table, '1=1');
+    
+            $res = $connection->exec_SELECTquery('*', $table, '1=1');
+        }
+        $counter = 1;
+        while ( $row = $connection->sql_fetch_assoc($res) ) {
+            $config = $this->getConfig($row['pid'], $table);
+            if ($config) {
+                $fieldArray = [];
+                $vaultfields = GeneralUtility::trimExplode(',',$config['fields'],true);
+                foreach ( $vaultfields as $f ) {
+                    $fieldArray[$f] = $row[$f];
+                }
+                $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
+                $connection->exec_UPDATEquery($table, 'uid=' . $row['uid'], $fieldArray);
+                //$this->output->outputLine('unlocking ' . $row['']);
+                $this->output("\rUnlocking Record ".$counter." of ".$count['xcount']);
+                if ( $includeFiles ) {
+                    foreach ( $filerefconfig as $reffield ) {
+                        //if ($row[$reffield] > 0) {
+                        $resref = $connection->exec_SELECTquery('*', 'sys_file_reference', sprintf('tablenames="%s" and fieldname="%s" and uid_foreign="%d"', $table, $reffield, $row['uid']));
+            
+                        while ( $ref = $connection->sql_fetch_assoc($resref) ) {
+                            $sysfile = $connection->exec_SELECTgetSingleRow('*', 'sys_file', 'uid=' . $ref['uid_local']);
+                            $ret = Storage::unlockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $key, $password);
+                            $this->output->outputLine('unlocking file ' . $sysfile['identifier']);
                         }
                     }
                 }
             }
+            $counter++;
         }
+        $this->output("\r\nUnlocking Done\n");
     }
 }
