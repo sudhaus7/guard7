@@ -18,13 +18,13 @@ class Guard7CommandController extends  CommandController {
     /**
      * Lock all data of a table
      *
-     * @param int $pid UID of a Folder
      * @param string $table Table to lock
+     * @param int $pid UID of a Folder
      * @param null $includeFiles Lock referenced files as well
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    public function locktableCommand ($pid=0,$table,$includeFiles=false) {
+    public function locktableCommand ($table,$pid=0,$includeFiles=false) {
         $filerefconfig = [];
     
         if ( $includeFiles ) {
@@ -65,7 +65,7 @@ class Guard7CommandController extends  CommandController {
                 $fieldArray = Storage::lockRecord($table, $row['uid'], $vaultfields, $fieldArray, $pubkeys);
     
                 $connection->exec_UPDATEquery($table, 'uid=' . $row['uid'], $fieldArray);
-                $this->output->outputLine('locking ' . $row['username']);
+               
     
                 if ( $includeFiles ) {
                     foreach ( $filerefconfig as $reffield ) {
@@ -76,7 +76,7 @@ class Guard7CommandController extends  CommandController {
                         while ( $ref = $connection->sql_fetch_assoc($resref) ) {
                             $sysfile = $connection->exec_SELECTgetSingleRow('*', 'sys_file', 'uid=' . $ref['uid_local']);
                             $ret = Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
-                            $this->output->outputLine('locking file ' . $sysfile['identifier']);
+                            //$this->output->outputLine('locking file ' . $sysfile['identifier']);
                         }
                     }
                 }
@@ -101,8 +101,8 @@ class Guard7CommandController extends  CommandController {
                 $this->configcache[$pid]=$ts['tx_sudhaus7guard7.'];
             }
         }
-        if (isset($this->configcache[$table.'.'])  && isset($ts['tx_sudhaus7guard7.'][$table . '.']['fields'])) {
-            return $this->configcache[$table.'.'];
+        if (isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table.'.'])  && isset($this->configcache[$pid][$table . '.']['fields'])) {
+            return $this->configcache[$pid][$table.'.'];
         }
         return false;
     }
@@ -110,13 +110,13 @@ class Guard7CommandController extends  CommandController {
     /**
      * Unlock all Data of a table
      *
-     * @param int $pid UID of a Folder
      * @param string $table Table to lock
      * @param string $keyfile File with a Masterkey (PEM)
+     * @param int $pid UID of a Folder
      * @param string $password Password for masterkey
      * @param bool $includeFiles Unlock referenced files as well
      */
-    public function unlocktableCommand ($pid=0,$table,$keyfile,$password='',$includeFiles=false) {
+    public function unlocktableCommand ($table,$keyfile,$pid=0,$password='',$includeFiles=false) {
         $key = \file_get_contents($keyfile);
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
