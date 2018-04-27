@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 class Guard7CommandController extends  CommandController {
+    
     /**
      * Lock all data of a table
      *
