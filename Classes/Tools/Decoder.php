@@ -30,14 +30,24 @@ class Decoder {
 		$privkey = Keys::unlockKey( $key, $password);
 		list($method,$b64_iv,$b64_envkeys,$b64_secret) = explode(':',$data);
 		$keyhash = Keys::getChecksum( openssl_pkey_get_details($privkey)['key']);
-		$iv = base64_decode( $b64_iv);
+		
 		$envkeys = json_decode( base64_decode( $b64_envkeys ),true);
 		$envkey = base64_decode( $envkeys[$keyhash]);
-
-		if (!@\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
-			\openssl_free_key( $privkey );
-			throw new UnlockException('Data not unlockable');
-		}
+        
+        if (PHP_MAJOR_VERSION < 7) {
+            if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method)) {
+                \openssl_free_key( $privkey );
+                throw new UnlockException('Data not unlockable');
+            }
+        } else {
+            $iv = base64_decode( $b64_iv);
+            if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
+                \openssl_free_key( $privkey );
+                throw new UnlockException('Data not unlockable');
+            }
+        }
+		
+		
 		\openssl_free_key( $privkey );
 		return $open;
 
