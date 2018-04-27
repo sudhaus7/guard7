@@ -70,7 +70,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey')),
             ButtonBar::BUTTON_POSITION_LEFT);
         
-        $buttonBar->addButton($buttonBar->makeLinkButton()
+     /*   $buttonBar->addButton($buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('listrencode'))
             ->setShowLabelText($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode'))
@@ -78,7 +78,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
             ->setTitle($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode')),
             ButtonBar::BUTTON_POSITION_LEFT);
-        
+       */
         
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
         

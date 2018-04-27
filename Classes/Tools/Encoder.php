@@ -58,8 +58,13 @@ class Encoder {
 		foreach ($pubkeys as $idx=>$key) {
 			$pubkeys[$idx] = \openssl_get_publickey($key);
 		}
-  
-		$ret = \openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method, $iv);
+        
+        if (PHP_MAJOR_VERSION < 7) {
+            $ret = \openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method);
+        } else {
+            $ret = \openssl_seal($this->content, $sealed, $ekeys, $pubkeys, $this->method, $iv);
+        }
+  		
 		if (!$ret > 0) {
 		    throw new SealException("Seal failed");
         }
@@ -90,7 +95,7 @@ class Encoder {
 	/**
 	 * @return array
 	 */
-	public function getPubkeys(): array {
+	public function getPubkeys() {
 		return array_values($this->pubkeys);
 	}
 
@@ -107,17 +112,22 @@ class Encoder {
 	/**
 	 * @return string
 	 */
-	public function getMethod(): string {
+	public function getMethod()  {
 		return $this->method;
 	}
 
 	/**
-	 * @param string $method
+	 * @param \string $method
 	 */
-	public function setMethod( string $method ) {
-
-		//$valid = ['RC4','AES128','AES256','DES'];
-		$valid = openssl_get_cipher_methods(true);
+	public function setMethod( $method ) {
+        
+        if (PHP_MAJOR_VERSION < 7) {
+            $valid = ['RC4','DES'];
+        } else {
+            $valid = ['RC4','AES128','AES256','DES'];
+        }
+		
+		//$valid = openssl_get_cipher_methods(true);
 		if (\in_array( $method, $valid)) $this->method = $method;
 	}
 

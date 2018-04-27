@@ -86,7 +86,7 @@ class Keys {
 	 *
 	 * @return array
 	 */
-	public static function createKey($password = null) : array {
+	public static function createKey($password = null) {
 		$config = [
 			"digest_alg" => "sha512",
 			"private_key_bits" => 4096,

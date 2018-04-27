@@ -36,15 +36,22 @@ class ExttemplateMethods {
 	 * @return string
 	 */
 	public function render(array $parameter = array(), TypoScriptConstantsViewHelper $parentObject) {
-
-		$list = openssl_get_cipher_methods(true);
-		foreach ($list as $k=>$v) {
-			$up = \strtoupper( $v);
-			if ($up != $v){
-				unset($list[$k]);
-			}
-
-		}
+        
+        if (PHP_MAJOR_VERSION < 7) {
+    
+            $list = ['RC4','DES'];
+        } else {
+            $list = ['RC4','AES128','AES256','DES'];
+            
+        }
+//		$list = openssl_get_cipher_methods(true);
+//		foreach ($list as $k=>$v) {
+//			$up = \strtoupper( $v);
+//			if ($up != $v){
+//				unset($list[$k]);
+//			}
+//
+//		}
 		$content = '';
 		foreach ($list as $method) {
 			$content.=sprintf('<option value="%1$s" %2$s>%1$s</option>',$method, $method==$parameter['fieldValue'] ? 'selected':'');

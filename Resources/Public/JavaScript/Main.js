@@ -6,14 +6,14 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         if (Guard7Tools.hasPrivateKey()) {
             var privkey = Guard7Tools.getPrivateKey();
             sudhaus7guard7data.forEach(function (e) {
-                console.log('tick', e.fieldname);
+                //console.log('tick', e.fieldname);
                 Guard7Tools.decode(privkey, e, function (data) {
 
                     var name = 'data[' + e.tablename + '][' + e.tableuid + '][' + e.fieldname + ']';
                     //  console.log(name,data,e,privkey);
                     $('[data-formengine-input-name="' + name + '"]').val(data).prop('disabled', false);
                     $('[data-formengine-input-name="' + name + '"]').removeProp('disabled');
-                    console.log('tock', e.fieldname);
+                    //console.log('tock', e.fieldname);
                 });
             });
         }
