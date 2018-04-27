@@ -33,7 +33,7 @@ class Decoder {
 		
 		$envkeys = json_decode( base64_decode( $b64_envkeys ),true);
 		$envkey = base64_decode( $envkeys[$keyhash]);
-        
+        var_dump(PHP_MAJOR_VERSION);
         if (PHP_MAJOR_VERSION < 7) {
             if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method)) {
                 \openssl_free_key( $privkey );
