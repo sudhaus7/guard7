@@ -112,7 +112,7 @@ class Encoder {
 	/**
 	 * @return string
 	 */
-	public function getMethod(): string {
+	public function getMethod()  {
 		return $this->method;
 	}
 
