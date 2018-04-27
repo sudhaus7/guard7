@@ -95,7 +95,7 @@ class Encoder {
 	/**
 	 * @return array
 	 */
-	public function getPubkeys(): array {
+	public function getPubkeys() {
 		return array_values($this->pubkeys);
 	}
 
