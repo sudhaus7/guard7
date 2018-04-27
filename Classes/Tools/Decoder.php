@@ -34,7 +34,7 @@ class Decoder {
 		$envkeys = json_decode( base64_decode( $b64_envkeys ),true);
 		$envkey = base64_decode( $envkeys[$keyhash]);
 
-		if (!\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
+		if (!@\openssl_open(base64_decode( $b64_secret),$open,$envkey,$privkey,$method,$iv)) {
 			\openssl_free_key( $privkey );
 			throw new UnlockException('Data not unlockable');
 		}
