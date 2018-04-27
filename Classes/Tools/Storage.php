@@ -41,11 +41,11 @@ class Storage {
 	}
 
 	/**
-	 * @param $table
-	 * @param $uid
-	 * @param $fields
-	 * @param $data
-	 * @param $pubKeys
+	 * @param string $table
+	 * @param int $uid
+	 * @param array $fields
+	 * @param array $data
+	 * @param array $pubKeys
 	 *
 	 * @return mixed
 	 */
