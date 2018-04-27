@@ -35,7 +35,7 @@ class Guard7CommandController extends  CommandController {
             }
         }
     
-        $this->output("\nStart locking\n");
+        $this->output("\nStart locking (get a coffee, this can take a while..)\n");
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
 
