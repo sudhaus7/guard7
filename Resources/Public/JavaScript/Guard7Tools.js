@@ -37,15 +37,20 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
             },
             function(err,keypair) {
                 try {
-                    //console.log('xx',keypair);
-                    if (password) {
-                        var tmp = forge.pki.encryptRsaPrivateKey(keypair.privateKey, password, {algorithm: 'AES256'});
-                        keypair.privateKey = tmp;
-                    }
-                    resolve({
+
+                    var ret = {
                         privateKey: forge.pki.privateKeyToPem(keypair.privateKey, 64),
                         publicKey: forge.pki.publicKeyToPem(keypair.publicKey, 64)
-                    });
+                    };
+                    if (password) {
+                        try {
+                            var tmp = forge.pki.encryptRsaPrivateKey(keypair.privateKey, password, {algorithm: 'aes256'});
+                            ret.privateKey = tmp;
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    }
+                    resolve(ret);
                 } catch(e) {
                     reject(e);
                 }

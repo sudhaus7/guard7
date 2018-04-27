@@ -20,7 +20,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                             var privkey = Guard7Tools.getPrivateKey();
                             sudhaus7guard7data.forEach(function (e) {
                                 Guard7Tools.decode(privkey, e, function (data) {
-                                    $('table[data-table="' + e.tablename + '"] tr[data-uid="' + e.tableuid + '"] td.col-title span').attr('title', data).text(data);
+                                    $('table[data-table="' + e.tablename + '"] tr[data-uid="' + e.tableuid + '"] td:nth-child(2) span').attr('title', data).text(data);
                                 });
                             });
                         });

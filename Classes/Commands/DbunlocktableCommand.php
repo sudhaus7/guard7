@@ -25,12 +25,6 @@ class DbunlocktableCommand extends Command {
         $this->setDescription('Lock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem')
             ->addOption(
-                'pid',
-                'pid',
-                InputOption::VALUE_REQUIRED,
-                'UID of a Folder'
-            )
-            ->addOption(
                 'table',
                 't',
                 InputOption::VALUE_REQUIRED,
@@ -41,6 +35,12 @@ class DbunlocktableCommand extends Command {
                 'keyfile',
                 InputOption::VALUE_REQUIRED,
                 'File with a Masterkey (PEM)'
+            )
+            ->addOption(
+                'pid',
+                'pid',
+                InputOption::VALUE_OPTIONAL,
+                'UID of a Folder'
             )
             ->addOption(
                 'password',
@@ -71,43 +71,72 @@ class DbunlocktableCommand extends Command {
                 }
             }
         }
+    
+        $output->write("\nStart locking (get a coffee, this can take a while..)", true);
         
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($table);
-        $ts = BackendUtility::getPagesTSconfig($pid);
-        if ( isset($ts['tx_sudhaus7guard7.']) ) {
-            if ( isset($ts['tx_sudhaus7guard7.'][$table . '.']) && isset($ts['tx_sudhaus7guard7.'][$table . '.']['fields']) ) {
-                $res = $connection->select(['*'], $table, ['pid' => $pid]);
-                while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
-                    $fieldArray = [];
-                    $vaultfields = GeneralUtility::trimExplode(',',
-                        $ts['tx_sudhaus7guard7.'][$table . '.']['fields']);
-                    foreach ( $vaultfields as $f ) {
-                        $fieldArray[$f] = $row[$f];
-                    }
-                    $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
-                    $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
-                    $output->writeln(['unlocking ' . $row['username']]);
+        $where = [];
+        if ( $pid > 0 ) $where['pid'] = $pid;
+    
+        $count = $connection->count('uid', $table, $where);
+        $res = $connection->select(['*'], $table, $where);
+        $counter = 1;
+        while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
+            $output->write("\rUnlocking Record " . $counter . " of " . $count['xcount']);
+        
+        
+            $config = $this->getConfig($row['pid'], $table);
+            if ( $config ) {
+                $fieldArray = [];
+                $vaultfields = GeneralUtility::trimExplode(',', $config['fields']);
+                foreach ( $vaultfields as $f ) {
+                    $fieldArray[$f] = $row[$f];
+                }
+                $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
+                $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
+            
+            
+                if ( $lockFiles ) {
+                    foreach ( $filerefconfig as $reffield ) {
+                        //if ($row[$reffield] > 0) {
                     
-                    if ( $lockFiles ) {
-                        foreach ( $filerefconfig as $reffield ) {
-                            //if ($row[$reffield] > 0) {
-                            
-                            $resref = $connection->select(['*'], 'sys_file_reference', [
-                                'tablenames' => $table,
-                                'fieldname' => $reffield,
-                                'uid_foreign' => $row['uid']
-                            ]);
-                            while ( $ref = $resref->fetch(\PDO::FETCH_ASSOC) ) {
-                                $sysfile = $connection->select(['*'], 'sys_file', ['uid' => $ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
-                                $ret = Storage::unlockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $key, $password);
-                                $output->writeln(['unlocking file ' . $sysfile['identifier']]);
-                            }
+                        $resref = $connection->select(['*'], 'sys_file_reference', [
+                            'tablenames' => $table,
+                            'fieldname' => $reffield,
+                            'uid_foreign' => $row['uid']
+                        ]);
+                        while ( $ref = $resref->fetch(\PDO::FETCH_ASSOC) ) {
+                            $sysfile = $connection->select(['*'], 'sys_file', ['uid' => $ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
+                            $ret = Storage::unlockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $key, $password);
+                            //  $output->writeln(['unlocking file ' . $sysfile['identifier']]);
                         }
                     }
                 }
             }
+            $counter++;
+           
         }
+    }
+    
+    var $configcache = [];
+    
+    /**
+     * @param $pid
+     * @param $table
+     * @return bool|mixed
+     */
+    private function getConfig($pid, $table) {
+        if ( !isset($this->configcache[$pid]) ) {
+            $ts = BackendUtility::getPagesTSconfig($pid);
+            if ( isset($ts['tx_sudhaus7guard7.']) ) {
+                $this->configcache[$pid] = $ts['tx_sudhaus7guard7.'];
+            }
+        }
+        if ( isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields']) ) {
+            return $this->configcache[$pid][$table . '.'];
+        }
+        return false;
     }
 }

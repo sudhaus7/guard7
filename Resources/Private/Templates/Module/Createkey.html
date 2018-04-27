@@ -1,6 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
       xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
-      xmlns:s7="http://sudhaus7.de/ns/SUDHAUS7/Sudhaus7Viewhelpers/ViewHelpers" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/xhtml"
       lang="en"
       f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
       v:schemaLocation="https://fluidtypo3.org/schemas/vhs-master.xsd"
@@ -14,6 +14,7 @@
     <div id="createkey">
         <button value="2084"><f:translate key="module.createkey.button.2048"></f:translate></button>
         <button value="4096"><f:translate key="module.createkey.button.4096"></f:translate></button>
+        <label>Passwort <input type="text" placeholder="Optionales Passwort (empfohlen)" name="password"/> </label>
         <label>Public Key<textarea name="publickey"></textarea></label>
         <label>Private Key<textarea name="privatekey"></textarea></label>
     </div>
