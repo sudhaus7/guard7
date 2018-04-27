@@ -8,26 +8,28 @@ work in progress !!!
 
 Working:
 
-Encryption / Decryption of arbitrary text-fields in tables
-Public/Private Key management for FE Users
-Backend: Decryption on Client, List module and TCA Fields. Rudimentary Support for Private Keys and Password encrypted Private Keys
+- Assymetric encryption / decryption of arbitrary text-fields in tables with several public keys.
 
-Tools for generating keys, validating keys and encrtyption/decryption in PHP and JS for Plugins.
+- Public/Private Key management for FE Users
 
-PageTS base confguration of to be encrypted database fields and tables.
+- Backend: Decryption on Client, List module and TCA Fields. 
+- Rudimentary Support for Private Keys and Password encrypted Private Keys
 
-PageTS based configuration for additional Public Keys (not sure if that is a good idea anymore)
+- Tools for generating keys, validating keys and encrtyption/decryption in PHP and JS for Plugins.
 
-Commandline locking and unlocking for all configured fields
+- PageTS base confguration of to be encrypted database fields and tables.
 
-Signal slot for collection of Public keys on encryption
+- PageTS based configuration for additional Public Keys (not sure anymore if that is a good idea, input welcome )
+
+- Commandline locking and unlocking for all configured fields
+
+- Signal slot for collection of Public keys on encryption
 
 TODO:
 - Re-encoding of dirty datasets 
 - documentation
 - comments
 - licenses
-- Backport to 7.6
 - Testing/proofing for 9.x
 
 
