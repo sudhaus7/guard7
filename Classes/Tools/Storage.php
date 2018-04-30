@@ -105,7 +105,7 @@ class Storage {
                     continue;
                 }
                 $connection->exec_DELETEquery( 'tx_guard7_domain_model_data',sprintf('tablename="%s" and tableuid=%d and fieldname="%s"',$table,$obj->getUid(),$fieldname));
-                //$obj->$setter( '&#128274;'); // 🔒
+                $obj->$setter( '&#128274;'); // 🔒
     
                 $encoder = new Encoder( $value, $pubKeys);
                 $encoded = $encoder->run();
