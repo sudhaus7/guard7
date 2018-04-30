@@ -6,7 +6,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         if (Guard7Tools.hasPrivateKey()) {
             var privkey = Guard7Tools.getPrivateKey();
             sudhaus7guard7data.forEach(function (e) {
-                console.log('tick', e.fieldname);
+                //console.log('tick', e.fieldname);
                 Guard7Tools.decode(privkey, e, function (data) {
 
                     var name = 'data[' + e.tablename + '][' + e.tableuid + '][' + e.fieldname + ']';
@@ -14,7 +14,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                     $('[data-formengine-input-name="' + name + '"]').val(data).prop('disabled', false);
                     $('[data-formengine-input-name="' + name + '"]').removeProp('disabled');
                     $('[data-formengine-input-name="' + name + '"]').attr('placeholder', '');
-                    console.log('tock', e.fieldname);
+                    //console.log('tock', e.fieldname);
                 });
             });
         }
