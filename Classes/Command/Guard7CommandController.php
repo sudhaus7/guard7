@@ -81,9 +81,9 @@ class Guard7CommandController extends  CommandController {
                         }
                     }
                 }
-                $counter++;
+                
             }
-            
+            $counter++;
     
         }
     }
@@ -142,6 +142,7 @@ class Guard7CommandController extends  CommandController {
         $counter = 1;
         while ( $row = $connection->sql_fetch_assoc($res) ) {
             $config = $this->getConfig($row['pid'], $table);
+            $this->output("\rUnlocking Record ".$counter." of ".$count['xcount']);
             if ($config) {
                 $fieldArray = [];
                 $vaultfields = GeneralUtility::trimExplode(',',$config['fields'],true);
@@ -151,7 +152,7 @@ class Guard7CommandController extends  CommandController {
                 $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
                 $connection->exec_UPDATEquery($table, 'uid=' . $row['uid'], $fieldArray);
                 //$this->output->outputLine('unlocking ' . $row['']);
-                $this->output("\rUnlocking Record ".$counter." of ".$count['xcount']);
+                
                 if ( $includeFiles ) {
                     foreach ( $filerefconfig as $reffield ) {
                         //if ($row[$reffield] > 0) {
