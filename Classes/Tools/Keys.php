@@ -16,8 +16,24 @@ use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use SUDHAUS7\Guard7\WrongKeyPassException;
 
 class Keys {
-
-
+    
+    
+    /**
+     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param bool $checkFEuser
+     * @param array $aPubkeys
+     * @return array
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     */
+    public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj,$checkFEuser=false,$aPubkeys=[]) {
+        $class = \get_class($obj);
+        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+        $table = $dataMapper->getDataMap($class)->getTableName();
+        return self::collectPublicKeys($table,(int)$obj->getUid(),(int)$obj->getPid(),$checkFEuser,$aPubkeys);
+    }
+    
 	/**
 	 * @param null $table
 	 * @param mixed $uid

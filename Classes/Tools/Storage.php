@@ -39,16 +39,17 @@ class Storage {
 				[ 'parent' => $tx_guard7_domain_model_data_uid, 'signature' => $checksum ] );
 		}
 	}
-
-	/**
-	 * @param string $table
-	 * @param int $uid
-	 * @param array $fields
-	 * @param array $data
-	 * @param array $pubKeys
-	 *
-	 * @return mixed
-	 */
+	
+    
+    /**
+     * @param string $table
+     * @param int$uid
+     * @param array $fields
+     * @param array $data
+     * @param array $pubKeys
+     * @return mixed
+     * @throws \SUDHAUS7\Guard7\SealException
+     */
 	public static function lockRecord($table,$uid,$fields,$data,$pubKeys) {
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
@@ -78,12 +79,58 @@ class Storage {
 		}
 		return $data;
 	}
-
-	/**
-	 * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
-	 * @param $table
-	 */
-	public static function unlockModel (&$obj,$table,$privateKey,$password=null) {
+    
+    
+    /**
+     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param array $fields
+     * @param array $pubKeys
+     * @throws \SUDHAUS7\Guard7\SealException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     */
+	public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj,array $fields,array $pubKeys) {
+	    $class = \get_class($obj);
+        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+        $table = $dataMapper->getDataMap($class)->getTableName();
+        /** @var DatabaseConnection $connection */
+        $connection = $GLOBALS['TYPO3_DB'];
+        
+        
+        foreach ($fields as $fieldname) {
+            $setter = 'set'.GeneralUtility::underscoredToUpperCamelCase( $fieldname);
+            $getter = 'get'.GeneralUtility::underscoredToUpperCamelCase( $fieldname);
+            if (\method_exists( $obj, $getter)) {
+                $value = $obj->$getter();
+                if ($value == '&#128274;' || $value == '🔒' || empty($value)) {
+                    continue;
+                }
+                $connection->exec_DELETEquery( 'tx_guard7_domain_model_data',sprintf('tablename="%s" and tableuid=%d and fieldname="%s"',$table,$obj->getUid(),$fieldname));
+                //$obj->$setter( '&#128274;'); // 🔒
+    
+                $encoder = new Encoder( $value, $pubKeys);
+                $encoded = $encoder->run();
+                unset($encoder);
+                $connection->exec_INSERTquery('tx_guard7_domain_model_data', [
+                    'tablename'  => $table,
+                    'tableuid'   => $obj->getUid(),
+                    'fieldname'  => $fieldname,
+                    'secretdata' => $encoded,
+                ]);
+                $insertid = $connection->sql_insert_id();
+                self::updateKeyLog( $insertid, $pubKeys);
+                $connection->exec_UPDATEquery($table, 'uid='.$obj->getUid(), [$fieldname=>'&#128274;']);// 🔒
+                
+            }
+        }
+    }
+    
+    /**
+     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param string $table
+     * @param string $privateKey
+     * @param null $password
+     */
+	public static function unlockModel (\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj,$table,$privateKey,$password=null) {
 		$uid = $obj->getUid();
         /** @var DatabaseConnection $connection */
         $connection = $GLOBALS['TYPO3_DB'];
