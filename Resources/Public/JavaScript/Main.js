@@ -13,6 +13,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                     //  console.log(name,data,e,privkey);
                     $('[data-formengine-input-name="' + name + '"]').val(data).prop('disabled', false);
                     $('[data-formengine-input-name="' + name + '"]').removeProp('disabled');
+                    $('[data-formengine-input-name="' + name + '"]').attr('placeholder', '');
                     console.log('tock', e.fieldname);
                 });
             });
@@ -22,7 +23,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
     var lockData = function () {
         sudhaus7guard7data.forEach(function (e) {
             var name = 'data['+e.tablename+']['+e.tableuid+']['+e.fieldname+']';
-            $('[data-formengine-input-name="'+name+'"]').val('').prop('disabled',true);
+            $('[data-formengine-input-name="' + name + '"]').val('').prop('disabled', true).attr('placeholder', '🔒 Bitte Privaten Schlüssel angeben');
         });
     };
 
