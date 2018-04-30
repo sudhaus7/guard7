@@ -40,16 +40,66 @@ class Storage {
 				[ 'parent' => $tx_guard7_domain_model_data_uid, 'signature' => $checksum ] );
 		}
 	}
-
-	/**
-	 * @param $table
-	 * @param $uid
-	 * @param $fields
-	 * @param $data
-	 * @param $pubKeys
-	 *
-	 * @return mixed
-	 */
+    
+    
+    /**
+     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param array $fields
+     * @param array $pubKeys
+     * @throws \SUDHAUS7\Guard7\SealException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     */
+    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys) {
+        $class = \get_class($obj);
+        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+        $table = $dataMapper->getDataMap($class)->getTableName();
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable($table);
+        
+        
+        foreach ( $fields as $fieldname ) {
+            $setter = 'set' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
+            $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
+            if ( \method_exists($obj, $getter) ) {
+                $value = $obj->$getter();
+                if ( $value == '&#128274;' || $value == '🔒' || empty($value) ) {
+                    continue;
+                }
+                $connection->delete('tx_guard7_domain_model_data',
+                    [
+                        'tablename' => $table,
+                        'tableuid' => $obj->getUid(),
+                        'fieldname' => $fieldname
+                    ]);
+                $obj->$setter('&#128274;'); // 🔒
+                
+                $encoder = new Encoder($value, $pubKeys);
+                $encoded = $encoder->run();
+                unset($encoder);
+                $connection->insert('tx_guard7_domain_model_data', [
+                    'tablename' => $table,
+                    'tableuid' => $uid,
+                    'fieldname' => $fieldname,
+                    'secretdata' => $encoded,
+                ]);
+                $insertid = $connection->lastInsertId();
+                self::updateKeyLog($insertid, $pubKeys);
+                $connection->update($table, [$fieldname => '&#128274;'], ['uid' => $obj->getUid()]);// 🔒
+                
+            }
+        }
+    }
+    
+    /**
+     * @param $table
+     * @param $uid
+     * @param $fields
+     * @param $data
+     * @param $pubKeys
+     * @return mixed
+     * @throws \SUDHAUS7\Guard7\SealException
+     */
 	public static function lockRecord($table,$uid,$fields,$data,$pubKeys) {
 		/** @var Connection $connection */
 		$connection = GeneralUtility::makeInstance(ConnectionPool::class)

@@ -74,6 +74,12 @@ TODO:
 - comments
 - licenses
 - Testing/proofing for 9.x
+- Unittests (this should be no 1 todo..)
+- the current system does not really work together with extbase's persistence workflow. The methods Storage::lockModel and Storage::unlockModel works, but need to be persisted twice with new models (no uid). Maybe something like extending from a different AbstractEntity could work. But I am wishing for a  container approach for dependency injection in the persistance layer.
+
+- on domain/models will look into hooking into the persistence layers events
+
 
 
 fberger@sudhaus7.de
+@FoppelFB on Twitter
