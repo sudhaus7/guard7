@@ -79,7 +79,7 @@ class Storage {
                 unset($encoder);
                 $connection->insert('tx_guard7_domain_model_data', [
                     'tablename' => $table,
-                    'tableuid' => $uid,
+                    'tableuid' => $obj->getUid(),
                     'fieldname' => $fieldname,
                     'secretdata' => $encoded,
                 ]);
