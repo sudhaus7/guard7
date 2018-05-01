@@ -72,21 +72,10 @@ class Keys {
 			$pubKeys[$checksum] = $confArr['masterkeypublic'];
 		}
 		if ($pid > 0) {
-			$ts = BackendUtility::getPagesTSconfig( $pid );
-			if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
-				if ( isset( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) && ! empty( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) ) {
-					foreach ( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] as $key ) {
-						$pubKeys[ self::getChecksum( $key )] = $key;
-					}
-				}
-				if ($table) {
-					if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) ) {
-						foreach ( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] as $key ) {
-							$pubKeys[ self::getChecksum( $key )] = $key;
-						}
-					}
-				}
-			}
+		    $tskeys = Helper::getTsPubkeys($pid,$table);
+		    foreach ($tskeys as $key) {
+                $pubKeys[ self::getChecksum( $key )] = $key;
+            }
 		}
 		if($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
 			if ( isset( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) && ! empty( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) ) {
