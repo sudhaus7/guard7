@@ -10,14 +10,29 @@ namespace SUDHAUS7\Guard7\Tools;
 
 
 use SUDHAUS7\Guard7\KeyNotReadableException;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use SUDHAUS7\Guard7\WrongKeyPassException;
 
 class Keys {
-
-
+    
+    
+    /**
+     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param bool $checkFEuser
+     * @param array $aPubkeys
+     * @return array
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     */
+    public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = []) {
+        $class = \get_class($obj);
+        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+        $table = $dataMapper->getDataMap($class)->getTableName();
+        return self::collectPublicKeys($table, (int)$obj->getUid(), (int)$obj->getPid(), $checkFEuser, $aPubkeys);
+    }
+    
 	/**
 	 * @param null $table
 	 * @param mixed $uid
@@ -56,22 +71,11 @@ class Keys {
 			$pubKeys[$checksum] = $confArr['masterkeypublic'];
 		}
 		if ($pid > 0) {
-			$ts = BackendUtility::getPagesTSconfig( $pid );
-			if ( isset( $ts['tx_sudhaus7guard7.'] ) ) {
-				if ( isset( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) && ! empty( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] ) ) {
-					foreach ( $ts['tx_sudhaus7guard7.']['generalPublicKeys.'] as $key ) {
-						$pubKeys[ self::getChecksum( $key )] = $key;
-					}
-				}
-				if ($table) {
-					if ( isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) && is_array( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] ) ) {
-						foreach ( $ts['tx_sudhaus7guard7.'][ $table . '.' ]['publicKeys.'] as $key ) {
-							$pubKeys[ self::getChecksum( $key )] = $key;
-						}
-					}
-				}
-			}
-		}
+            $tskeys = Helper::getTsPubkeys($pid, $table);
+            foreach ( $tskeys as $key ) {
+                $pubKeys[self::getChecksum($key)] = $key;
+            }
+        }
 		if($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
 			if ( isset( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) && ! empty( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) ) {
 				$pubKeys[ self::getChecksum( $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'] ) ] = $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'];
