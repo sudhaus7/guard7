@@ -117,7 +117,7 @@ Typo3 7.6:
 DOCROOT#$  typo3/cli_dispatch.phpsh extbase  guard7:locktable --table=tablename
 ```
 
-Typo3 7.6:
+Typo3 8:
 ```
 BASEDIR#$ vendor/bin/typo3 guard7:db:lock --table=tablename
 ```
