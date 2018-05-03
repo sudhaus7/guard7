@@ -105,6 +105,8 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         return false;
     };
 
+
+
     Guard7Tools.decode = function (privatekeyconfig, row, callback) {
 
         if (!privatekeyconfig.init) return;

@@ -143,24 +143,86 @@ class PageRenderer  {
 				if (\in_array( 'edit', $config)) {
 
 
+				 
 					$idlist = GeneralUtility::trimExplode( ',', array_keys( $config )[0], true );
 					$id     = array_shift( $idlist );
-					$rec    = BackendUtility::getRecord( $table, $id, 'uid,pid' );
+					$rec    = BackendUtility::getRecord( $table, $id, '*' );
 
 					$ts = BackendUtility::getPagesTSconfig( $rec['pid'] );
 					if ( isset( $ts['tx_sudhaus7guard7.'] ) && isset( $ts['tx_sudhaus7guard7.'][ $table . '.' ] ) ) {
 
 
-						$fields = GeneralUtility::trimExplode( ',',
-							$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'], true );
+						$fields = GeneralUtility::trimExplode( ',',$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'], true );
+                        
+                        $config = [
+                            'table'=>$table,
+                            'fields'=>[
+                                $table=>$fields
+                            ],
+                            'irre'=>[]
+                        ];
+                        
+                        $data = [
+                        
+                        ];
                         
                         /** @var DatabaseConnection $connection */
                         $connection = $GLOBALS['TYPO3_DB'];
 
-                        $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata' , 'tx_guard7_domain_model_data', sprintf('tablename = "%s" and tableuid=%d',$table,$id));
+                        $res = $connection->exec_SELECTquery('tablename,tableuid,fieldname,secretdata' , 'tx_guard7_domain_model_data', sprintf('tablename = "%s" and tableuid=%d',$table,$id));
+                        
+                        while($row = $connection->sql_fetch_assoc($res)) {
+                            $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]',$row['tablename'],$row['tableuid'],$row['fieldname']);
+                            $data[] = ['identifier'=>$identifier,'method'=>'val','secretdata'=>$row['secretdata']];
+                        }
+                        
 						$pageRenderer->loadRequireJsModule( 'TYPO3/CMS/Guard7/Main' );
+                        
+                        
+                        /**
+                         * Handle / prepare IRRE
+                         */
+                        $tcafields = GeneralUtility::trimExplode(',', $GLOBALS['TCA'][$table]['types'][0]['showitem'],true);
+                        
+                        foreach ($tcafields as $field) {
+                            if ($GLOBALS['TCA'][$table]['columns'][$field]['config']['type']=='inline') {
+                                $reltable = $GLOBALS['TCA'][$table]['columns'][$field]['config']['foreign_table'];
+                                $config['irre'][]=['table'=>$reltable,'field'=>$field];
+                                $config['fields'][$reltable] = GeneralUtility::trimExplode( ',',$ts['tx_sudhaus7guard7.'][ $reltable . '.' ]['fields'], true );
+                                
+                               
+                                
+                           
+                                $label = $GLOBALS['TCA'][$reltable]['ctrl']['label'];
+                                if ($GLOBALS['TCA'][$reltable]['ctrl']['label_alt_force']) $label .= ','. $GLOBALS['TCA'][$reltable]['ctrl']['label_alt'];
+                                $labelfields = GeneralUtility::trimExplode(',', $label,true);
+                                $labels = [];
+                                $irreres = $connection->exec_SELECTquery('tablename,tableuid,fieldname,secretdata' , 'tx_guard7_domain_model_data', sprintf('tablename = "%s" and tableuid in (%s)',$reltable,$rec[$field]),'','tableuid asc');
+                                while($row = $connection->sql_fetch_assoc($irreres)) {
+                                   // $data[]=$row;
+    
+                                    if (in_array($row['fieldname'],$labelfields)) {
+                                        $labels[$row['tableuid']][]=$row['secretdata'];
+                                    }
+                                    
+                                    $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]',$row['tablename'],$row['tableuid'],$row['fieldname']);
+                                    $data[] = ['identifier'=>$identifier,'method'=>'val','secretdata'=>$row['secretdata']];
+                                    
+                                }
+                                if (!empty($labels)) {
+                                    foreach ($labels as $id=>$label) {
+                                        $identifier = sprintf('#data-%d-%s-%d-%s-%s-%d_label',$rec['pid'],$table,$rec['uid'],$field,$reltable,$id);
+                                        $data[] = ['identifier'=>$identifier,'method'=>'label','secretdata'=>\implode('|', $label)];
+                                    }
+        
+                                }
+                                
+                            }
+                           
+                        }
+						
 						$pageRenderer->addJsInlineCode( __METHOD__,
-							'var sudhaus7guard7data = ' . json_encode( $data ) . ';' );
+							'var sudhaus7guard7data = ' . json_encode( $data ) . '; var sudhaus7guard7config = ' . json_encode( $config ) . ';' );
 
 					}
 				}

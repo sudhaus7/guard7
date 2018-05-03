@@ -84,17 +84,17 @@ class Datamap implements SingletonInterface {
 		}
 
 	}
-
-	/**
-	 * @param $status
-	 * @param $table
-	 * @param $id
-	 * @param $fieldArray
-	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
-	 *
-	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
-	 * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
-	 */
+    
+    /**
+     * @param $status
+     * @param $table
+     * @param $id
+     * @param $fieldArray
+     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+     * @throws \SUDHAUS7\Guard7\SealException
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     */
 	public function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj) {
 
 		if ($status == 'new') {
