@@ -114,7 +114,7 @@ per table:
 
 Typo3 7.6:
 ```
-DOCROOT#$  typo3/cli_dispatch.phpsh extbase help guard7:locktable --table=tablename
+DOCROOT#$  typo3/cli_dispatch.phpsh extbase  guard7:locktable --table=tablename
 ```
 
 Typo3 7.6:
