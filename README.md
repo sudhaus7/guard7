@@ -17,7 +17,7 @@ Working:
 
 - Tools for generating keys, validating keys and encrtyption/decryption in PHP and JS for Plugins.
 
-- PageTS base confguration of to be encrypted database fields and tables.
+- PageTS based confguration of to be encrypted database fields and tables.
 
 - PageTS based configuration for additional Public Keys (not sure anymore if that is a good idea, input welcome )
 
@@ -25,7 +25,7 @@ Working:
 
 - Signal slot for collection of Public keys on encryption
 
-
+- IRRE Support for non MM Relations
 
 Installation
 --
@@ -62,13 +62,71 @@ for typo3 7.6
 
 4. Add the public part of your newly generate masterkey into the public key field of the Guard7 extension setup 
 
-5. configure the pagets tree (tbd)
-6. lock the data (tbd)
+5. configure the pagets tree. Example Configuration, add to the PageTS:
+```
+tx_sudhaus7guard7 {
+    generalPublicKeys {
+       10 (
+-----BEGIN PUBLIC KEY-----
+Additional-base64-encoded-public-key
+-----END PUBLIC KEY-----       
+)
+    }
+    table_1 {
+        fields = title,first_name,last_name,phone,mobile
+    }
+    table_2 {
+        fields = first_name,last_name,email,passno,phone,birthplace,street,zip,city
+        publicKeys {
+        
+        10 (
+-----BEGIN PUBLIC KEY-----
+Additional-base64-encoded-public-key
+-----END PUBLIC KEY-----
+)
+        
+        }
+    }
+}
+```
 
+Description
+```
+tx_sudhaus7guard7.[tablename].fields = fieldlist
+```
+(required) A comma separated list of fields for this table to encode. Can be extended. The encoding process will only run for tables and fields that are found in the PageTS tree for the referencing page
+
+```
+tx_sudhaus7guard7.[tablename].publicKeys = {}
+```
+(optional) An array if public keys, which will be used to encode data for this table. Only used if found in the PageTS tree for the referencing page
+
+```
+tx_sudhaus7guard7.generalPublicKeys = {}
+```
+(optional) An array of public keys, which will be used for every table. Only used if found in the PageTS tree for the referencing page
+
+IRRE Tables must be listed like normal tables as well. The relation itself must not be encoded.
+
+6. lock the Database:
+
+per table:
+
+Typo3 7.6:
+```
+DOCROOT#$  typo3/cli_dispatch.phpsh extbase help guard7:locktable --table=tablename
+```
+
+Typo3 7.6:
+```
+BASEDIR#$ vendor/bin/typo3 guard7:db:lock --table=tablename
+```
 
 
 TODO:
 --
+- IRRE MM Relations
+- IRRE foreign field support
 - Re-encoding of dirty datasets 
 - documentation
 - comments
