@@ -196,7 +196,7 @@ class PageRenderer  {
                                 $labels = [];
                                 
                                 $query = $connection->createQueryBuilder();
-                                $irreres = $query->select([
+                                $irreres = $query->select(...[
                                     'tablename',
                                     'tableuid',
                                     'fieldname',
