@@ -194,34 +194,37 @@ class PageRenderer  {
                                 if ( $GLOBALS['TCA'][$reltable]['ctrl']['label_alt_force'] ) $label .= ',' . $GLOBALS['TCA'][$reltable]['ctrl']['label_alt'];
                                 $labelfields = GeneralUtility::trimExplode(',', $label, true);
                                 $labels = [];
-                                
-                                $query = $connection->createQueryBuilder();
-                                $irreres = $query->select(...[
-                                    'tablename',
-                                    'tableuid',
-                                    'fieldname',
-                                    'secretdata'
-                                ])
-                                    ->from('tx_guard7_domain_model_data')
-                                    ->andWhere($query->expr()->eq('tablename', $query->createNamedParameter($reltable)))
-                                    ->andWhere($query->expr()->in('tableuid', GeneralUtility::trimExplode(',', $rec[$field], true)))
-                                    ->addOrderBy('tableuid', 'ASC')
-                                    ->execute();
-                                
-                                while ( $row = $irreres->fetch(\PDO::FETCH_ASSOC) ) {
-                                    // $data[]=$row;
-                                    
-                                    if ( in_array($row['fieldname'], $labelfields) ) {
-                                        $labels[$row['tableuid']][] = $row['secretdata'];
+    
+                                if ( !empty($rec[$field]) ) {
+        
+                                    $query = $connection->createQueryBuilder();
+                                    $irreres = $query->select(...[
+                                        'tablename',
+                                        'tableuid',
+                                        'fieldname',
+                                        'secretdata'
+                                    ])
+                                        ->from('tx_guard7_domain_model_data')
+                                        ->andWhere($query->expr()->eq('tablename', $query->createNamedParameter($reltable)))
+                                        ->andWhere($query->expr()->in('tableuid', GeneralUtility::trimExplode(',', $rec[$field], true)))
+                                        ->addOrderBy('tableuid', 'ASC')
+                                        ->execute();
+        
+                                    while ( $row = $irreres->fetch(\PDO::FETCH_ASSOC) ) {
+                                        // $data[]=$row;
+            
+                                        if ( in_array($row['fieldname'], $labelfields) ) {
+                                            $labels[$row['tableuid']][] = $row['secretdata'];
+                                        }
+            
+                                        $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row['tablename'], $row['tableuid'], $row['fieldname']);
+                                        $data[] = [
+                                            'identifier' => $identifier,
+                                            'method' => 'val',
+                                            'secretdata' => $row['secretdata']
+                                        ];
+            
                                     }
-                                    
-                                    $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row['tablename'], $row['tableuid'], $row['fieldname']);
-                                    $data[] = [
-                                        'identifier' => $identifier,
-                                        'method' => 'val',
-                                        'secretdata' => $row['secretdata']
-                                    ];
-                                    
                                 }
                                 if ( !empty($labels) ) {
                                     foreach ( $labels as $id => $label ) {
