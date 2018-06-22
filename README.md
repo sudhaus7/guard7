@@ -1,30 +1,22 @@
 Guard7
 (old name datavault)
 
-A Typo3 (8) Plugin to facilitate asymetric RSA encryption with multiple public keys 
+A Typo3 v7 and v8 Plugin to facilitate asymetric RSA encryption with multiple public keys 
 
 !!! work in progress !!!
 work in progress !!!
 
 Working:
 
-- Asymetric encryption / decryption of arbitrary text-fields in tables with several public keys.
-
+- Asymetric encryption / decryption of arbitrary text-fields in tables with multiple public keys.
 - Public/Private Key management for FE Users
-
 - Backend: Decryption on Client, List module and TCA Fields. 
 - Rudimentary Support for Private Keys and Password encrypted Private Keys
-
 - Tools for generating keys, validating keys and encrtyption/decryption in PHP and JS for Plugins.
-
 - PageTS based confguration of to be encrypted database fields and tables.
-
 - PageTS based configuration for additional Public Keys (not sure anymore if that is a good idea, input welcome )
-
 - Commandline locking and unlocking for all configured fields
-
 - Signal slot for collection of Public keys on encryption
-
 - IRRE Support for non MM Relations
 
 Installation
@@ -49,20 +41,20 @@ and for typo3 8.x
 }
 ```
 
-for typo3 7.6 
+or for typo3 7.6 
 ```
 "require": {
   "SUDHAUS7/guard7": "dev-typo76"
 }
 ```
 
-2. Enable the extension, choose your default Encryption. Recommended AES256, faster are AES128 or RC4. If you run Typo3 7.6 on php 5.6 you have to use RC4 or DEC. You can change this in the running environment later.
+2. Enable the extension, access the extensions options and choose your default Encryption. Recommended is AES256, faster are AES128 or RC4. If you run Typo3 7.6 on php 5.6 you _have_ to use RC4 or DEC (this is a limitation in PHP 5.6's openssl implementation). You can change this in the running environment later. Save the settings
 
-3. Switch to the Guard7 Module, and choose the Menu Button 'Generate a new Key'. On the new Screen either press the 2048 or 4096 button and wait a moment. Please store the Private Key somewhere save. Without it you will lose data, if it is the only key used in the system. Copy the Public Part of the key and switch back to the extensionmanager in Guard7's configuration.
+3. Switch to the Guard7 Module, and choose the Menu Button 'Generate a new Key'. On the next Screen either press the 2048 or 4096 button and wait a moment. Please store the Private Key somewhere save! Without it you will lose data! Especially if it is the only key used in the system. Copy the Public Part of the key and switch back to the extensionmanager and open Guard7's configuration options.
 
 4. Add the public part of your newly generate masterkey into the public key field of the Guard7 extension setup 
 
-5. configure the pagets tree. Example Configuration, add to the PageTS:
+5. Configure the pagets tree. Example Configuration, add to the PageTS:
 ```
 tx_sudhaus7guard7 {
     generalPublicKeys {
@@ -99,14 +91,14 @@ tx_sudhaus7guard7.[tablename].fields = fieldlist
 ```
 tx_sudhaus7guard7.[tablename].publicKeys = {}
 ```
-(optional) An array if public keys, which will be used to encode data for this table. Only used if found in the PageTS tree for the referencing page
+(optional) An array of public keys, which will be used to encode data for this table. Only used if found in the PageTS tree for the referencing page
 
 ```
 tx_sudhaus7guard7.generalPublicKeys = {}
 ```
 (optional) An array of public keys, which will be used for every table. Only used if found in the PageTS tree for the referencing page
 
-IRRE Tables must be listed like normal tables as well. The relation itself must not be encoded.
+IRRE Tables must be listed like normal tables as well. The relation field itself _must_ not be added to the fields list!
 
 6. lock the Database:
 
