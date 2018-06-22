@@ -1,4 +1,5 @@
 Guard7
+--
 (old name datavault)
 
 A Typo3 v7 and v8 Plugin to facilitate asymetric RSA encryption with multiple public keys 
@@ -7,7 +8,7 @@ A Typo3 v7 and v8 Plugin to facilitate asymetric RSA encryption with multiple pu
 work in progress !!!
 
 Working:
-
+--
 - Asymetric encryption / decryption of arbitrary text-fields in tables with multiple public keys.
 - Public/Private Key management for FE Users
 - Backend: Decryption on Client, List module and TCA Fields. 
