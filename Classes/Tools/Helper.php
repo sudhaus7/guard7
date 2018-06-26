@@ -17,10 +17,10 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Helper {
-    
-    
     public static function getTsConfig($pid, $table = null) {
-        if ( !isset($GLOBALS['__METHOD__' . '-CACHE']) ) $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        if ( !isset($GLOBALS['__METHOD__' . '-CACHE']) ) {
+            $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        }
         if ( !isset($GLOBALS['__METHOD__' . '-CACHE'][$pid]) ) {
             $ts = BackendUtility::getPagesTSconfig($pid);
             if ( isset($ts['tx_sudhaus7guard7.']) ) {
@@ -42,7 +42,9 @@ class Helper {
      * @return array
      */
     public static function getTsConfigCustom($pid, $table = null) {
-        if ( !isset($GLOBALS['__METHOD__' . '-CACHE']) ) $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        if ( !isset($GLOBALS['__METHOD__' . '-CACHE']) ) {
+            $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        }
         if ( !isset($GLOBALS['__METHOD__' . '-CACHE'][$pid]) ) {
             $rootline = GeneralUtility::makeInstance(RootlineUtility::class, $pid, '', null);
             try {
@@ -55,7 +57,6 @@ class Helper {
             //tsconfig_includes
             $code = $GLOBALS['TYPO3_CONF_VARS']['BE']['defaultPageTSconfig'];
             foreach ( $rl as $p ) {
-                
                 if ( trim($p['tsconfig_includes']) ) {
                     $includeTsConfigFileList = GeneralUtility::trimExplode(',', $p['tsconfig_includes'], true);
                     // Traversing list

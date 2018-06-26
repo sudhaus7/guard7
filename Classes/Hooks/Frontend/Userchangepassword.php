@@ -19,25 +19,24 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @package SUDHAUS7\Guard7\Frontend
  */
 class Userchangepassword {
-
-	/**
-	 * @param $params
-	 */
-	public function handle($params) {
-
-		/** @var Connection $connection */
-		$connection    = GeneralUtility::makeInstance(ConnectionPool::class)
-		                            ->getConnectionForTable('fe_users');
-		$user          = $params['user'];
-		$signature_old = Keys::getChecksum( $user['tx_guard7_publickey'] );
-		Storage::markForReencode( $signature_old );
-
-		$password                     = $params['newPassword'];
-		$keypair                      = Keys::createKey( $password );
-		$data                         = [];
-		$data['tx_guard7_publickey']  = $keypair['public'];
-		$data['tx_guard7_privatekey'] = $keypair['private'];
-		$connection->update( 'fe_users', $data, ['uid'=>$user['uid']]);
-
-	}
+    
+    /**
+     * @param $params
+     */
+    public function handle($params) {
+        
+        /** @var Connection $connection */
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('fe_users');
+        $user = $params['user'];
+        $signature_old = Keys::getChecksum($user['tx_guard7_publickey']);
+        Storage::markForReencode($signature_old);
+        
+        $password = $params['newPassword'];
+        $keypair = Keys::createKey($password);
+        $data = [];
+        $data['tx_guard7_publickey'] = $keypair['public'];
+        $data['tx_guard7_privatekey'] = $keypair['private'];
+        $connection->update('fe_users', $data, ['uid' => $user['uid']]);
+    }
 }

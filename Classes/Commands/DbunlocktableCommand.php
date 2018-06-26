@@ -18,9 +18,7 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-
 class DbunlocktableCommand extends Command {
-    
     public function configure() {
         $this->setDescription('Lock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem')
@@ -78,7 +76,9 @@ class DbunlocktableCommand extends Command {
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($table);
         $where = [];
-        if ( $pid > 0 ) $where['pid'] = $pid;
+        if ( $pid > 0 ) {
+            $where['pid'] = $pid;
+        }
     
         $count = $connection->count('uid', $table, $where);
         $res = $connection->select(['*'], $table, $where);
@@ -96,8 +96,8 @@ class DbunlocktableCommand extends Command {
                 }
                 $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
                 $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
-            
-            
+                
+                
                 if ( $lockFiles ) {
                     foreach ( $filerefconfig as $reffield ) {
                         //if ($row[$reffield] > 0) {
@@ -116,11 +116,10 @@ class DbunlocktableCommand extends Command {
                 }
             }
             $counter++;
-           
         }
     }
     
-    var $configcache = [];
+    public $configcache = [];
     
     /**
      * @param $pid

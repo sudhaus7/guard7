@@ -8,40 +8,32 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
-
 use SUDHAUS7\Guard7\KeyNotReadableException;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class FeLogin {
-
-
-	public function handle($ar) {
-
-		/** @var TypoScriptFrontendController $pObj */
-		$pObj = $ar['pObj'];
-
-		if ( isset( $GLOBALS['guard7_temp_pass'] ) ) {
-
-			if ( ! empty( $pObj->fe_user->user['tx_guard7_privatekey'] ) ) {
-				try {
-					$privkey = Keys::unlockKeyToPem( $pObj->fe_user->user['tx_guard7_privatekey'],
-						$GLOBALS['guard7_temp_pass'] );
-					$GLOBALS['TSFE']->fe_user->setKey( 'user', 'tx_guard7_privatekey', $privkey );
-					$GLOBALS['TSFE']->fe_user->storeSessionData( 'guard7' );
-					//$pObj->fe_user->setAndSaveSessionData( 'tx_guard7_privatekey', $privkey);
-				} catch(WrongKeyPassException $e) {
-
-				} catch (KeyNotReadableException $e) {
-
-				}
-
-			}
-			unset( $GLOBALS['guard7_temp_pass'] );
-
-		}
-
-	}
-
+    public function handle($ar) {
+        
+        /** @var TypoScriptFrontendController $pObj */
+        $pObj = $ar['pObj'];
+        
+        if ( isset($GLOBALS['guard7_temp_pass']) ) {
+            if ( !empty($pObj->fe_user->user['tx_guard7_privatekey']) ) {
+                try {
+                    $privkey = Keys::unlockKeyToPem(
+                        $pObj->fe_user->user['tx_guard7_privatekey'],
+                        $GLOBALS['guard7_temp_pass']
+                    );
+                    $GLOBALS['TSFE']->fe_user->setKey('user', 'tx_guard7_privatekey', $privkey);
+                    $GLOBALS['TSFE']->fe_user->storeSessionData('guard7');
+                    //$pObj->fe_user->setAndSaveSessionData( 'tx_guard7_privatekey', $privkey);
+                } catch ( WrongKeyPassException $e ) {
+                } catch ( KeyNotReadableException $e ) {
+                }
+            }
+            unset($GLOBALS['guard7_temp_pass']);
+        }
+    }
 }

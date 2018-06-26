@@ -8,7 +8,6 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
-
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -34,7 +33,6 @@ class ToolbarController implements ToolbarItemInterface {
         $pageRenderer = $this->getPageRenderer();
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Toolbar');
         $pageRenderer->addCssFile('../' . ExtensionManagementUtility::siteRelPath('guard7') . 'Resources/Public/Css/styles.css');
-        
     }
     
     /**
@@ -79,5 +77,4 @@ class ToolbarController implements ToolbarItemInterface {
     public function getIndex() {
         return 5;
     }
-    
 }

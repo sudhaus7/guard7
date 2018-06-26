@@ -55,34 +55,41 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
     }
     
     public function indexAction() {
-        
         $iconFactory = $this->view->getModuleTemplate()->getIconFactory();
         $docHeader = $this->view->getModuleTemplate()->getDocHeaderComponent();
         $buttonBar = $docHeader->getButtonBar();
         
         
-        $buttonBar->addButton($buttonBar->makeLinkButton()
+        $buttonBar->addButton(
+            
+            
+            $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('createkey'))
             ->setShowLabelText($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey'))
+                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.createkey'))
             ->setIcon($iconFactory->getIcon('key', Icon::SIZE_SMALL))
             ->setTitle($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey')),
-            ButtonBar::BUTTON_POSITION_LEFT);
+                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.createkey')),
+            ButtonBar::BUTTON_POSITION_LEFT
         
-        $buttonBar->addButton($buttonBar->makeLinkButton()
+        
+        );
+        
+        $buttonBar->addButton(
+            
+            $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('listrencode'))
             ->setShowLabelText($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode'))
+                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.listrencode'))
             ->setIcon($iconFactory->getIcon('key', Icon::SIZE_SMALL))
             ->setTitle($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode')),
-            ButtonBar::BUTTON_POSITION_LEFT);
+                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.listrencode')),
+            ButtonBar::BUTTON_POSITION_LEFT
+        
+        );
         
         
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
-        
-        
     }
     
     /**
@@ -111,7 +118,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
      * @param array $params
      * @param \TYPO3\CMS\Core\Http\AjaxRequestHandler|null $ajaxObj
      */
-    public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = NULL) {
+    public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = null) {
         
         /** @var ServerRequest $request */
         $request = $params['request'];
@@ -147,5 +154,4 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         
         $ajaxObj->addContent('data', \json_encode($data));
     }
-    
 }

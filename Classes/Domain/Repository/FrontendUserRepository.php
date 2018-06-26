@@ -8,7 +8,5 @@
 
 namespace SUDHAUS7\Guard7\Domain\Repository;
 
-
 class FrontendUserRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
-
 }

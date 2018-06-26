@@ -8,12 +8,10 @@
 
 namespace SUDHAUS7\Guard7;
 
-
 /**
  * Class WrongkeypassException
  * thrown when the password to a locked private key does not match
  * @package SUDHAUS7\Guard7
  */
 class WrongKeyPassException extends \Exception {
-
 }

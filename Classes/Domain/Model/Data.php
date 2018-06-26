@@ -8,7 +8,6 @@
 
 namespace SUDHAUS7\Guard7\Domain\Model;
 
-
 class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
     
     /**
@@ -136,5 +135,4 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
     public function setNeedsreencode($needsreencode) {
         $this->needsreencode = $needsreencode;
     }
-    
 }

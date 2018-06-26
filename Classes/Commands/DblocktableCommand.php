@@ -19,9 +19,7 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-
 class DblocktableCommand extends Command {
-    
     public function configure() {
         $this->setDescription('Lock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:lock --pid=123 --table=fe_users')
@@ -43,7 +41,6 @@ class DblocktableCommand extends Command {
                 InputOption::VALUE_NONE,
                 'Lock referenced files as well'
             );
-        
     }
     
     /**
@@ -63,8 +60,6 @@ class DblocktableCommand extends Command {
         
         if ( $lockFiles ) {
             foreach ( $GLOBALS['TCA'][$table]['columns'] as $col => $config ) {
-                
-                
                 if ( $config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table'] == 'sys_file_reference' ) {
                     $filerefconfig[] = $col;
                 }
@@ -77,7 +72,9 @@ class DblocktableCommand extends Command {
     
     
         $where = [];
-        if ( $pid > 0 ) $where['pid'] = $pid;
+        if ( $pid > 0 ) {
+            $where['pid'] = $pid;
+        }
     
         $count = $connection->count('uid', $table, $where);
         $res = $connection->select(['*'], $table, $where);
@@ -87,9 +84,10 @@ class DblocktableCommand extends Command {
         while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
             $config = $this->getConfig($row['pid'], $table);
             if ( $config ) {
-            
                 $keys = [];
-                if ( isset($config['publicKeys.']) && !empty($config['publicKeys.']) ) $keys = \array_values($config['publicKeys.']);
+                if ( isset($config['publicKeys.']) && !empty($config['publicKeys.']) ) {
+                    $keys = \array_values($config['publicKeys.']);
+                }
                 $pubkeys = Keys::collectPublicKeys($table, $row['uid'], $pid, false, $keys);
             
                 $fieldArray = [];
@@ -101,7 +99,7 @@ class DblocktableCommand extends Command {
                 $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
                 //$output->writeln(['locking ' . $row['username']]);
                 $output->write("\rLocking Record " . $counter . " of " . $count['xcount']);
-            
+                
                 if ( $lockFiles ) {
                     foreach ( $filerefconfig as $reffield ) {
                         //if ($row[$reffield] > 0) {
@@ -120,12 +118,11 @@ class DblocktableCommand extends Command {
                 }
             }
             $counter++;
-         
         }
         $output->write("\nDone", true);
     }
     
-    var $configcache = [];
+    public $configcache = [];
     
     /**
      * @param $pid

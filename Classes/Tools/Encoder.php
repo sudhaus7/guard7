@@ -8,7 +8,6 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
-
 use SUDHAUS7\Guard7\SealException;
 
 class Encoder {
@@ -29,19 +28,20 @@ class Encoder {
      */
     protected $method = 'RC4';
     
-    public function __construct($content, $pubKeys = [], $method=null) {
-        
-        
+    public function __construct($content, $pubKeys = [], $method = null) {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'] );
+            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
             $method  = $confArr['defaultmethod'];
         }
-        if (is_array($content)) $content=\json_encode( $content );
-        if (\is_object( $content)) throw new \Exception('No support for Objects');
+        if ( is_array($content) ) {
+            $content = \json_encode($content);
+        }
+        if ( \is_object($content) ) {
+            throw new \Exception('No support for Objects');
+        }
         $this->content = $content;
         $this->setPubkeys($pubKeys);
-        $this->setMethod( $method);
-        
+        $this->setMethod($method);
     }
     
     public function setContent($content) {
@@ -56,7 +56,7 @@ class Encoder {
         $signatures = array_keys($this->pubkeys);
         $pubkeys = array_values($this->pubkeys);
         $iv = \openssl_random_pseudo_bytes(32);
-        foreach ( $pubkeys as $idx=> $key) {
+        foreach ( $pubkeys as $idx => $key ) {
             $pubkeys[$idx] = \openssl_get_publickey($key);
         }
         
@@ -65,21 +65,21 @@ class Encoder {
             throw new SealException("Seal failed");
         }
         $this->content = '';
-        foreach ( $pubkeys as $key) {
+        foreach ( $pubkeys as $key ) {
             \openssl_free_key($key);
         }
         $envelope = [];
-        foreach ( $ekeys as $k=> $ekey) {
+        foreach ( $ekeys as $k => $ekey ) {
             $envelope[$signatures[$k]]=base64_encode($ekey);
         }
-        $b64_iv = base64_encode( $iv );
-        $b64_envelope = base64_encode(json_encode( $envelope ));
-        $b64_data = base64_encode( $sealed );
+        $b64_iv = base64_encode($iv);
+        $b64_envelope = base64_encode(json_encode($envelope));
+        $b64_data = base64_encode($sealed);
         return $this->method.':'.$b64_iv.':'.$b64_envelope.':'.$b64_data;
     }
     
     public function addPubkey($key) {
-        $checksum = Keys::getChecksum( $key );
+        $checksum = Keys::getChecksum($key);
         $this->pubkeys[$checksum] = $key;
     }
     
@@ -97,9 +97,9 @@ class Encoder {
     /**
      * @param array $pubkeys
      */
-    public function setPubkeys( array $pubkeys ) {
-        foreach ( $pubkeys as $key) {
-            $checksum = Keys::getChecksum( $key );
+    public function setPubkeys(array $pubkeys) {
+        foreach ( $pubkeys as $key ) {
+            $checksum = Keys::getChecksum($key);
             $this->pubkeys[$checksum] = $key;
         }
     }
@@ -114,11 +114,13 @@ class Encoder {
     /**
      * @param string $method
      */
-    public function setMethod( string $method ) {
+    public function setMethod(string $method) {
         
         //$valid = ['RC4','AES128','AES256','DES'];
         $valid = openssl_get_cipher_methods(true);
-        if (\in_array( $method, $valid)) $this->method = $method;
+        if ( \in_array($method, $valid) ) {
+            $this->method = $method;
+        }
     }
     
     
@@ -130,20 +132,21 @@ class Encoder {
      *
      * @return array
      */
-    public static function encodeArray($row,$fields,$publicKeys,$method=null) {
-        if ($method === null ) {
-            $confArr = unserialize( $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'] );
+    public static function encodeArray($row, $fields, $publicKeys, $method = null) {
+        if ( $method === null ) {
+            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
             $method  = $confArr['defaultmethod'];
         }
         $checksums = null;
-        foreach ( $fields as $field) {
+        foreach ( $fields as $field ) {
             if (isset($row[$field]) && !empty($row[$field])) {
-                $encoder = new Encoder( $row[$field],$publicKeys,$method);
+                $encoder = new Encoder($row[$field], $publicKeys, $method);
                 $row[$field] = $encoder->run();
-                if (!$checksums) $checksums=$encoder->getChecksums();
+                if ( !$checksums ) {
+                    $checksums = $encoder->getChecksums();
+                }
             }
         }
         return [$row,$checksums];
     }
-    
 }

@@ -8,7 +8,5 @@
 
 namespace SUDHAUS7\Guard7\Commands;
 
-
 class DbrepairdirtyCommand {
-
 }
