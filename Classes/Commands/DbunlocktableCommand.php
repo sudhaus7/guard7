@@ -18,8 +18,10 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class DbunlocktableCommand extends Command {
-    public function configure() {
+class DbunlocktableCommand extends Command
+{
+    public function configure()
+    {
         $this->setDescription('Lock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem')
             ->addOption(
@@ -54,7 +56,8 @@ class DbunlocktableCommand extends Command {
             );
     }
     
-    public function execute(InputInterface $input, OutputInterface $output) {
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
         $table = $input->getOption('table');
         $pid = (int)$input->getOption('pid');
         $keyfile = $input->getOption('keyfile');
@@ -62,9 +65,9 @@ class DbunlocktableCommand extends Command {
         $password = $input->hasOption('password') ? $input->getOption('password') : null;
         $lockFiles = $input->hasOption('includeFiles');
         $filerefconfig = [];
-        if ( $lockFiles ) {
-            foreach ( $GLOBALS['TCA'][$table]['columns'] as $col => $config ) {
-                if ( $config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table'] == 'sys_file_reference' ) {
+        if ($lockFiles) {
+            foreach ($GLOBALS['TCA'][$table]['columns'] as $col => $config) {
+                if ($config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table'] == 'sys_file_reference') {
                     $filerefconfig[] = $col;
                 }
             }
@@ -76,30 +79,30 @@ class DbunlocktableCommand extends Command {
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($table);
         $where = [];
-        if ( $pid > 0 ) {
+        if ($pid > 0) {
             $where['pid'] = $pid;
         }
     
         $count = $connection->count('uid', $table, $where);
         $res = $connection->select(['*'], $table, $where);
         $counter = 1;
-        while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
+        while ($row = $res->fetch(\PDO::FETCH_ASSOC)) {
             $output->write("\rUnlocking Record " . $counter . " of " . $count['xcount']);
         
         
             $config = $this->getConfig($row['pid'], $table);
-            if ( $config ) {
+            if ($config) {
                 $fieldArray = [];
                 $vaultfields = GeneralUtility::trimExplode(',', $config['fields']);
-                foreach ( $vaultfields as $f ) {
+                foreach ($vaultfields as $f) {
                     $fieldArray[$f] = $row[$f];
                 }
                 $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
                 $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
                 
                 
-                if ( $lockFiles ) {
-                    foreach ( $filerefconfig as $reffield ) {
+                if ($lockFiles) {
+                    foreach ($filerefconfig as $reffield) {
                         //if ($row[$reffield] > 0) {
                     
                         $resref = $connection->select(['*'], 'sys_file_reference', [
@@ -107,7 +110,7 @@ class DbunlocktableCommand extends Command {
                             'fieldname' => $reffield,
                             'uid_foreign' => $row['uid']
                         ]);
-                        while ( $ref = $resref->fetch(\PDO::FETCH_ASSOC) ) {
+                        while ($ref = $resref->fetch(\PDO::FETCH_ASSOC)) {
                             $sysfile = $connection->select(['*'], 'sys_file', ['uid' => $ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
                             $ret = Storage::unlockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $key, $password);
                             //  $output->writeln(['unlocking file ' . $sysfile['identifier']]);
@@ -126,14 +129,15 @@ class DbunlocktableCommand extends Command {
      * @param $table
      * @return bool|mixed
      */
-    private function getConfig($pid, $table) {
-        if ( !isset($this->configcache[$pid]) ) {
+    private function getConfig($pid, $table)
+    {
+        if (!isset($this->configcache[$pid])) {
             $ts = BackendUtility::getPagesTSconfig($pid);
-            if ( isset($ts['tx_sudhaus7guard7.']) ) {
+            if (isset($ts['tx_sudhaus7guard7.'])) {
                 $this->configcache[$pid] = $ts['tx_sudhaus7guard7.'];
             }
         }
-        if ( isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields']) ) {
+        if (isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields'])) {
             return $this->configcache[$pid][$table . '.'];
         }
         return false;

@@ -18,12 +18,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Class Userchangepassword
  * @package SUDHAUS7\Guard7\Frontend
  */
-class Userchangepassword {
+class Userchangepassword
+{
     
     /**
      * @param $params
      */
-    public function handle($params) {
+    public function handle($params)
+    {
         
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)

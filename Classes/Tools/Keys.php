@@ -13,7 +13,8 @@ use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
-class Keys {
+class Keys
+{
     
     
     /**
@@ -25,7 +26,8 @@ class Keys {
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = []) {
+    public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
+    {
         $class = \get_class($obj);
         $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
         $table = $dataMapper->getDataMap($class)->getTableName();
@@ -43,7 +45,8 @@ class Keys {
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = []) {
+    public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = [])
+    {
         $keysFromSignalslot = [];
         /** @var Dispatcher $signalSlotDispatcher */
         $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
@@ -57,28 +60,28 @@ class Keys {
         
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
         $pubKeys = [];
-        if ( !empty($keysFromSignalslot) ) {
-            foreach ( $keysFromSignalslot as $key ) {
+        if (!empty($keysFromSignalslot)) {
+            foreach ($keysFromSignalslot as $key) {
                 $pubKeys[self::getChecksum($key)] = $key;
             }
         }
-        if ( !empty($aPubkeys) ) {
-            foreach ( $aPubkeys as $key ) {
+        if (!empty($aPubkeys)) {
+            foreach ($aPubkeys as $key) {
                 $pubKeys[self::getChecksum($key)] = $key;
             }
         }
-        if ( !empty($confArr['masterkeypublic']) ) {
+        if (!empty($confArr['masterkeypublic'])) {
             $checksum = self::getChecksum($confArr['masterkeypublic']);
             $pubKeys[$checksum] = $confArr['masterkeypublic'];
         }
-        if ( $pid > 0 ) {
+        if ($pid > 0) {
             $tskeys = Helper::getTsPubkeys($pid, $table);
-            foreach ( $tskeys as $key ) {
+            foreach ($tskeys as $key) {
                 $pubKeys[self::getChecksum($key)] = $key;
             }
         }
-        if ( $checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser ) {
-            if ( isset($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey']) && !empty($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey']) ) {
+        if ($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
+            if (isset($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey']) && !empty($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'])) {
                 $pubKeys[self::getChecksum($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'])] = $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'];
             }
         }
@@ -91,7 +94,8 @@ class Keys {
      *
      * @return array
      */
-    public static function createKey($password = null): array {
+    public static function createKey($password = null): array
+    {
         $config = [
             "digest_alg" => "sha512",
             "private_key_bits" => 4096,
@@ -102,7 +106,7 @@ class Keys {
         \openssl_pkey_export($res, $privatekey);
         $publickey = openssl_pkey_get_details($res);
         $publickey = $publickey["key"];
-        if ( $password ) {
+        if ($password) {
             \openssl_pkey_export($res, $privatekey, $password);
         }
         \openssl_free_key($res);
@@ -119,8 +123,9 @@ class Keys {
      * @return mixed
      * @throws KeyNotReadableException
      */
-    public static function lockPrivatePemKey($key, $password) {
-        if ( !$privkey = openssl_pkey_get_private($key) ) {
+    public static function lockPrivatePemKey($key, $password)
+    {
+        if (!$privkey = openssl_pkey_get_private($key)) {
             throw new KeyNotReadableException("Can not read Private Key");
         }
         $ret = self::lockPrivateKey($privkey, $password);
@@ -128,7 +133,8 @@ class Keys {
         return $ret;
     }
     
-    public static function lockPrivateKey($key, $password) {
+    public static function lockPrivateKey($key, $password)
+    {
         \openssl_pkey_export($key, $privatekey, $password);
         return $privatekey;
     }
@@ -141,7 +147,8 @@ class Keys {
      * @throws KeyNotReadableException
      * @throws WrongKeyPassException
      */
-    public static function unlockKeyToPem($key, $password) {
+    public static function unlockKeyToPem($key, $password)
+    {
         $privkey = self::unlockKey($key, $password);
         openssl_pkey_export($privkey, $out);
         \openssl_free_key($privkey);
@@ -157,13 +164,14 @@ class Keys {
      * @throws WrongKeyPassException
      * @throws KeyNotReadableException
      */
-    public static function unlockKey($key, $password) {
-        if ( $password ) {
-            if ( !$privkey = openssl_pkey_get_private($key, $password) ) {
+    public static function unlockKey($key, $password)
+    {
+        if ($password) {
+            if (!$privkey = openssl_pkey_get_private($key, $password)) {
                 throw new WrongKeyPassException("Can not read Private Key (password given)");
             }
         } else {
-            if ( !$privkey = openssl_pkey_get_private($key) ) {
+            if (!$privkey = openssl_pkey_get_private($key)) {
                 throw new KeyNotReadableException("Can not read Private Key");
             }
         }
@@ -171,23 +179,24 @@ class Keys {
         //return $privkey;
     }
     
-    public static function getChecksum($key) {
+    public static function getChecksum($key)
+    {
         $key = trim($key);
         $a = explode("\n", $key);
         $core = '';
         $active = false;
-        foreach ( $a as $line ) {
+        foreach ($a as $line) {
             $line = trim($line);
             
-            if ( $active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----') ) {
+            if ($active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----')) {
                 $active = false;
             }
             
-            if ( $active ) {
+            if ($active) {
                 $core .= $line;
             }
             
-            if ( !$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----') ) {
+            if (!$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
                 $active = true;
             }
         }

@@ -12,5 +12,6 @@ namespace SUDHAUS7\Guard7;
  * Class KeyNotReadableException
  * @package SUDHAUS7\Guard7
  */
-class KeyNotReadableException extends \Exception {
+class KeyNotReadableException extends \Exception
+{
 }

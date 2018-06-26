@@ -2,7 +2,6 @@
 
 call_user_func(
     function () {
-        
         $tempColumns = [
             'tx_guard7_publickey' => [
                 

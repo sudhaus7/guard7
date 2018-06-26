@@ -14,25 +14,28 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Storage {
-    public static function markForReencode($signature) {
+class Storage
+{
+    public static function markForReencode($signature)
+    {
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_signatures');
         $res = $connection->select(['parent'], 'tx_guard7_signatures', ['signature' => $signature]);
         $list = $res->fetchAll(\PDO::FETCH_ASSOC);
-        foreach ( $list as $row ) {
+        foreach ($list as $row) {
             $connection->update('tx_guard7_domain_model_data', ['needsreencode' => 1], ['uid' => $row['parent']]);
         }
     }
     
-    public static function updateKeyLog($tx_guard7_domain_model_data_uid, $pubkeys) {
+    public static function updateKeyLog($tx_guard7_domain_model_data_uid, $pubkeys)
+    {
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_signatures');
         
         $connection->delete('tx_guard7_signatures', ['parent' => $tx_guard7_domain_model_data_uid]);
-        foreach ( $pubkeys as $checksum => $key ) {
+        foreach ($pubkeys as $checksum => $key) {
             $connection->insert(
                 'tx_guard7_signatures',
                 [
@@ -51,7 +54,8 @@ class Storage {
      * @throws \SUDHAUS7\Guard7\SealException
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys) {
+    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys)
+    {
         $class = \get_class($obj);
         $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
         $table = $dataMapper->getDataMap($class)->getTableName();
@@ -60,12 +64,12 @@ class Storage {
             ->getConnectionForTable($table);
         
         
-        foreach ( $fields as $fieldname ) {
+        foreach ($fields as $fieldname) {
             $setter = 'set' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
-            if ( \method_exists($obj, $getter) ) {
+            if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ( $value == '&#128274;' || $value == '🔒' || empty($value) ) {
+                if ($value == '&#128274;' || $value == '🔒' || empty($value)) {
                     continue;
                 }
                 $connection->delete(
@@ -103,14 +107,15 @@ class Storage {
      * @return mixed
      * @throws \SUDHAUS7\Guard7\SealException
      */
-    public static function lockRecord($table, $uid, $fields, $data, $pubKeys) {
+    public static function lockRecord($table, $uid, $fields, $data, $pubKeys)
+    {
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
-        foreach ( $data as $fieldname => $value ) {
-            if ( in_array($fieldname, $fields) ) {
+        foreach ($data as $fieldname => $value) {
+            if (in_array($fieldname, $fields)) {
                 $data[$fieldname] = '&#128274;';
-                if ( $value == '&#128274;' || $value == '🔒' ) {
+                if ($value == '&#128274;' || $value == '🔒') {
                     continue;
                 }
                 $fieldArray[$fieldname] = '&#128274;'; // 🔒
@@ -142,7 +147,8 @@ class Storage {
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
      * @param $table
      */
-    public static function unlockModel(&$obj, $table, $privateKey, $password = null) {
+    public static function unlockModel(&$obj, $table, $privateKey, $password = null)
+    {
         $uid = $obj->getUid();
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -155,19 +161,19 @@ class Storage {
                 'tableuid' => $uid
             ]
         );
-        while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
+        while ($row = $res->fetch(\PDO::FETCH_ASSOC)) {
             $setter = 'set' . GeneralUtility::underscoredToUpperCamelCase($row['fieldname']);
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($row['fieldname']);
-            if ( \method_exists($obj, $getter) ) {
+            if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ( $value == '&#128274;' || $value == '🔒' ) {
+                if ($value == '&#128274;' || $value == '🔒') {
                     try {
                         $newvalue = Decoder::decode($row['secretdata'], $privateKey, $password);
                         
-                        if ( \method_exists($obj, $setter) ) {
+                        if (\method_exists($obj, $setter)) {
                             $obj->$setter($newvalue);
                         }
-                    } catch ( \Exception $e ) {
+                    } catch (\Exception $e) {
                         //$data[ $fieldname ] = '🔒';
                     }
                 }
@@ -175,16 +181,17 @@ class Storage {
         }
     }
     
-    public static function unlockRecord($table, $data, $privateKey, $uid = 0, $password = null) {
-        if ( $uid == 0 ) {
+    public static function unlockRecord($table, $data, $privateKey, $uid = 0, $password = null)
+    {
+        if ($uid == 0) {
             $uid = $data['uid'];
         }
         
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
-        foreach ( $data as $fieldname => $value ) {
-            if ( $value == '&#128274;' || $value == '🔒' ) {
+        foreach ($data as $fieldname => $value) {
+            if ($value == '&#128274;' || $value == '🔒') {
                 $row = $connection->select(
                     ['secretdata'],
                     'tx_guard7_domain_model_data',
@@ -199,12 +206,12 @@ class Storage {
                     1
                 )
                     ->fetch(\PDO::FETCH_ASSOC);
-                if ( $row && $row['secretdata'] ) {
+                if ($row && $row['secretdata']) {
                     try {
                         //$privateKey='xxx';
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
-                    } catch ( WrongKeyPassException $e ) {
-                    } catch ( UnlockException $e ) {
+                    } catch (WrongKeyPassException $e) {
+                    } catch (UnlockException $e) {
                         //$data[ $fieldname ] = '🔒';
                     }
                 }
@@ -214,40 +221,43 @@ class Storage {
     }
     
     
-    private static function sanitizePath($path) {
+    private static function sanitizePath($path)
+    {
         str_replace('../', '', $path);
         $path = \realpath($path);
-        if ( strpos($path, PATH_site) === 0 ) {
+        if (strpos($path, PATH_site) === 0) {
             return $path;
         }
         return null;
     }
     
-    public static function lockFile($filepath, $pubKeys) {
+    public static function lockFile($filepath, $pubKeys)
+    {
         $filepath = self::sanitizePath($filepath);
-        if ( is_file($filepath) ) {
+        if (is_file($filepath)) {
             try {
                 $encoded = self::encodeFile($filepath, $pubKeys);
-                if ( $encoded !== null ) {
+                if ($encoded !== null) {
                     //@unlink( $filepath );
                     \file_put_contents($filepath, 'encoded');
                     \file_put_contents($filepath . '.s7sec', $encoded);
                     return true;
                 }
-            } catch ( \Exception $e ) {
+            } catch (\Exception $e) {
                 return false;
             }
         }
         return false;
     }
     
-    public static function unlockFile($filepath, $privateKey, $password) {
+    public static function unlockFile($filepath, $privateKey, $password)
+    {
         $filepath = self::sanitizePath($filepath) . '.s7sec';
         
-        if ( is_file($filepath) ) {
+        if (is_file($filepath)) {
             try {
                 $data = self::decodeFile($filepath, $privateKey, $password);
-                if ( $data !== null ) {
+                if ($data !== null) {
                     @unlink($filepath);
                     \file_put_contents(
                         dirname($filepath) . '/' . $data['filename'],
@@ -255,21 +265,22 @@ class Storage {
                     );
                     return true;
                 }
-            } catch ( \Exception $e ) {
+            } catch (\Exception $e) {
                 return false;
             }
         }
         return false;
     }
     
-    public static function encodeFile($filepath, $pubKeys) {
+    public static function encodeFile($filepath, $pubKeys)
+    {
         $filepath = self::sanitizePath($filepath);
         $encoded = null;
-        if ( is_file($filepath) ) {
+        if (is_file($filepath)) {
             $identifier = str_replace(PATH_site, '', $filepath);
             $identifier = str_replace('fileadmin/', '', $identifier);
             $buf = \file_get_contents($filepath);
-            if ( $buf == 'encoded' ) {
+            if ($buf == 'encoded') {
                 throw new \Exception('already encoded');
             }
             $data = [
@@ -295,10 +306,11 @@ class Storage {
      * @throws UnlockException
      * @throws WrongKeyPassException
      */
-    public static function decodeFile($filepath, $privatekey, $password = null) {
+    public static function decodeFile($filepath, $privatekey, $password = null)
+    {
         $filepath = self::sanitizePath($filepath);
         $data = null;
-        if ( is_file($filepath) ) {
+        if (is_file($filepath)) {
             $enc = \file_get_contents($filepath);
             $json = Decoder::decode($enc, $privatekey, $password);
             $data = \json_decode($json, true);

@@ -19,8 +19,10 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class DblocktableCommand extends Command {
-    public function configure() {
+class DblocktableCommand extends Command
+{
+    public function configure()
+    {
         $this->setDescription('Lock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:lock --pid=123 --table=fe_users')
             ->addOption(
@@ -51,16 +53,17 @@ class DblocktableCommand extends Command {
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    public function execute(InputInterface $input, OutputInterface $output) {
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
         $table = $input->getOption('table');
         $pid = (int)$input->getOption('pid');
         $lockFiles = $input->hasOption('includeFiles');
         
         $filerefconfig = [];
         
-        if ( $lockFiles ) {
-            foreach ( $GLOBALS['TCA'][$table]['columns'] as $col => $config ) {
-                if ( $config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table'] == 'sys_file_reference' ) {
+        if ($lockFiles) {
+            foreach ($GLOBALS['TCA'][$table]['columns'] as $col => $config) {
+                if ($config['config']['type'] == 'inline' && isset($config['config']['foreign_table']) && $config['config']['foreign_table'] == 'sys_file_reference') {
                     $filerefconfig[] = $col;
                 }
             }
@@ -72,7 +75,7 @@ class DblocktableCommand extends Command {
     
     
         $where = [];
-        if ( $pid > 0 ) {
+        if ($pid > 0) {
             $where['pid'] = $pid;
         }
     
@@ -81,18 +84,18 @@ class DblocktableCommand extends Command {
     
         $output->write("\nStart locking (get a coffee, this can take a while..)", true);
         $counter = 1;
-        while ( $row = $res->fetch(\PDO::FETCH_ASSOC) ) {
+        while ($row = $res->fetch(\PDO::FETCH_ASSOC)) {
             $config = $this->getConfig($row['pid'], $table);
-            if ( $config ) {
+            if ($config) {
                 $keys = [];
-                if ( isset($config['publicKeys.']) && !empty($config['publicKeys.']) ) {
+                if (isset($config['publicKeys.']) && !empty($config['publicKeys.'])) {
                     $keys = \array_values($config['publicKeys.']);
                 }
                 $pubkeys = Keys::collectPublicKeys($table, $row['uid'], $pid, false, $keys);
             
                 $fieldArray = [];
                 $vaultfields = GeneralUtility::trimExplode(',', $config['fields']);
-                foreach ( $vaultfields as $f ) {
+                foreach ($vaultfields as $f) {
                     $fieldArray[$f] = $row[$f];
                 }
                 $fieldArray = Storage::lockRecord($table, $row['uid'], $vaultfields, $fieldArray, $pubkeys);
@@ -100,8 +103,8 @@ class DblocktableCommand extends Command {
                 //$output->writeln(['locking ' . $row['username']]);
                 $output->write("\rLocking Record " . $counter . " of " . $count['xcount']);
                 
-                if ( $lockFiles ) {
-                    foreach ( $filerefconfig as $reffield ) {
+                if ($lockFiles) {
+                    foreach ($filerefconfig as $reffield) {
                         //if ($row[$reffield] > 0) {
                     
                         $resref = $connection->select(['*'], 'sys_file_reference', [
@@ -109,7 +112,7 @@ class DblocktableCommand extends Command {
                             'fieldname' => $reffield,
                             'uid_foreign' => $row['uid']
                         ]);
-                        while ( $ref = $resref->fetch(\PDO::FETCH_ASSOC) ) {
+                        while ($ref = $resref->fetch(\PDO::FETCH_ASSOC)) {
                             $sysfile = $connection->select(['*'], 'sys_file', ['uid' => $ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
                             $ret = Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
                             // $output->writeln(['locking file ' . $sysfile['identifier']]);
@@ -129,14 +132,15 @@ class DblocktableCommand extends Command {
      * @param $table
      * @return bool|mixed
      */
-    private function getConfig($pid, $table) {
-        if ( !isset($this->configcache[$pid]) ) {
+    private function getConfig($pid, $table)
+    {
+        if (!isset($this->configcache[$pid])) {
             $ts = BackendUtility::getPagesTSconfig($pid);
-            if ( isset($ts['tx_sudhaus7guard7.']) ) {
+            if (isset($ts['tx_sudhaus7guard7.'])) {
                 $this->configcache[$pid] = $ts['tx_sudhaus7guard7.'];
             }
         }
-        if ( isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields']) ) {
+        if (isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields'])) {
             return $this->configcache[$pid][$table . '.'];
         }
         return false;

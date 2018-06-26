@@ -13,27 +13,30 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class SignalHandler {
+class SignalHandler
+{
     
     
     /**
      * @param EditDocumentController $cntrl
      */
-    public function EditDocumentInit($cntrl) {
+    public function EditDocumentInit($cntrl)
+    {
         $mypagerenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $mypagerenderer->editconf = $cntrl->editconf;
         $mypagerenderer->controller = $cntrl;
     }
     
     
-    public function FeuserFetchkey($keys, $uid, $pid) {
-        if ( substr($uid, 0, 3) != 'NEW' && $uid > 0 ) {
+    public function FeuserFetchkey($keys, $uid, $pid)
+    {
+        if (substr($uid, 0, 3) != 'NEW' && $uid > 0) {
             /** @var Connection $connection */
             $connection = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getConnectionForTable('fe_users');
             $row = $connection->select(['tx_guard7_publickey'], 'fe_users', ['uid' => $uid])
                 ->fetch(\PDO::FETCH_ASSOC);
-            if ( $row && !empty($row['tx_guard7_publickey']) ) {
+            if ($row && !empty($row['tx_guard7_publickey'])) {
                 $keys[] = $row['tx_guard7_publickey'];
             }
         }

@@ -8,5 +8,6 @@
 
 namespace SUDHAUS7\Guard7\Tests\Unit\Tools;
 
-class EncoderTest {
+class EncoderTest
+{
 }
