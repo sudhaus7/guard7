@@ -19,11 +19,10 @@ class Guard7CommandController extends  CommandController {
     /**
      * Lock all data of a table
      *
-     * @param string $table Table to lock
-     * @param int $pid UID of a Folder
-     * @param null $includeFiles Lock referenced files as well
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     * @param $table
+     * @param int $pid
+     * @param bool $includeFiles
+     * @throws \SUDHAUS7\Guard7\SealException
      */
     public function locktableCommand ($table,$pid=0,$includeFiles=false) {
         $filerefconfig = [];

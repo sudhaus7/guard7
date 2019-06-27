@@ -1,5 +1,5 @@
 {
-  "name": "SUDHAUS7/guard7",
+  "name": "sudhaus7/guard7",
   "description": "(Sudhaus7) Plugin and framework for encrypting and decrypting data in Typo3, including a RSA public and private key management.",
   "version": "7.0.0",
   "type": "typo3-cms-extension",
@@ -15,15 +15,46 @@
       "email": "mhofmann@sudhaus7.de"
     }
   ],
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "vendor-dir": ".Build/vendor"
+  },
   "require": {
+
     "typo3/cms-core": ">=7.0,<8.0"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^6.3.0",
+    "typo3/cms-fluid-styled-content": "^7.6.23",
+    "helhum/typo3-composer-setup": "^0.5.1",
+    "helmich/typo3-typoscript-lint": "^1.4.4",
+    "nimut/testing-framework": "^3.0",
+    "roave/security-advisories": "dev-master"
+  },
+
   "replace": {
     "guard7": "self.version"
   },
   "autoload": {
     "psr-4": {
       "SUDHAUS7\\Guard7\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SUDHAUS7\\Guard7\\Tests\\": "Tests/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "7.0.x-dev"
+    },
+    "typo3/cms": {
+      "extension-key": "guard7",
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/public"
     }
   }
 }
