@@ -32,12 +32,26 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         ev.preventDefault();
         if (Guard7Tools.hasPrivateKey()) {
             Guard7Tools.clearPrivateKey();
-            $('#sudhaus7-guard7-controller-toolbarcontroller > a > span').removeClass('fa-unlock').addClass('fa-lock');
-            $('#sudhaus7-guard7-controller-toolbarcontroller .clearKey').hide();
-            $('#sudhaus7-guard7-controller-toolbarcontroller .newkey-elem').show();
-            $('body').trigger('sudhaus7-guard7-privkey-removed');
 
         }
     });
 
+
+    $(window).on('privatekey-has-been-set',function(ev) {
+        var keyconfig = window.sessionStorage.getItem('Guard7Privkey');
+        if (keyconfig) {
+            var keyconfig = JSON.parse(keyconfig);
+            $('#sudhaus7-guard7-controller-toolbarcontroller [name="newkey"]').val(keyconfig.privateKeypem);
+        }
+        $('#sudhaus7-guard7-controller-toolbarcontroller > a > span').removeClass('fa-lock').addClass('fa-unlock');
+        $('#sudhaus7-guard7-controller-toolbarcontroller .clearKey').show();
+        $('#sudhaus7-guard7-controller-toolbarcontroller .newkey-elem').hide();
+    });
+
+    $(window).on('privatekey-has-been-cleared',function(ev) {
+        $('#sudhaus7-guard7-controller-toolbarcontroller > a > span').removeClass('fa-unlock').addClass('fa-lock');
+        $('#sudhaus7-guard7-controller-toolbarcontroller .clearKey').hide();
+        $('#sudhaus7-guard7-controller-toolbarcontroller .newkey-elem').show();
+        $('body').trigger('sudhaus7-guard7-privkey-removed');
+    });
 });

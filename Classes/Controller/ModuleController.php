@@ -18,7 +18,8 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Lang\LanguageService;
 
-class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController {
+class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+{
     
     /**
      * Backend Template Container
@@ -48,41 +49,42 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
     /**
      * ModuleController constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->db = $GLOBALS['TYPO3_DB'];
         $this->moduleUri = BackendUtility::getModuleUrl($this->moduleName);
     }
     
-    public function indexAction() {
-        
+    public function indexAction()
+    {
         $iconFactory = $this->view->getModuleTemplate()->getIconFactory();
         $docHeader = $this->view->getModuleTemplate()->getDocHeaderComponent();
         $buttonBar = $docHeader->getButtonBar();
         
         
-        $buttonBar->addButton($buttonBar->makeLinkButton()
+        $buttonBar->addButton(
+            $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('createkey'))
             ->setShowLabelText($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey'))
             ->setIcon($iconFactory->getIcon('key', Icon::SIZE_SMALL))
             ->setTitle($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.createkey')),
-            ButtonBar::BUTTON_POSITION_LEFT);
+            ButtonBar::BUTTON_POSITION_LEFT
+        );
         
-     /*   $buttonBar->addButton($buttonBar->makeLinkButton()
-            ->setHref($this->uriBuilder->uriFor('listrencode'))
-            ->setShowLabelText($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode'))
-            ->setIcon($iconFactory->getIcon('key', Icon::SIZE_SMALL))
-            ->setTitle($this->getLanguageService()
-                ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode')),
-            ButtonBar::BUTTON_POSITION_LEFT);
-       */
+        /*   $buttonBar->addButton($buttonBar->makeLinkButton()
+               ->setHref($this->uriBuilder->uriFor('listrencode'))
+               ->setShowLabelText($this->getLanguageService()
+                   ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode'))
+               ->setIcon($iconFactory->getIcon('key', Icon::SIZE_SMALL))
+               ->setTitle($this->getLanguageService()
+                   ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xml:module.action.listrencode')),
+               ButtonBar::BUTTON_POSITION_LEFT);
+          */
         
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
-        
-        
     }
     
     /**
@@ -90,11 +92,13 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
      *
      * @return LanguageService
      */
-    protected function getLanguageService() {
+    protected function getLanguageService()
+    {
         return $GLOBALS['LANG'];
     }
     
-    public function createkeyAction() {
+    public function createkeyAction()
+    {
         $iconFactory = $this->view->getModuleTemplate()->getIconFactory();
         $docHeader = $this->view->getModuleTemplate()->getDocHeaderComponent();
         $buttonBar = $docHeader->getButtonBar();
@@ -111,7 +115,8 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
      * @param array $params
      * @param \TYPO3\CMS\Core\Http\AjaxRequestHandler|null $ajaxObj
      */
-    public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = NULL) {
+    public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = null)
+    {
         
         /** @var ServerRequest $request */
         $request = $params['request'];
@@ -127,15 +132,14 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $fields = trim($fields, ',');
         $fields = "'" . str_replace(',', "','", $fields) . "'";
         $where = [
-            'tableuid in ('.implode(',',$idlist).')',
+            'tableuid in ('.implode(',', $idlist).')',
             //'fieldname in ("'.implode('","',$fields).'")',
             'fieldname in ('.$fields.')',
             'tablename = "'.$table.'"',
         ];
-        $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata', 'tx_guard7_domain_model_data', implode(' AND ',$where));
+        $data = $connection->exec_SELECTgetRows('tablename,tableuid,fieldname,secretdata', 'tx_guard7_domain_model_data', implode(' AND ', $where));
         
         
         $ajaxObj->addContent('data', \json_encode($data));
     }
-    
 }

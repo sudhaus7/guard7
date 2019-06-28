@@ -8,8 +8,8 @@
 
 namespace SUDHAUS7\Guard7\Domain\Model;
 
-
-class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
+class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+{
     
     /**
      * Tablename
@@ -47,7 +47,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      *
      * @return \string $tablename
      */
-    public function getTablename() {
+    public function getTablename()
+    {
         return $this->tablename;
     }
     
@@ -57,7 +58,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      * @param \string $tablename
      * @return void
      */
-    public function setTablename($tablename) {
+    public function setTablename($tablename)
+    {
         $this->tablename = $tablename;
     }
     
@@ -66,7 +68,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      *
      * @return \string $tableuid
      */
-    public function getTableuid() {
+    public function getTableuid()
+    {
         return $this->tableuid;
     }
     
@@ -76,7 +79,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      * @param \string $tableuid
      * @return void
      */
-    public function setTableuid($tableuid) {
+    public function setTableuid($tableuid)
+    {
         $this->tableuid = $tableuid;
     }
     
@@ -85,7 +89,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      *
      * @return \string $fieldname
      */
-    public function getFieldname() {
+    public function getFieldname()
+    {
         return $this->fieldname;
     }
     
@@ -95,7 +100,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      * @param \string $fieldname
      * @return void
      */
-    public function setFieldname($fieldname) {
+    public function setFieldname($fieldname)
+    {
         $this->fieldname = $fieldname;
     }
     
@@ -104,7 +110,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      *
      * @return \string $secretdata
      */
-    public function getSecretdata() {
+    public function getSecretdata()
+    {
         return $this->secretdata;
     }
     
@@ -114,7 +121,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      * @param \string $secretdata
      * @return void
      */
-    public function setSecretdata($secretdata) {
+    public function setSecretdata($secretdata)
+    {
         $this->secretdata = $secretdata;
     }
     
@@ -123,7 +131,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      *
      * @return \string $needsreencode
      */
-    public function getNeedsreencode() {
+    public function getNeedsreencode()
+    {
         return $this->needsreencode;
     }
     
@@ -133,8 +142,8 @@ class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
      * @param \string $needsreencode
      * @return void
      */
-    public function setNeedsreencode($needsreencode) {
+    public function setNeedsreencode($needsreencode)
+    {
         $this->needsreencode = $needsreencode;
     }
-    
 }

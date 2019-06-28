@@ -13,6 +13,6 @@ namespace SUDHAUS7\Guard7;
  * Thrown when a Key was unable to unlock sealed data
  * @package SUDHAUS7\Guard7
  */
-class UnlockException extends \Exception {
-
+class UnlockException extends \Exception
+{
 }

@@ -8,14 +8,14 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
-
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ToolbarController implements ToolbarItemInterface {
+class ToolbarController implements ToolbarItemInterface
+{
     
     /**
      * @var array
@@ -29,12 +29,12 @@ class ToolbarController implements ToolbarItemInterface {
     protected $iconFactory;
     
     
-    public function __construct() {
+    public function __construct()
+    {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $pageRenderer = $this->getPageRenderer();
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Toolbar');
         $pageRenderer->addCssFile('../' . ExtensionManagementUtility::siteRelPath('guard7') . 'Resources/Public/Css/styles.css');
-        
     }
     
     /**
@@ -42,25 +42,30 @@ class ToolbarController implements ToolbarItemInterface {
      *
      * @return PageRenderer
      */
-    protected function getPageRenderer() {
+    protected function getPageRenderer()
+    {
         return GeneralUtility::makeInstance(PageRenderer::class);
     }
     
-    public function checkAccess() {
+    public function checkAccess()
+    {
         return true;
     }
     
-    public function getItem() {
+    public function getItem()
+    {
         $opendocsMenu = array();
         $opendocsMenu[] = '<span class="t3-icon fa fa-lock" title="Guard7">' . '</span>';
         return implode(LF, $opendocsMenu);
     }
     
-    public function hasDropDown() {
+    public function hasDropDown()
+    {
         return true;
     }
     
-    public function getDropDown() {
+    public function getDropDown()
+    {
         $dropdown = [];
         $dropdown[] = '<ul class="dropdown-list">';
         
@@ -72,12 +77,13 @@ class ToolbarController implements ToolbarItemInterface {
         return implode(LF, $dropdown);
     }
     
-    public function getAdditionalAttributes() {
+    public function getAdditionalAttributes()
+    {
         return array();
     }
     
-    public function getIndex() {
+    public function getIndex()
+    {
         return 5;
     }
-    
 }
