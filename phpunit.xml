@@ -26,13 +26,11 @@
         timeoutForLargeTests="60"
         verbose="false">
         <testsuites>
-                <testsuite name="Guard7 Functional tests">
-                        <directory>Tests/Functional/</directory>
-                </testsuite>
                 <testsuite name="Guard7 Unit tests">
                         <directory>Tests/Unit/</directory>
                 </testsuite>
         </testsuites>
+
         <filter>
                 <whitelist processUncoveredFilesFromWhitelist="true">
                         <directory suffix=".php">Classes</directory>
