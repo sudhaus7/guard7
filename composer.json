@@ -59,6 +59,7 @@
     }
   },
   "scripts": {
-    "test": "@php .Build/vendor/bin/phpunit"
+    "unittest": "@php .Build/vendor/bin/phpunit",
+    "funciontest": "@php .Build/vendor/bin/phpunit"
   }
 }
