@@ -132,6 +132,12 @@ class Keys
         \openssl_free_key($privkey);
         return $ret;
     }
+    
+    /**
+     * @param keyresource $key
+     * @param $password
+     * @return mixed
+     */
     public static function lockPrivateKey($key, $password)
     {
         \openssl_pkey_export($key, $privatekey, $password);

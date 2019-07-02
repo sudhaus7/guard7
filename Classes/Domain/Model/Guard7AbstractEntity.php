@@ -26,7 +26,8 @@ abstract class Guard7AbstractEntity extends AbstractEntity
      * @param null $password
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public function _unlock($privateKey, $password=null) {
+    public function _unlock($privateKey, $password=null)
+    {
         $table = Helper::getModelTable($this);
         Storage::unlockModel($this, $table, $privateKey, $password);
     }
