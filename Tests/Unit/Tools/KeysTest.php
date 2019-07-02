@@ -14,6 +14,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     *
      */
     public function canCreatePrivateKey()
     {
@@ -24,6 +26,7 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
      */
     public function canCreatePublicKey()
     {
@@ -34,6 +37,7 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
      */
     public function canCreateEncryptedPrivateKey()
     {
@@ -45,6 +49,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
      */
     public function unlockKeyWithPasswordGetsKeyResourceFromEncryptedKey()
     {
@@ -55,6 +61,9 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\WrongKeyPassException
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
      */
     public function unlockKeyWithWrongPasswortThrowsException()
     {
@@ -65,6 +74,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\KeyNotReadableException
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
      */
     public function unlockKeyWithInvalidPemKey()
     {
@@ -74,6 +85,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
      */
     public function unlockKeyWithoutPasswordGetsKeyResourceFromUnencryptedKey()
     {
@@ -84,6 +97,9 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKeyToPem
      */
     public function unlockKeyToPemCreatesPEMFormatedPrivateKeyFromEncryptedPrivateKey()
     {
@@ -94,6 +110,9 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::createKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::unlockKey
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::lockPrivateKey
      */
     public function lockPrivateKeyLocksAnUnencryptedKey()
     {
@@ -105,6 +124,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::getChecksum
+     *
      */
     public function checksumCreatesValidChecksumForPrivateKey()
     {
@@ -116,6 +137,7 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::getChecksum
      */
     public function checksumCreatesValidChecksumForEncryptedPrivateKey()
     {
@@ -127,6 +149,8 @@ class KeysTest extends UnitTestCase
     
     /**
      * @test
+     * @covers \SUDHAUS7\Guard7\Tools\Keys::getChecksum
+     *
      */
     public function checksumCreatesValidChecksumForPublicKey()
     {

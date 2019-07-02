@@ -9,9 +9,11 @@
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
-        forceCoversAnnotation="false"
         mapTestClassNameToCoveredClassName="false"
-
+        forceCoversAnnotation="true"
+        beStrictAboutCoversAnnotation="true"
+        beStrictAboutOutputDuringTests="true"
+        beStrictAboutTodoAnnotatedTests="true"
         processIsolation="false"
         stopOnError="false"
         stopOnFailure="false"
@@ -31,4 +33,15 @@
                         <directory>Tests/Unit/</directory>
                 </testsuite>
         </testsuites>
+        <filter>
+                <whitelist processUncoveredFilesFromWhitelist="true">
+                        <directory suffix=".php">Classes</directory>
+                </whitelist>
+        </filter>
+        <logging>
+                <log type="coverage-html" target=".Build/coverage" />
+                <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+                <log type="junit" target=".Build/junit.xml" />
+                <log type="coverage-clover" target=".Build/coverage-clover.xml" />
+        </logging>
 </phpunit>
