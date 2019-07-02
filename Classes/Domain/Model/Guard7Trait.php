@@ -1,21 +1,21 @@
 <?php
 
 
-namespace SUDHAUS7\Guard7\Domain\Model;
+namespace Domain\Model;
 
-use Domain\Model\Guard7Interface;
+
 use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-abstract class Guard7AbstractEntity extends AbstractEntity implements Guard7Interface
+trait Guard7Trait
 {
+    
     /**
      * @var bool
      */
     private $_needsPersisting = false;
-    
+
     final public function _hasNeedForPersisting() {
         return $this->_needsPersisting;
     }

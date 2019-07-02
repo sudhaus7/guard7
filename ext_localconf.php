@@ -37,6 +37,13 @@ $signalSlotDispatcher->connect(
     'FeuserFetchkey',
     false
 );
+$signalSlotDispatcher->connect(
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+    'afterPersistObject',
+    \Hooks\Frontend\AfterPersistHandler::class,
+    'handle',
+    false
+);
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \SUDHAUS7\Guard7\Command\Guard7CommandController::class;
 
@@ -51,3 +58,5 @@ if (TYPO3_MODE === 'BE') {
         'onInstall'
     );
 }
+
+
