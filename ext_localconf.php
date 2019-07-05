@@ -40,7 +40,7 @@ $signalSlotDispatcher->connect(
 $signalSlotDispatcher->connect(
     \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
     'afterPersistObject',
-    \Hooks\Frontend\AfterPersistHandler::class,
+    \SUDHAUS7\Guard7\Hooks\Frontend\AfterPersistHandler::class,
     'handle',
     false
 );

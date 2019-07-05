@@ -3,7 +3,7 @@
 
 namespace SUDHAUS7\Guard7\Domain\Model;
 
-use Domain\Model\Guard7Interface;
+use SUDHAUS7\Guard7\Domain\Model\Guard7Interface;
 use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
@@ -20,7 +20,7 @@ abstract class Guard7AbstractEntity extends AbstractEntity implements Guard7Inte
         return $this->_needsPersisting;
     }
     
-    final public function _hasBeenForPersisted() {
+    final public function _removeNeedForPersisting() {
         $this->_needsPersisting = false;
     }
     

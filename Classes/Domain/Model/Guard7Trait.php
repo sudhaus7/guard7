@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Domain\Model;
+namespace SUDHAUS7\Guard7\Domain\Model;
 
 
 use SUDHAUS7\Guard7\Tools\Helper;
@@ -20,7 +20,7 @@ trait Guard7Trait
         return $this->_needsPersisting;
     }
     
-    final public function _hasBeenForPersisted() {
+    final public function _removeNeedForPersisting() {
         $this->_needsPersisting = false;
     }
     
