@@ -32,7 +32,8 @@ class Encoder
     public function __construct($content, $pubKeys = [], $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'],['allowed_classes' => false]);
+            $x = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'];
             $method  = $confArr['defaultmethod'];
         }
         if (is_array($content)) {
@@ -135,17 +136,17 @@ class Encoder
     
     
     /**
-     * @param $row array
-     * @param $fields array
-     * @param $publicKeys array
-     * @param string $method
-     *
+     * @param $row
+     * @param $fields
+     * @param $publicKeys
+     * @param null $method
      * @return array
+     * @throws SealException
      */
     public static function encodeArray($row, $fields, $publicKeys, $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'],['allowed_classes'=>false]);
             $method  = $confArr['defaultmethod'];
         }
         $checksums = null;

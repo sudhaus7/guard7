@@ -1,5 +1,5 @@
 define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
-
+console.log('loaded');
     const unlockData = function () {
         if (Guard7Tools.hasPrivateKey()) {
             var privkey = Guard7Tools.getPrivateKey();

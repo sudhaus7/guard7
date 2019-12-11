@@ -85,13 +85,13 @@ class Datamap implements SingletonInterface
      * @param $id
      * @param $fieldArray
      * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
-     *
+     * @throws \SUDHAUS7\Guard7\SealException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
     public function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj)
     {
-        if ($status == 'new') {
+        if ($status === 'new') {
             //	$pObj->substNEWwithIDs
             $ts = BackendUtility::getPagesTSconfig($fieldArray['pid']);
             if (isset($ts['tx_sudhaus7guard7.'])) {

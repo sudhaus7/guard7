@@ -16,16 +16,15 @@
         }
     ],
     "require": {
-        "php": "~7.0.0 || ~7.1.0 || ~7.2.0",
         "typo3/cms-core": "^8.7.0"
     },
     "require-dev": {
-        "typo3-console/php-server-command": "^0.1.1",
         "nimut/testing-framework": "^4.1",
         "phpunit/phpunit": "*",
         "phpstan/phpstan": "^0.11",
         "codeception/codeception": "^3.1",
-        "codeception/phpbuiltinserver": "^1.5"
+        "codeception/phpbuiltinserver": "^1.5",
+        "georgringer/backend-debug": "^1.1"
     },
     "replace": {
         "guard7": "self.version"
@@ -34,5 +33,28 @@
         "psr-4": {
             "SUDHAUS7\\Guard7\\": "Classes/"
         }
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "8.0.x-dev"
+        },
+        "typo3/cms": {
+            "extension-key": "guard7",
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
+            "web-dir": ".Build/public"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "mkdir -p .Build/public/typo3conf/ext/",
+            "[ -L .Build/public/typo3conf/ext/guard7 ] || ln -snvf ../../../../. .Build/public/typo3conf/ext/guard7"
+        ]
     }
 }

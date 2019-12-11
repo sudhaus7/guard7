@@ -37,17 +37,35 @@ class ExttemplateMethods
      */
     public function render(array $parameter = array(), TypoScriptConstantsViewHelper $parentObject)
     {
-        $list = openssl_get_cipher_methods(true);
+        $content = '<option value="">Please choose</option>';
+        
+        if (defined('SODIUM_LIBRARY_VERSION')) {
+            $content .= '<optgroup label="Sodium">';
+            $content .= '<option value="libsodium">Sodium '.SODIUM_LIBRARY_VERSION.'</option>';
+            $content .= '</optgroup>';
+        }
+        
+        if (\function_exists('openssl_get_cipher_methods')) {
+            $content .= '<optgroup label="OpenSSL">';
+            $list = openssl_get_cipher_methods(false);
+            foreach ($list as $method) {
+                $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method == $parameter['fieldValue'] ? 'selected' : '');
+            }
+            $content .= '</optgroup>';
+        }
+        
+       
+ 
+        /*
         foreach ($list as $k => $v) {
-            $up = \strtoupper($v);
-            if ($up != $v) {
+            //$up = \strtoupper($v);
+            if ($up !== $v) {
                 unset($list[$k]);
             }
         }
-        $content = '';
-        foreach ($list as $method) {
-            $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method == $parameter['fieldValue'] ? 'selected' : '');
-        }
+        */
+        
+        
         
         $this->tag->setTagName('select');
         $this->tag->forceClosingTag(true);

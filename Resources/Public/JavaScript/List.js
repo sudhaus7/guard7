@@ -4,7 +4,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         if (Guard7Tools.hasPrivateKey()) {
             if (sudhaus7guard7tables && sudhaus7guard7tables.length > 0) {
 
-                var ajaxUrl = TYPO3.settings.ajaxUrls['Guard7Backend::getListData'];
+                var ajaxUrl = TYPO3.settings.ajaxUrls['guard7_backend_list_data'];
 
 
                 sudhaus7guard7tables.forEach(function (tablename) {

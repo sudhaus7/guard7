@@ -1,5 +1,6 @@
 define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
+
     $('#createkey button').click(function(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -8,16 +9,17 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         if (!password || password.length < 1) {
             password = null;
         }
-        //console.log($('#loading'));
+
         $('#loading').removeClass('off');
+
         Guard7Tools.createPrivateKey(password, depth)
         .then(function(keypair) {
+            console.log(keypair, $('#createkey textarea[name="privatekey"]'));
             $('#createkey textarea[name="privatekey"]').val(keypair.privateKey);
             $('#createkey textarea[name="publickey"]').val(keypair.publicKey);
             $('#loading').addClass('off');
         })
         .catch(function (err) {
-
             $('#loading').addClass('off');
         });
     })

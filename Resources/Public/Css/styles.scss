@@ -57,7 +57,7 @@
   }
 }
 
-.tx-bfactor-template {
+.tx-sudhaus7-template {
   #createkey {
     label {
       display:block;
@@ -68,6 +68,10 @@
       height: 150px;
 
       color: #000;
+    }
+
+    input[type="text"] {
+      width: 100%;
     }
   }
   #loading {

@@ -174,7 +174,7 @@ class Storage
                             $obj->$setter($newvalue);
                         }
                     } catch (\Exception $e) {
-                        //$data[ $fieldname ] = '🔒';
+                        //$data[ $fieldname ] = '&#128274;';
                     }
                 }
             }
@@ -212,7 +212,7 @@ class Storage
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
                     } catch (WrongKeyPassException $e) {
                     } catch (UnlockException $e) {
-                        //$data[ $fieldname ] = '🔒';
+                        //$data[ $fieldname ] = '&#128274;';
                     }
                 }
             }

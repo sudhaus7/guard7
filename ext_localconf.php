@@ -59,6 +59,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['guard7_tableunlo
 ];
 
 
+
 if (TYPO3_MODE === 'BE') {
     $class = \TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class;
     $dispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance($class);

@@ -13,6 +13,9 @@ return [
     'guard7:db:unlock' => [
         'class' => SUDHAUS7\Guard7\Commands\DbunlocktableCommand::class,
     ],
+    'guard7:createkeypair' => [
+        'class' => SUDHAUS7\Guard7\Commands\CreatekeypairCommand::class,
+    ],
     //'guard7:file:lock' => [
     //	'class' => SUDHAUS7\Guard7\Commands\FilelockCommand::class
     //],

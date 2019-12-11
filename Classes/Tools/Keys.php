@@ -58,7 +58,7 @@ class Keys
             $pid
         ]);
         
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'],['allowed_classes' => false]);
         $pubKeys = [];
         if (!empty($keysFromSignalslot)) {
             foreach ($keysFromSignalslot as $key) {

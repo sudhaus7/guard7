@@ -8,6 +8,8 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
@@ -120,18 +122,18 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
     }
     
     /**
-     * @param array $params
-     * @param \TYPO3\CMS\Core\Http\AjaxRequestHandler|null $ajaxObj
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    public function ajaxData($params = array(), \TYPO3\CMS\Core\Http\AjaxRequestHandler &$ajaxObj = null)
+    public function ajaxData(ServerRequestInterface $request, ResponseInterface $response)
     {
         
         /** @var ServerRequest $request */
-        $request = $params['request'];
         $get = $request->getQueryParams();
         $table = $get['table'];
         $idlist = $get['uids'];
-        $a = 1;
+
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
@@ -142,8 +144,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
             'tableuid',
             'fieldname',
             'secretdata'
-        ])
-            ->from('tx_guard7_domain_model_data');
+        ])->from('tx_guard7_domain_model_data');
         
         $fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
         $fields .= ',' . $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
@@ -156,8 +157,10 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         
         $result = $query->execute();
         $data = $result->fetchAll();
-        
-        
-        $ajaxObj->addContent('data', \json_encode($data));
+    
+    
+        $response->getBody()->write(\json_encode($data));
+        return $response;
+        //$response->addContent('data', \json_encode($data));
     }
 }

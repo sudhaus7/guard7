@@ -127,7 +127,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         //   console.log(publicPem,checksumpubkey,envkeyar);
 
         var runmethod = null;
-        switch (method) {
+        switch (method.toUpperCase()) {
             case 'RC4':
                 runmethod='RC4';
                 break;

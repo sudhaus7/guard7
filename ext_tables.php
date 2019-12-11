@@ -72,10 +72,5 @@ $iconRegistry->registerIcon(
 
 if (TYPO3_MODE === 'BE') {
     $GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][] = \SUDHAUS7\Guard7\Controller\ToolbarController::class;
-    
-    
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerAjaxHandler(
-        'Guard7Backend::getListData',
-        \SUDHAUS7\Guard7\Controller\ModuleController::class . '->ajaxData'
-    );
+
 }
