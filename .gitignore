@@ -53,3 +53,5 @@ fabric.properties
 
 .scannerwork
 /.php_cs.cache
+/.scannerwork/
+/composer.lock
