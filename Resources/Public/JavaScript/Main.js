@@ -22,8 +22,8 @@ console.log('loaded');
                         break;
                     case 'label':
                         if (parseInt($(e.identifier).data('locked')) === 1) {
-                            var arr = e.secretdata.split('|');
-                            for (var i = 0, l = arr.length; i < l; i++) {
+                            let arr = e.secretdata.split('|');
+                            for (let i = 0, l = arr.length; i < l; i++) {
                                 Guard7Tools.decode(privkey, {'secretdata': arr[i]}, function (data) {
                                     arr[i] = data;
                                 });
@@ -50,8 +50,8 @@ console.log('loaded');
                     break;
                 case 'label':
                     const count = data.secretdata.split('|').length;
-                    var txt = [];
-                    for (var i = 0; i < count; i++) {
+                    let txt = [];
+                    for (let i=0;i<count;i++) {
                         txt.push('🔒');
                     }
                     $(data.identifier).text(txt.join(',')).data('locked', 1);
@@ -64,8 +64,8 @@ console.log('loaded');
 
     const initFields = function () {
 
-        for (var i = 0, l = sudhaus7guard7data.length; i < l; i++) {
-            var data = sudhaus7guard7data[i];
+        for (let i = 0, l = sudhaus7guard7data.length; i < l; i++) {
+            const data = sudhaus7guard7data[i];
             switch (data.method) {
                 case 'val':
                     if (parseInt($(data.identifier).data('locked')) === 0 || isNaN($(data.identifier).data('locked'))) {
@@ -77,7 +77,7 @@ console.log('loaded');
                     break;
                 case 'label':
                     if (parseInt($(data.identifier).data('locked')) === 0 || isNaN($(data.identifier).data('locked'))) {
-                        var txt = $(data.identifier).text();
+                        const txt = $(data.identifier).text();
                         $(data.identifier).text(txt.replace(/&#128274;/g, '🔒')).data('locked', 1);
                     }
                     break;
@@ -88,7 +88,8 @@ console.log('loaded');
 
     };
 
-    var handleIrreEvent = function () {
+
+    const handleIrreEvent = function() {
         if (inline.isLoading) {
             window.setTimeout(handleIrreEvent, 100);
         } else {
@@ -99,7 +100,7 @@ console.log('loaded');
         }
     };
 
-    var toggleEvent = function (event) {
+    const toggleEvent = function (event) {
 
         var $triggerElement = TYPO3.jQuery(event.target);
         if ($triggerElement.parents('.t3js-formengine-irre-control').length == 1) {

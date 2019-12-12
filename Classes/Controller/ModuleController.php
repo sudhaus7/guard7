@@ -66,8 +66,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         
         
         $buttonBar->addButton(
-            
-            
             $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('createkey'))
             ->setShowLabelText($this->getLanguageService()
@@ -81,7 +79,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         );
         
         $buttonBar->addButton(
-            
             $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('listrencode'))
             ->setShowLabelText($this->getLanguageService()

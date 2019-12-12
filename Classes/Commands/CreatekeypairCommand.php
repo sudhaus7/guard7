@@ -3,14 +3,13 @@
 
 namespace SUDHAUS7\Guard7\Commands;
 
-
 use SUDHAUS7\Guard7\Tools\Keys;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreatekeypairCommand  extends Command
+class CreatekeypairCommand extends Command
 {
     public function configure()
     {
@@ -29,7 +28,6 @@ class CreatekeypairCommand  extends Command
                 'Keysize (default 4096)',
                 4096
             );
-            
     }
     
     public function execute(InputInterface $input, OutputInterface $output)
@@ -44,6 +42,5 @@ class CreatekeypairCommand  extends Command
         }
         
         $output->write($pair);
-    
     }
 }

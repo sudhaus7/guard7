@@ -8,6 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
+use SUDHAUS7\Guard7\MissingKeyException;
 use SUDHAUS7\Guard7\UnlockException;
 use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Database\Connection;
@@ -47,6 +48,7 @@ class Storage
     }
     
     
+    
     /**
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
      * @param array $fields
@@ -54,7 +56,7 @@ class Storage
      * @throws \SUDHAUS7\Guard7\SealException
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys)
+    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys, $store = true)
     {
         $class = \get_class($obj);
         $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
@@ -146,9 +148,14 @@ class Storage
     /**
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
      * @param $table
+     * @param null $privateKey
+     * @param null $password
+     * @throws MissingKeyException
      */
-    public static function unlockModel(&$obj, $table, $privateKey, $password = null)
+    public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table, $privateKey=null, $password = null)
     {
+        
+        
         $uid = $obj->getUid();
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)

@@ -3,3 +3,6 @@ defaultmethod = RC4
 
 # cat=basic//02; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateTextarea->render]; label=The Public part of a Master key
 masterkeypublic =
+
+# cat=basic//10; type=boolean; label=Use javascript decoding in Backend. (more secure)
+usejavascriptdecodinginbackend = true

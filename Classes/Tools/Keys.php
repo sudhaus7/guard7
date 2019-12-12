@@ -51,15 +51,17 @@ class Keys
         /** @var Dispatcher $signalSlotDispatcher */
         $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
         
-        // Signal Name for example: collectPublicKeys_fe_users
-        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . '_' . $table, [
-            $keysFromSignalslot,
-            $uid,
-            $pid
-        ]);
-        
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'],['allowed_classes' => false]);
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
         $pubKeys = [];
+    
+        // Signal Global
+        $keysFromSignalslot = [];
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, 'global', [$keysFromSignalslot,$uid,$pid]);
+       
+        
+        // Signal Name by table for example: collectPublicKeys_fe_users
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__.'_'.$table, [$keysFromSignalslot,$uid,$pid]);
+        
         if (!empty($keysFromSignalslot)) {
             foreach ($keysFromSignalslot as $key) {
                 $pubKeys[self::getChecksum($key)] = $key;
@@ -133,6 +135,11 @@ class Keys
         return $ret;
     }
     
+    /**
+     * @param keyresource $key
+     * @param $password
+     * @return mixed
+     */
     public static function lockPrivateKey($key, $password)
     {
         \openssl_pkey_export($key, $privatekey, $password);
@@ -157,8 +164,8 @@ class Keys
     }
     
     /**
-     * @param $key
-     * @param $password
+     * @param string $key
+     * @param string|null $password
      *
      * @return bool|resource
      * @throws WrongKeyPassException
@@ -166,7 +173,7 @@ class Keys
      */
     public static function unlockKey($key, $password)
     {
-        if ($password) {
+        if ($password !== null) {
             if (!$privkey = openssl_pkey_get_private($key, $password)) {
                 throw new WrongKeyPassException("Can not read Private Key (password given)");
             }

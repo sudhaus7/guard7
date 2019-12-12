@@ -30,7 +30,7 @@ class Datamap implements SingletonInterface
      */
     public function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj)
     {
-        if ($status == 'new') {
+        if ($status === 'new') {
             if (isset($this->insertCache[$table]) && isset($this->insertCache[$table][$id]) && is_array($this->insertCache[$table][$id])) {
                 $newid = $pObj->substNEWwithIDs[$id];
                 /** @var Connection $connection */

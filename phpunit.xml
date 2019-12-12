@@ -1,0 +1,45 @@
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
+        backupGlobals="true"
+        backupStaticAttributes="false"
+        bootstrap=".Build/vendor/nimut/testing-framework/res/Configuration/UnitTestsBootstrap.php"
+        cacheTokens="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        mapTestClassNameToCoveredClassName="false"
+        forceCoversAnnotation="true"
+        beStrictAboutCoversAnnotation="true"
+        beStrictAboutOutputDuringTests="true"
+        beStrictAboutTodoAnnotatedTests="true"
+        processIsolation="false"
+        stopOnError="false"
+        stopOnFailure="false"
+        stopOnIncomplete="false"
+        stopOnSkipped="false"
+        stopOnRisky="false"
+        testSuiteLoaderFile="phpunit/src/Runner/StandardTestSuiteLoader.php"
+        timeoutForSmallTests="1"
+        timeoutForMediumTests="10"
+        timeoutForLargeTests="60"
+        verbose="false">
+        <testsuites>
+                <testsuite name="Guard7 Unit tests">
+                        <directory>Tests/Unit/</directory>
+                </testsuite>
+        </testsuites>
+
+        <filter>
+                <whitelist processUncoveredFilesFromWhitelist="true">
+                        <directory suffix=".php">Classes</directory>
+                </whitelist>
+        </filter>
+        <logging>
+                <log type="coverage-html" target=".Build/coverage" />
+                <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+                <log type="junit" target=".Build/junit.xml" />
+                <log type="coverage-clover" target=".Build/coverage-clover.xml" />
+        </logging>
+</phpunit>

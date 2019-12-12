@@ -20,22 +20,24 @@ class Helper
 {
     public static function getTsConfig($pid, $table = null)
     {
-        if (!isset($GLOBALS['__METHOD__' . '-CACHE'])) {
-            $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        $cacheKey = __METHOD__ . '-CACHE';
+        if (!isset($GLOBALS[$cacheKey])) {
+            $GLOBALS[$cacheKey] = [];
         }
-        if (!isset($GLOBALS['__METHOD__' . '-CACHE'][$pid])) {
+        if (!isset($GLOBALS[$cacheKey][$pid])) {
             $ts = BackendUtility::getPagesTSconfig($pid);
             if (isset($ts['tx_sudhaus7guard7.'])) {
                 // if ( isset($ts['tx_sudhaus7guard7.'][$table.'.']) && !empty($ts['tx_sudhaus7guard7.'][$table.'.'])) {
-                $GLOBALS['__METHOD__' . '-CACHE'][$pid] = $ts['tx_sudhaus7guard7.'];
+                $GLOBALS[$cacheKey][$pid] = $ts['tx_sudhaus7guard7.'];
                 //$GLOBALS['__METHOD__'.'-CACHE'][$table.'-'.$pid] = GeneralUtility::trimExplode(',', $ts['tx_sudhaus7guard7.'][$table.'.']['fields'],true)
                 //}
             }
         }
-        if ($table) {
-            return isset($GLOBALS['__METHOD__' . '-CACHE'][$pid][$table . '.']) ? $GLOBALS['__METHOD__' . '-CACHE'][$pid][$table . '.'] : [];
+        if ($table !== null) {
+            $tableKey = $table.'.';
+            return isset($GLOBALS[$cacheKey][$pid][$tableKey]) ? $GLOBALS[$cacheKey][$pid][$tableKey] : [];
         }
-        return isset($GLOBALS['__METHOD__' . '-CACHE'][$pid]) ? $GLOBALS['__METHOD__' . '-CACHE'][$pid] : [];
+        return isset($GLOBALS[$cacheKey][$pid]) ? $GLOBALS[$cacheKey][$pid] : [];
     }
     
     /**
@@ -45,10 +47,12 @@ class Helper
      */
     public static function getTsConfigCustom($pid, $table = null)
     {
-        if (!isset($GLOBALS['__METHOD__' . '-CACHE'])) {
-            $GLOBALS['__METHOD__' . '-CACHE'] = [];
+        $cacheKey = __METHOD__ . '-CACHE';
+        
+        if (!isset($GLOBALS[$cacheKey])) {
+            $GLOBALS[$cacheKey] = [];
         }
-        if (!isset($GLOBALS['__METHOD__' . '-CACHE'][$pid])) {
+        if (!isset($GLOBALS[$cacheKey][$pid])) {
             $rootline = GeneralUtility::makeInstance(RootlineUtility::class, $pid, '', null);
             try {
                 $rl = $rootline->get();
@@ -94,15 +98,16 @@ class Helper
             $ts = $oTSparser->setup;
             if (isset($ts['tx_sudhaus7guard7.'])) {
                 // if ( isset($ts['tx_sudhaus7guard7.'][$table.'.']) && !empty($ts['tx_sudhaus7guard7.'][$table.'.'])) {
-                $GLOBALS['__METHOD__' . '-CACHE'][$pid] = $ts['tx_sudhaus7guard7.'];
+                $GLOBALS[$cacheKey][$pid] = $ts['tx_sudhaus7guard7.'];
                 //$GLOBALS['__METHOD__'.'-CACHE'][$table.'-'.$pid] = GeneralUtility::trimExplode(',', $ts['tx_sudhaus7guard7.'][$table.'.']['fields'],true)
                 //}
             }
         }
-        if ($table) {
-            return isset($GLOBALS['__METHOD__' . '-CACHE'][$pid][$table . '.']) ? $GLOBALS['__METHOD__' . '-CACHE'][$pid][$table . '.'] : [];
+        if ($table !== null) {
+            $tableKey = $table.'.';
+            return isset($GLOBALS[$cacheKey][$pid][$tableKey]) ? $GLOBALS[$cacheKey][$pid][$tableKey] : [];
         }
-        return isset($GLOBALS['__METHOD__' . '-CACHE'][$pid]) ? $GLOBALS['__METHOD__' . '-CACHE'][$pid] : [];
+        return isset($GLOBALS[$cacheKey][$pid]) ? $GLOBALS[$cacheKey][$pid] : [];
     }
     
     public static function getTsPubkeys($pid, $table = null)
@@ -130,22 +135,70 @@ class Helper
      * @param int $pid
      * @return array
      */
-    public static function getFields($table, $pid)
+    public static function getFields($table, $pid = 0)
     {
-        $ts = self::getTsConfig($pid, $table);
-        return isset($ts['fields']) ? GeneralUtility::trimExplode(',', $ts['fields'], true) : [];
+        $fields = [];
+        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if (isset($config['tableName']) && $config['tableNAme'] === $table) {
+                    $myfields = $config['fields'];
+                    if (!is_array($myfields)) {
+                        $myfields =  GeneralUtility::trimExplode(',', $myfields, true);
+                    }
+                    if (!empty($myfields)) {
+                        $fields = $myfields;
+                    }
+                }
+            }
+        }
+        
+        if ($pid > 0) {
+            $ts = self::getTsConfig($pid, $table);
+            if (isset($ts['fields'])) {
+                $myfields = GeneralUtility::trimExplode(',', $ts['fields'], true);
+                if (!empty($myfields)) {
+                    $fields = \array_merge($fields, $myfields);
+                }
+            }
+        }
+        return $fields;
     }
     
     /**
      * @param AbstractEntity $obj
+     * @param null $table
      * @return array
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function getModelFields(AbstractEntity $obj)
+    public static function getModelFields(AbstractEntity $obj, $table = null)
+    {
+        if ($table === null) {
+            $table = self::getModelTable($obj);
+        }
+        return self::getFields($table, $obj->getPid());
+    }
+    
+    /**
+     * @param AbstractEntity $obj
+     * @return string
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     */
+    public static function getModelTable(AbstractEntity $obj)
     {
         $class = \get_class($obj);
-        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
-        $table = $dataMapper->getDataMap($class)->getTableName();
-        return self::getFields($table, $obj->getPid());
+        $table = null;
+        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if (isset($config['className']) && $config['className'] === $class && isset($config['tableName']) && !empty($config['tableNAme'])) {
+                    $table = $config['tableName'];
+                }
+            }
+        }
+        
+        if ($table === null) {
+            $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+            $table = $dataMapper->getDataMap($class)->getTableName();
+        }
+        return $table;
     }
 }

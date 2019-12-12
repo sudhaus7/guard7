@@ -24,6 +24,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
 
     Guard7Tools.clearPrivateKey = function () {
         window.sessionStorage.removeItem('Guard7Privkey');
+        $(window).trigger('privatekey-has-been-cleared');
     };
 
 
@@ -82,6 +83,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         keyconfig.checksumpubkey = Guard7Tools.getCheckSum(keyconfig.publicPem);
         keyconfig.init = true;
         window.sessionStorage.setItem('Guard7Privkey', JSON.stringify(keyconfig));
+        $(window).trigger('privatekey-has-been-set');
     };
 
 
