@@ -54,8 +54,7 @@ class ExttemplateMethods
                 $list = ['RC4','AES128','AES192','AES256','AES512','DES']; //to ensure Javascript compatibility
             }
             foreach ($list as $method) {
-                
-                if ( in_array(\strtolower($method), $availablelist, true) ) {
+                if (in_array(\strtolower($method), $availablelist, true)) {
                     $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method === $parameter['fieldValue'] ? 'selected' : '');
                 }
             }

@@ -154,8 +154,6 @@ class Storage
      */
     public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table, $privateKey=null, $password = null)
     {
-        
-        
         $uid = $obj->getUid();
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -173,7 +171,7 @@ class Storage
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($row['fieldname']);
             if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ($value == '&#128274;' || $value == '🔒') {
+                if ($value === '&#128274;' || $value === '🔒') {
                     try {
                         $newvalue = Decoder::decode($row['secretdata'], $privateKey, $password);
                         
@@ -198,7 +196,7 @@ class Storage
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
         foreach ($data as $fieldname => $value) {
-            if ($value == '&#128274;' || $value == '🔒') {
+            if ($value === '&#128274;' || $value === '🔒') {
                 $row = $connection->select(
                     ['secretdata'],
                     'tx_guard7_domain_model_data',
@@ -215,9 +213,9 @@ class Storage
                     ->fetch(\PDO::FETCH_ASSOC);
                 if ($row && $row['secretdata']) {
                     try {
-                        //$privateKey='xxx';
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
                     } catch (WrongKeyPassException $e) {
+                    
                     } catch (UnlockException $e) {
                         //$data[ $fieldname ] = '&#128274;';
                     }
@@ -284,10 +282,14 @@ class Storage
         $filepath = self::sanitizePath($filepath);
         $encoded = null;
         if (is_file($filepath)) {
-            $identifier = str_replace(PATH_site, '', $filepath);
-            $identifier = str_replace('fileadmin/', '', $identifier);
+            
+            $identifier = str_replace(array(
+                PATH_site,
+                'fileadmin/'
+            ), '', $filepath);
+            
             $buf = \file_get_contents($filepath);
-            if ($buf == 'encoded') {
+            if ($buf === 'encoded') {
                 throw new \Exception('already encoded');
             }
             $data = [
@@ -308,10 +310,11 @@ class Storage
      * @param $filepath
      * @param $privatekey
      * @param null $password
-     *
      * @return mixed|null
+     * @throws MissingKeyException
      * @throws UnlockException
      * @throws WrongKeyPassException
+     * @throws \SUDHAUS7\Guard7\KeyNotReadableException
      */
     public static function decodeFile($filepath, $privatekey, $password = null)
     {
