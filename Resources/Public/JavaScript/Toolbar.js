@@ -62,7 +62,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         $('#sudhaus7-guard7-controller-toolbarcontroller .clearKey').hide();
         $('#sudhaus7-guard7-controller-toolbarcontroller .newkey-elem').show();
         $('body').trigger('sudhaus7-guard7-privkey-removed');
-        if (sudhaus7guard7data_DISABLED) {
+        if (sudhaus7guard7data_DISABLED || sudhaus7guard7data_privatekeytofrontend) {
             var ajaxUrl = TYPO3.settings.ajaxUrls['guard7_backend_storekeyinglobal'];
             $.post(ajaxUrl,{'key':''},function(data){
 

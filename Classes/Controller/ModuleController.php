@@ -120,8 +120,9 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
     public function storeKeyInGlobal(ServerRequestInterface $request, ResponseInterface $response)
     {
         $post = $request->getParsedBody();
-        if (isset($post['key']) && !empty($post['key'])) {
-            $GLOBALS['BE_USER']->setSessionData('privatekey', $post['key']);
+        if (isset($post['key'])) {
+            $GLOBALS['BE_USER']->setAndSaveSessionData('privatekey', $post['key']);
+            
         }
         
         $response->getBody()->write(\json_encode(['ok'=>1]));

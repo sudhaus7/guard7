@@ -35,28 +35,21 @@ class ToolbarController implements ToolbarItemInterface
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $pageRenderer = $this->getPageRenderer();
         $config = Helper::getExtensionConfig();
+        $inlinecode = '';
         if ($config['usejavascriptdecodinginbackend']) {
-            $pageRenderer->addJsInlineCode(
-                __METHOD__,
-                'var sudhaus7guard7data_DISABLED = false;'
-            );
+            $inlinecode .= 'var sudhaus7guard7data_DISABLED = false;';
         } else {
-            $pageRenderer->addJsInlineCode(
-                __METHOD__,
-                'var sudhaus7guard7data_DISABLED = true;'
-            );
+            $inlinecode .= 'var sudhaus7guard7data_DISABLED = true;';
         }
         if ($config['populatebeuserprivatekeytofrontend']) {
-            $pageRenderer->addJsInlineCode(
-                __METHOD__,
-                'var sudhaus7guard7data_privatekeytofrontend = false;'
-            );
+            $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = true;';
         } else {
-            $pageRenderer->addJsInlineCode(
-                __METHOD__,
-                'var sudhaus7guard7data_privatekeytofrontend = true;'
-            );
+            $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = false';
         }
+        $pageRenderer->addJsInlineCode(
+            __METHOD__,
+            $inlinecode
+        );
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Toolbar');
         $pageRenderer->addCssFile('../' . ExtensionManagementUtility::siteRelPath('guard7') . 'Resources/Public/Css/styles.css');
     }

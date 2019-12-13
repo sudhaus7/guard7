@@ -26,6 +26,9 @@ $guard7ExtensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['
     ]
 );
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ $_EXTKEY ] = \SUDHAUS7\Guard7\Hooks\Backend\FeLogin::class . '->handle';
+if ($guard7ExtensionConfiguration['populatebeuserprivatekeytofrontend']) {
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser'][$_EXTKEY] = \SUDHAUS7\Guard7\Hooks\Backend\FeLogin::class . '->handleBeUser';
+}
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ $_EXTKEY ] = \SUDHAUS7\Guard7\Hooks\Frontend\Userchangepassword::class . '->handle';
 
@@ -80,6 +83,3 @@ if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] = [];
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Backend\Utility\BackendUtility::class] = [
-    'className'=>\SUDHAUS7\Guard7\Hooks\Backend\Guard7BackendUtility::class
-];
