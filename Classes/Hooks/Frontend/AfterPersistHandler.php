@@ -39,16 +39,20 @@ class AfterPersistHandler
     private function dopersist(AbstractEntity $object)
     {
         try {
+            
             $table = Helper::getModelTable($object);
             $fields = Helper::getModelFields($object, $table);
             $pubKeys = Keys::collectPublicKeys($table, 0, (int)$object->getPid(), true);
             Storage::lockModel($object, $fields, $pubKeys, false);
-            $om = GeneralUtility::makeInstance(ObjectManager::class);
-            $pm = $om->get(PersistenceManager::class);
-            
-            $pm->add($object);
-            $pm->persistAll();
+            if ($object->_isDirty()) {
+                $om = GeneralUtility::makeInstance(ObjectManager::class);
+                $pm = $om->get(PersistenceManager::class);
+                $pm->add($object);
+                $pm->persistAll();
+            }
         } catch (\Exception $e) {
+            $x=1;
         }
+        
     }
 }

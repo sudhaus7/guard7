@@ -56,11 +56,11 @@ class Storage
      * @throws \SUDHAUS7\Guard7\SealException
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys, $store = true)
+    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, array $fields, array $pubKeys, $store = true)
     {
-        $class = \get_class($obj);
-        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
-        $table = $dataMapper->getDataMap($class)->getTableName();
+        
+        $table = Helper::getModelTable($obj);
+        
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($table);
@@ -71,7 +71,7 @@ class Storage
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
             if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ($value == '&#128274;' || $value == '🔒' || empty($value)) {
+                if (Helper::checkLockedValue($value) || empty($value)) {
                     continue;
                 }
                 $connection->delete(
@@ -117,7 +117,7 @@ class Storage
         foreach ($data as $fieldname => $value) {
             if (in_array($fieldname, $fields)) {
                 $data[$fieldname] = '&#128274;';
-                if ($value == '&#128274;' || $value == '🔒') {
+                if (Helper::checkLockedValue($value)) {
                     continue;
                 }
                 $fieldArray[$fieldname] = '&#128274;'; // 🔒
@@ -147,13 +147,17 @@ class Storage
     
     /**
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
-     * @param $table
-     * @param null $privateKey
-     * @param null $password
-     * @throws MissingKeyException
+     * @param string|null $table
+     * @param string|null $privateKey
+     * @param string|null $password
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table, $privateKey=null, $password = null)
+    public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table=null, $privateKey=null, $password = null)
     {
+        if ($table===null) {
+            $table = Helper::getModelTable($obj);
+        }
+        
         $uid = $obj->getUid();
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -171,7 +175,7 @@ class Storage
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($row['fieldname']);
             if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ($value === '&#128274;' || $value === '🔒') {
+                if (Helper::checkLockedValue($value)) {
                     try {
                         $newvalue = Decoder::decode($row['secretdata'], $privateKey, $password);
                         
@@ -186,7 +190,16 @@ class Storage
         }
     }
     
-    public static function unlockRecord($table, $data, $privateKey, $uid = 0, $password = null)
+    /**
+     * @param string $table Tablename of the locked Record
+     * @param array $data The locked data-row
+     * @param string|null $privateKey
+     * @param string|null $password
+     * @param int $uid
+     * @return array
+     * @throws \SUDHAUS7\Guard7\KeyNotReadableException
+     */
+    public static function unlockRecord($table, $data, $privateKey=null, $password = null, $uid = 0)
     {
         if ($uid == 0) {
             $uid = $data['uid'];
@@ -196,7 +209,7 @@ class Storage
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
         foreach ($data as $fieldname => $value) {
-            if ($value === '&#128274;' || $value === '🔒') {
+            if (Helper::checkLockedValue($value)) {
                 $row = $connection->select(
                     ['secretdata'],
                     'tx_guard7_domain_model_data',
@@ -214,6 +227,8 @@ class Storage
                 if ($row && $row['secretdata']) {
                     try {
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
+                    } catch (MissingKeyException $e) {
+                    
                     } catch (WrongKeyPassException $e) {
                     
                     } catch (UnlockException $e) {
@@ -282,7 +297,6 @@ class Storage
         $filepath = self::sanitizePath($filepath);
         $encoded = null;
         if (is_file($filepath)) {
-            
             $identifier = str_replace(array(
                 PATH_site,
                 'fileadmin/'

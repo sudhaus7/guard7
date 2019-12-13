@@ -1,0 +1,48 @@
+plugin.tx_workshopblog {
+	persistence {
+		classes {
+			WORKSHOP\WorkshopBlog\Domain\Model\Comment {
+				mapping {
+					columns {
+						tstamp.mapOnProperty = tstamp
+					}
+				}
+			}
+			WORKSHOP\WorkshopBlog\Domain\Model\Comment {
+				newRecordStoragePid = 2
+				mapping {
+					columns {
+						tstamp.mapOnProperty = tstamp
+					}
+				}
+			}
+		}
+	}
+}
+
+
+config.tx_extbase {
+	persistence {
+		classes {
+			WORKSHOP\WorkshopBlog\Domain\Model\Comment {
+				mapping {
+					columns {
+						tstamp.mapOnProperty = tstamp
+					}
+				}
+			}
+			WORKSHOP\WorkshopBlog\Domain\Model\Comment {
+				newRecordStoragePid = 2
+				mapping {
+					columns {
+						tstamp.mapOnProperty = tstamp
+					}
+				}
+			}
+		}
+	}
+}
+
+tt_content.list.20.workshopblog_list = USER_INT
+tt_content.list.20.workshopblog_latest = USER_INT
+tt_content.list.20.workshopblog_detail = USER_INT

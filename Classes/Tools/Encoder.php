@@ -32,8 +32,7 @@ class Encoder
     public function __construct($content, $pubKeys = [], $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes' => false]);
-            $x = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'];
+            $confArr = Helper::getExtensionConfig();
             $method  = $confArr['defaultmethod'];
         }
         if (is_array($content)) {
@@ -149,7 +148,7 @@ class Encoder
     public static function encodeArray($row, $fields, $publicKeys, $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>false]);
+            $confArr = Helper::getExtensionConfig();
             $method  = $confArr['defaultmethod'];
         }
         $checksums = null;

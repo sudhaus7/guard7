@@ -41,6 +41,22 @@ trait Guard7Trait
     }
     
     /**
+     * isDirty has to ignore our property
+     * @param null $propertyName
+     * @return bool
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception\TooDirtyException
+     */
+    public function _isDirty($propertyName = null)
+    {
+        if ($propertyName !== null) {
+            if ($propertyName==='_needsPersisting') {
+                return false;
+            }
+        }
+        return parent::_isDirty($propertyName);
+    }
+    
+    /**
      * @param null $privateKey
      * @param null $password
      * @throws \SUDHAUS7\Guard7\MissingKeyException

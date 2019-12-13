@@ -89,8 +89,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
             ButtonBar::BUTTON_POSITION_LEFT
         
         );
-        
-        
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
     }
     

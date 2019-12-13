@@ -6,3 +6,8 @@ masterkeypublic =
 
 # cat=basic//10; type=boolean; label=Use javascript decoding in Backend. (more secure)
 usejavascriptdecodinginbackend = true
+
+
+# cat=basic//20; type=boolean; label=Destroy encoded Data when a record is deleted
+destroyencodeddataondelete = false
+

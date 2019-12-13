@@ -3,6 +3,9 @@
 if (!defined('TYPO3_MODE')) {
     die();
 }
+
+$guard7ExtensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
+
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
     'guard7',
     'auth',
@@ -46,6 +49,23 @@ $signalSlotDispatcher->connect(
     false
 );
 
+if ($guard7ExtensionConfiguration['destroyencodeddataondelete'] === true) {
+    $signalSlotDispatcher->connect(
+        \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+        'afterRemoveObject',
+        \SUDHAUS7\Guard7\Hooks\Frontend\AfterRemoveHandler::class,
+        'handle',
+        false
+    );
+}
+$signalSlotDispatcher->connect(
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+    'afterGettingObjectData',
+    \SUDHAUS7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler::class,
+    'handle',
+    false
+);
+
 
 /**
  * Format:
@@ -59,3 +79,4 @@ $signalSlotDispatcher->connect(
 if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] = [];
 }
+

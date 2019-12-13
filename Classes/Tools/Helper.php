@@ -140,7 +140,7 @@ class Helper
         $fields = [];
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
-                if (isset($config['tableName']) && $config['tableNAme'] === $table) {
+                if (isset($config['tableName']) && $config['tableName'] === $table) {
                     $myfields = $config['fields'];
                     if (!is_array($myfields)) {
                         $myfields =  GeneralUtility::trimExplode(',', $myfields, true);
@@ -185,11 +185,21 @@ class Helper
      */
     public static function getModelTable(AbstractEntity $obj)
     {
-        $class = \get_class($obj);
+        return self::getClassTable(\get_class($obj));
+    }
+    
+    /**
+     * @param string $class
+     * @return string|null
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     */
+    public static function getClassTable($class)
+    {
+        
         $table = null;
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
-                if (isset($config['className']) && $config['className'] === $class && isset($config['tableName']) && !empty($config['tableNAme'])) {
+                if (isset($config['className']) && $config['className'] === $class && isset($config['tableName']) && !empty($config['tableName'])) {
                     $table = $config['tableName'];
                 }
             }
@@ -200,5 +210,92 @@ class Helper
             $table = $dataMapper->getDataMap($class)->getTableName();
         }
         return $table;
+    }
+    
+    /**
+     * @param $className
+     * @return bool
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     */
+    public static function classIsGuard7Element($className,$pid=0)
+    {
+        
+        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if(isset($config['className']) && $className === $config['className']) {
+                    return true;
+                }
+            }
+        }
+    
+        if ($pid===0) {
+            if (isset($GLOBALS['TSFE'])) {
+                $pid = $GLOBALS['TSFE']->id;
+            }
+        }
+        if ($pid > 0) {
+            $table = self::getClassTable($className);
+            if ($table !== null) {
+                $ts = self::getTsConfig($pid, $table);
+                return !empty($ts);
+            }
+        }
+        return false;
+    }
+    
+    public static function tableIsGuard7Element($tableName,$pid=0)
+    {
+        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if(isset($config['tableName']) && $tableName === $config['tableName']) {
+                    return true;
+                }
+            }
+        }
+        if ($pid===0) {
+            if (isset($GLOBALS['TSFE'])) {
+                $pid = (int)$GLOBALS['TSFE']->id;
+            }
+        }
+        if ($pid > 0) {
+            $ts = self::getTsConfig($pid, $tableName);
+            return !empty($ts);
+        }
+    }
+    
+    public static function getAllGuard7Tables($pid=0)
+    {
+        $tables = [];
+        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if(isset($config['tableName']) ) {
+                    $tables[]=$config['tableName'];
+                }
+            }
+        }
+        
+        if ($pid===0) {
+            if (isset($GLOBALS['TSFE'])) {
+                $pid = (int)$GLOBALS['TSFE']->id;
+            }
+        }
+        if ($pid > 0) {
+            $ts = self::getTsConfig($pid);
+            foreach ($ts as $tableName=>$config) {
+                $tables[] = trim($tableName, '.');
+            }
+        }
+        return $tables;
+    }
+    
+    public static function checkLockedValue($value)
+    {
+        return $value === '&#128274;' || $value === '🔒';
+    }
+    
+    public static function getExtensionConfig()
+    {
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
+        return $confArr;
     }
 }

@@ -8,6 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
+use SUDHAUS7\Guard7\Tools\Helper;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
@@ -32,9 +33,11 @@ class PageRenderer
      */
     public function addJSCSS(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
+        $extensionConfig = Helper::getExtensionConfig();
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
+        
         if ($GLOBALS['SOBE']) {
             $class = get_class($GLOBALS['SOBE']);
-            
             
             if ($class == EditDocumentController::class) {
                 $this->handleEditDocumentController($parameters, $pageRenderer);
@@ -45,17 +48,17 @@ class PageRenderer
             }
         }
         
-        //$pageRenderer->
     }
     
     public function postRender(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
+        $extensionConfig = Helper::getExtensionConfig();
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
         if ($GLOBALS['SOBE']) {
             $class = get_class($GLOBALS['SOBE']);
             
             if ($class == RecordList::class) {
-                
-                //		$this->handleRecordList( $parameters, $pageRenderer);
+                //$this->handleRecordList( $parameters, $pageRenderer);
             }
         }
     }
@@ -65,36 +68,35 @@ class PageRenderer
         
         /** @var RecordList $controller */
         $controller = $GLOBALS['SOBE'];
-        
-        $ts = BackendUtility::getPagesTSconfig($controller->id);
-        if (isset($ts['tx_sudhaus7guard7.']) && is_array($ts['tx_sudhaus7guard7.']) && !empty($ts['tx_sudhaus7guard7.'])) {
-            $data = [];
-            $tmp = array_keys($ts['tx_sudhaus7guard7.']);
-            foreach ($tmp as $t) {
-                $data[] = trim($t, '.');
-            }
-            
-            if (!empty($data)) {
-                $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
-                $pageRenderer->addJsInlineCode(
-                    __METHOD__,
-                    'var sudhaus7guard7tables = ' . json_encode($data) . ';'
-                );
-            }
+    
+        $tables = Helper::getAllGuard7Tables($controller->id);
+        if (!empty($tables)) {
+            $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7tables = ' . json_encode($tables) . ';'
+            );
         }
     }
     
+    /**
+     * @param array $parameters
+     * @param \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer
+     */
     private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
+        $extensionConfig = Helper::getExtensionConfig();
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
         
         /** @var RecordList $controller */
         $controller = $GLOBALS['SOBE'];
         
-        $ts = BackendUtility::getPagesTSconfig($controller->id);
-        if (isset($ts['tx_sudhaus7guard7.']) && is_array($ts['tx_sudhaus7guard7.']) && !empty($ts['tx_sudhaus7guard7.'])) {
+        $tables = Helper::getAllGuard7Tables($controller->id);
+        if (!empty($tables)) {
             $data = [];
-            foreach ($ts['tx_sudhaus7guard7.'] as $table => $config) {
+            foreach ($tables as $table) {
                 $table = trim($table, '.');
+                
                 /** @var Connection $connection */
                 $connection = GeneralUtility::makeInstance(ConnectionPool::class)
                     ->getConnectionForTable($table);
@@ -142,10 +144,17 @@ class PageRenderer
         }
     }
     
+    /**
+     * @param array $parameters
+     * @param \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer
+     */
     private function handleEditDocumentController(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
+
         $this->editconf = $GLOBALS['SOBE']->editconf;
         $this->controller = $GLOBALS['SOBE'];
+        
+        
         if (!empty($this->editconf)) {
             foreach ($this->editconf as $table => $config) {
                 if (\in_array('edit', $config)) {
@@ -153,8 +162,7 @@ class PageRenderer
                     $id = array_shift($idlist);
                     $rec = BackendUtility::getRecord($table, $id, '*');
                     
-                    $ts = BackendUtility::getPagesTSconfig($rec['pid']);
-                    if (isset($ts['tx_sudhaus7guard7.']) && isset($ts['tx_sudhaus7guard7.'][$table . '.'])) {
+                    if (Helper::tableIsGuard7Element($table,$rec['pid'])) {
                         $data = [
                         
                         ];
@@ -194,13 +202,13 @@ class PageRenderer
                         $tcafields = GeneralUtility::trimExplode(',', $GLOBALS['TCA'][$table]['types'][0]['showitem'], true);
                         
                         foreach ($tcafields as $field) {
-                            if ($GLOBALS['TCA'][$table]['columns'][$field]['config']['type'] == 'inline') {
+                            if ($GLOBALS['TCA'][$table]['columns'][$field]['config']['type'] === 'inline') {
                                 $reltable = $GLOBALS['TCA'][$table]['columns'][$field]['config']['foreign_table'];
                                 $config['irre'][] = [
                                     'table' => $reltable,
                                     'field' => $field
                                 ];
-                                $config['fields'][$reltable] = GeneralUtility::trimExplode(',', $ts['tx_sudhaus7guard7.'][$reltable . '.']['fields'], true);
+                                $config['fields'][$reltable] = Helper::getFields($reltable,$rec['pid']);
                                 
                                 
                                 $label = $GLOBALS['TCA'][$reltable]['ctrl']['label'];
@@ -227,7 +235,7 @@ class PageRenderer
                                     while ($row = $irreres->fetch(\PDO::FETCH_ASSOC)) {
                                         // $data[]=$row;
                                         
-                                        if (in_array($row['fieldname'], $labelfields)) {
+                                        if (in_array($row['fieldname'], $labelfields, true)) {
                                             $labels[$row['tableuid']][] = $row['secretdata'];
                                         }
             
@@ -260,8 +268,6 @@ class PageRenderer
                         );
                     }
                 }
-                
-                //$record = BackendUtility::getRecord( $table, $uid)
             }
         }
     }

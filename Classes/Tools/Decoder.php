@@ -19,9 +19,9 @@ use SUDHAUS7\Guard7\WrongKeyPassException;
 class Decoder
 {
     /**
-     * @param $data
-     * @param null $key
-     * @param null $password
+     * @param array $data
+     * @param string|null $key
+     * @param string|null $password
      * @return mixed
      * @throws MissingKeyException
      * @throws UnlockException
@@ -32,7 +32,7 @@ class Decoder
     {
         if ($key === null) {
             if (isset($GLOBALS['GUARD7_PRIVATEKEY'])) {
-                $key = $GLOBALS['GUARD7_PRIVATEKEY'];
+                $key = (string)$GLOBALS['GUARD7_PRIVATEKEY'];
             } else {
                 throw new MissingKeyException('No key provided', 1576156831);
             }
