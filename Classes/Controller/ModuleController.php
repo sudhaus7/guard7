@@ -78,6 +78,7 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         
         );
         
+        /*
         $buttonBar->addButton(
             $buttonBar->makeLinkButton()
             ->setHref($this->uriBuilder->uriFor('listrencode'))
@@ -90,6 +91,8 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         
         );
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
+        */
+        
     }
     
     /**
