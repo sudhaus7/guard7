@@ -59,7 +59,8 @@ return [
             'label' => 'Date',
             'config' => [
                 'type' => 'input',
-                'eval' => 'datetime'
+                'eval' => 'datetime',
+                'renderType' => 'inputDateTime'
             ]
         ],
 
