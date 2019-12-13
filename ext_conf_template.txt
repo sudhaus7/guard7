@@ -7,6 +7,11 @@ masterkeypublic =
 # cat=basic//10; type=boolean; label=Use javascript decoding in Backend. (more secure)
 usejavascriptdecodinginbackend = true
 
+# cat=basic//15; type=boolean; label=Populate an active BE_USER Key to the frontend in the  $GLOBALS['GUARD7_PRIVATEKEY'] variable
+populatebeuserprivatekeytofrontend = false
+
+# cat=basic//16; type=boolean; label=Populate an active FE_USER Key to the frontend in the  $GLOBALS['GUARD7_PRIVATEKEY'] variable
+populatefeuserprivatekeytofrontend = false
 
 # cat=basic//20; type=boolean; label=Destroy encoded Data when a record is deleted
 destroyencodeddataondelete = false

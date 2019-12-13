@@ -31,8 +31,8 @@ class Decoder
     public static function decode($data, $key = null, $password = null)
     {
         if ($key === null) {
-            if (isset($GLOBALS['GUARD7_PRIVATEKEY'])) {
-                $key = (string)$GLOBALS['GUARD7_PRIVATEKEY'];
+            if (Helper::hasGlobalPrivateKey()) {
+                $key = Helper::getGlobalPrivateKey();
             } else {
                 throw new MissingKeyException('No key provided', 1576156831);
             }

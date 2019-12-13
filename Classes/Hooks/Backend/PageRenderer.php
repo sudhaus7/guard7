@@ -34,7 +34,17 @@ class PageRenderer
     public function addJSCSS(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
         $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+            $key = $GLOBALS['BE_USER']->getSessionData('privatekey');
+            if (!empty($key)) {
+                $GLOBALS['GUARD7_PRIVATEKEY']=$key;
+            }
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7data_DISABLED = true;'
+            );
+            return;
+        }
         
         if ($GLOBALS['SOBE']) {
             $class = get_class($GLOBALS['SOBE']);
@@ -47,13 +57,14 @@ class PageRenderer
                 $this->handleRecordListLight($parameters, $pageRenderer);
             }
         }
-        
     }
     
     public function postRender(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
         $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+            return;
+        }
         if ($GLOBALS['SOBE']) {
             $class = get_class($GLOBALS['SOBE']);
             
@@ -74,7 +85,7 @@ class PageRenderer
             $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
             $pageRenderer->addJsInlineCode(
                 __METHOD__,
-                'var sudhaus7guard7tables = ' . json_encode($tables) . ';'
+                'var sudhaus7guard7tables = ' . json_encode($tables) . ';var sudhaus7guard7data_DISABLED = false;'
             );
         }
     }
@@ -86,7 +97,9 @@ class PageRenderer
     private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
         $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) return;
+        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+            return;
+        }
         
         /** @var RecordList $controller */
         $controller = $GLOBALS['SOBE'];
@@ -138,7 +151,7 @@ class PageRenderer
                 $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
                 $pageRenderer->addJsInlineCode(
                     __METHOD__,
-                    'var sudhaus7guard7data = ' . json_encode($data) . ';'
+                    'var sudhaus7guard7data = ' . json_encode($data) . ';var sudhaus7guard7data_DISABLED = false;'
                 );
             }
         }
@@ -150,7 +163,6 @@ class PageRenderer
      */
     private function handleEditDocumentController(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
-
         $this->editconf = $GLOBALS['SOBE']->editconf;
         $this->controller = $GLOBALS['SOBE'];
         
@@ -162,7 +174,7 @@ class PageRenderer
                     $id = array_shift($idlist);
                     $rec = BackendUtility::getRecord($table, $id, '*');
                     
-                    if (Helper::tableIsGuard7Element($table,$rec['pid'])) {
+                    if (Helper::tableIsGuard7Element($table, $rec['pid'])) {
                         $data = [
                         
                         ];
@@ -208,7 +220,7 @@ class PageRenderer
                                     'table' => $reltable,
                                     'field' => $field
                                 ];
-                                $config['fields'][$reltable] = Helper::getFields($reltable,$rec['pid']);
+                                $config['fields'][$reltable] = Helper::getFields($reltable, $rec['pid']);
                                 
                                 
                                 $label = $GLOBALS['TCA'][$reltable]['ctrl']['label'];
@@ -264,7 +276,7 @@ class PageRenderer
                         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Main');
                         $pageRenderer->addJsInlineCode(
                             __METHOD__,
-                            'var sudhaus7guard7data = ' . json_encode($data) . ';'
+                            'var sudhaus7guard7data = ' . json_encode($data) . ';var sudhaus7guard7data_DISABLED = false;'
                         );
                     }
                 }

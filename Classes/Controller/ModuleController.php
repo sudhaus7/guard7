@@ -116,6 +116,18 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $buttonBar->addButton($btn, ButtonBar::BUTTON_POSITION_LEFT);
     }
     
+    
+    public function storeKeyInGlobal(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $post = $request->getParsedBody();
+        if (isset($post['key']) && !empty($post['key'])) {
+            $GLOBALS['BE_USER']->setSessionData('privatekey', $post['key']);
+        }
+        
+        $response->getBody()->write(\json_encode(['ok'=>1]));
+        return $response;
+    }
+    
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response

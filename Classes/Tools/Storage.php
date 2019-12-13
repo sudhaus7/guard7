@@ -58,7 +58,6 @@ class Storage
      */
     public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, array $fields, array $pubKeys, $store = true)
     {
-        
         $table = Helper::getModelTable($obj);
         
         /** @var Connection $connection */
@@ -228,9 +227,7 @@ class Storage
                     try {
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
                     } catch (MissingKeyException $e) {
-                    
                     } catch (WrongKeyPassException $e) {
-                    
                     } catch (UnlockException $e) {
                         //$data[ $fieldname ] = '&#128274;';
                     }

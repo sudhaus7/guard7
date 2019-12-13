@@ -77,7 +77,6 @@ class Datamap implements SingletonInterface
                 }
             }
         }
-        
     }
     
     /**
@@ -105,7 +104,7 @@ class Datamap implements SingletonInterface
         
         if ($status === 'update') {
             $extraPubkeys = [];
-            if ( $table === 'fe_users' && !empty($fieldArray['tx_guard7_publickey']) ) {
+            if ($table === 'fe_users' && !empty($fieldArray['tx_guard7_publickey'])) {
                 $extraPubkeys[] = $fieldArray['tx_guard7_publickey'];
             }
             $pid = $pObj->getPID($table, $id);
@@ -114,7 +113,6 @@ class Datamap implements SingletonInterface
                 $pubkeys = Keys::collectPublicKeys($table, $id, $pid, false, $extraPubkeys);
                 $fieldArray = Storage::lockRecord($table, $id, $vaultfields, $fieldArray, $pubkeys);
             }
-            
         }
     }
     
@@ -128,23 +126,24 @@ class Datamap implements SingletonInterface
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
      * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
      */
-    protected function handeInsert($table, $id, $fieldArray, array $vaultfields): array {
+    protected function handeInsert($table, $id, $fieldArray, array $vaultfields): array
+    {
         $extraPubkeys = [];
-        if ( $table === 'fe_users' && !empty($fieldArray['tx_guard7_publickey']) ) {
+        if ($table === 'fe_users' && !empty($fieldArray['tx_guard7_publickey'])) {
             $extraPubkeys[] = $fieldArray['tx_guard7_publickey'];
         }
         
         $pubkeys = Keys::collectPublicKeys($table, 0, $fieldArray['pid'], false, $extraPubkeys);
         
-        if ( !isset($this->insertCache[$table]) ) {
+        if (!isset($this->insertCache[$table])) {
             $this->insertCache[$table] = [];
         }
         $this->insertCache[$table][$id] = [];
         
         
-        foreach ( $fieldArray as $fieldname => $value ) {
-            if ( in_array($fieldname, $vaultfields) ) {
-                if ( strlen($value) > 0 ) {
+        foreach ($fieldArray as $fieldname => $value) {
+            if (in_array($fieldname, $vaultfields)) {
+                if (strlen($value) > 0) {
                     $fieldArray[$fieldname] = '&#128274;';
                     //$fieldArray[$fieldname] = '&#128274;'; // 🔒
                     $encoder = new Encoder($value, $pubkeys);
@@ -166,21 +165,22 @@ class Datamap implements SingletonInterface
      * @param $tmp
      * @return array
      */
-    protected function getTableFields($table, $pid) {
+    protected function getTableFields($table, $pid)
+    {
         $ts = BackendUtility::getPagesTSconfig($pid);
         $vaultfields = [];
-        if ( isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7']) && !empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7']) ) {
-            foreach ( $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config ) {
-                if ( $config['tableName'] === $table ) {
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7']) && !empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
+                if ($config['tableName'] === $table) {
                     $vaultfields = GeneralUtility::trimExplode(',', $config['fields'], true);
                 }
             }
         }
-        if ( isset($ts['tx_sudhaus7guard7.']) ) {
+        if (isset($ts['tx_sudhaus7guard7.'])) {
             $tablekey = $table . '.';
-            if ( isset($ts['tx_sudhaus7guard7.'][$tablekey]) && isset($ts['tx_sudhaus7guard7.'][$tablekey]['fields']) ) {
+            if (isset($ts['tx_sudhaus7guard7.'][$tablekey]) && isset($ts['tx_sudhaus7guard7.'][$tablekey]['fields'])) {
                 $tmpfields = GeneralUtility::trimExplode(',', $ts['tx_sudhaus7guard7.'][$tablekey]['fields'], true);
-                if ( !empty($tmpfields) ) {
+                if (!empty($tmpfields)) {
                     $vaultfields = array_merge($vaultfields, $tmpfields);
                 }
             }

@@ -39,7 +39,6 @@ class AfterPersistHandler
     private function dopersist(AbstractEntity $object)
     {
         try {
-            
             $table = Helper::getModelTable($object);
             $fields = Helper::getModelFields($object, $table);
             $pubKeys = Keys::collectPublicKeys($table, 0, (int)$object->getPid(), true);
@@ -53,6 +52,5 @@ class AfterPersistHandler
         } catch (\Exception $e) {
             $x=1;
         }
-        
     }
 }

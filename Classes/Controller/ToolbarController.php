@@ -8,6 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
+use SUDHAUS7\Guard7\Tools\Helper;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -33,6 +34,29 @@ class ToolbarController implements ToolbarItemInterface
     {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $pageRenderer = $this->getPageRenderer();
+        $config = Helper::getExtensionConfig();
+        if ($config['usejavascriptdecodinginbackend']) {
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7data_DISABLED = false;'
+            );
+        } else {
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7data_DISABLED = true;'
+            );
+        }
+        if ($config['populatebeuserprivatekeytofrontend']) {
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7data_privatekeytofrontend = false;'
+            );
+        } else {
+            $pageRenderer->addJsInlineCode(
+                __METHOD__,
+                'var sudhaus7guard7data_privatekeytofrontend = true;'
+            );
+        }
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Toolbar');
         $pageRenderer->addCssFile('../' . ExtensionManagementUtility::siteRelPath('guard7') . 'Resources/Public/Css/styles.css');
     }
@@ -67,13 +91,15 @@ class ToolbarController implements ToolbarItemInterface
     public function getDropDown()
     {
         $dropdown = [];
+        
         $dropdown[] = '<ul class="dropdown-list">';
-        
+
         $dropdown[] = '<li class="clearKey"><button >Schlüssel löschen</button></li>';
-        
         $dropdown[] = '<li class="newkey-elem"><textarea name="newkey"></textarea><br/><button>Schlüssel aktivieren</button></li>';
         
         $dropdown[] = '</ul>';
+        
+        
         return implode(LF, $dropdown);
     }
     

@@ -80,3 +80,6 @@ if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] = [];
 }
 
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Backend\Utility\BackendUtility::class] = [
+    'className'=>\SUDHAUS7\Guard7\Hooks\Backend\Guard7BackendUtility::class
+];

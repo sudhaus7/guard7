@@ -3,7 +3,6 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Frontend;
 
-
 use SUDHAUS7\Guard7\Interfaces\Guard7Interface;
 use SUDHAUS7\Guard7\Tools\Helper;
 use TYPO3\CMS\Core\Database\Connection;
@@ -11,7 +10,8 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-class AfterRemoveHandler {
+class AfterRemoveHandler
+{
     public function handle(AbstractEntity $object)
     {
         //if(property_exists($object,'_needsPersisting')) {
@@ -27,13 +27,13 @@ class AfterRemoveHandler {
         }
         return [$object];
     }
-    private function cleanup(AbstractEntity $object) {
+    private function cleanup(AbstractEntity $object)
+    {
         $table = Helper::getModelTable($object);
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
 
         $connection->delete('tx_guard7_domain_model_data', ['tableuid'=>$object->getUid(),'tablename'=>$table]);
-
     }
 }
