@@ -56,3 +56,5 @@ fabric.properties
 /.scannerwork/
 /composer.lock
 /.Build/
+
+tests/_output/*

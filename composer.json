@@ -34,7 +34,8 @@
         "codeception/phpbuiltinserver": "^1.5",
         "georgringer/backend-debug": "^1.1",
         "workshop/blog": "@dev",
-        "helhum/typo3-console": "^5.7"
+        "helhum/typo3-console": "^5.7",
+        "codeception/phpbuiltinserver": "^1.5"
     },
     "replace": {
         "guard7": "self.version"
