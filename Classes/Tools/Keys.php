@@ -31,6 +31,7 @@ class Keys
         $class = \get_class($obj);
         $table = Helper::getClassTable($class);
         
+        //TODO: refactor to work with object reference
         if (!$checkFEuser && $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] === true) {
             $checkFEuser = true;
             $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] = false;
