@@ -11,7 +11,9 @@ namespace SUDHAUS7\Guard7\Hooks\Backend;
 use SUDHAUS7\Guard7\KeyNotReadableException;
 use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
 use SUDHAUS7\Guard7\WrongKeyPassException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class FeLogin
@@ -45,8 +47,11 @@ class FeLogin
         
         if ($extConfig['populatefeuserprivatekeytofrontend']) {
             $key = $GLOBALS['TSFE']->fe_user->getKey('user','tx_guard7_privatekey');
+            $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
-                $GLOBALS['GUARD7_PRIVATEKEY'] = $key;
+                $privateKey->setKey($key);
+            } else {
+                $privateKey->setKey();
             }
         }
         
@@ -56,8 +61,9 @@ class FeLogin
         
         if (isset($ar['BE_USER'])) {
             $key = $ar['BE_USER']->getSessionData('privatekey');
-            if ( !empty($key) ) {
-                $GLOBALS['GUARD7_PRIVATEKEY'] = $key;
+            $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
+            if (!empty($key)) {
+                $privateKey->setKey($privateKey);
             }
         }
     }

@@ -30,11 +30,11 @@ class Keys
     {
         $class = \get_class($obj);
         $table = Helper::getClassTable($class);
-        
-        //TODO: refactor to work with object reference
-        if (!$checkFEuser && $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] === true) {
+        $encodeStorage = GeneralUtility::makeInstance(AddLoggedInFrontendUserPublicKeySingleton::class);
+    
+        if (!$checkFEuser && $encodeStorage->has($obj)) {
             $checkFEuser = true;
-            $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] = false;
+            $encodeStorage->remove($obj);
         }
         
         return self::collectPublicKeys($table, (int)$obj->getUid(), (int)$obj->getPid(), $checkFEuser, $aPubkeys);
@@ -53,7 +53,7 @@ class Keys
      */
     public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = [])
     {
-        $keysFromSignalslot = [];
+
         /** @var Dispatcher $signalSlotDispatcher */
         $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
         

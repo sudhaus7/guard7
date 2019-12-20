@@ -3,6 +3,8 @@
 
 namespace WORKSHOP\WorkshopBlog\Controller;
 
+use SUDHAUS7\Guard7\Tools\AddLoggedInFrontendUserPublicKeySingleton;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use WORKSHOP\WorkshopBlog\Domain\Model\Blog;
 use WORKSHOP\WorkshopBlog\Domain\Model\Comment;
@@ -60,7 +62,8 @@ class DetailController extends ActionController
         $comment->setCommentor(\strip_tags($comment->getCommentor()));
         
         if ($GLOBALS['TSFE']->loginUser) {
-            $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] = true;
+            $encodeStorage = GeneralUtility::makeInstance(AddLoggedInFrontendUserPublicKeySingleton::class);
+            $encodeStorage->add($comment);
         }
       
         $this->commentRepository->add($comment);

@@ -11,6 +11,7 @@ namespace SUDHAUS7\Guard7\Tools;
 use SUDHAUS7\Guard7\MissingKeyException;
 use SUDHAUS7\Guard7\UnlockException;
 use SUDHAUS7\Guard7\WrongKeyPassException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Decoder
@@ -30,9 +31,10 @@ class Decoder
      */
     public static function decode($data, $key = null, $password = null)
     {
+        $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
         if ($key === null) {
-            if (Helper::hasGlobalPrivateKey()) {
-                $key = Helper::getGlobalPrivateKey();
+            if ($privateKey->hasKey()) {
+                $key = $privateKey->getKey();
             } else {
                 throw new MissingKeyException('No key provided', 1576156831);
             }

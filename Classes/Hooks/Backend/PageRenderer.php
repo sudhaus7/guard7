@@ -9,6 +9,7 @@
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 use SUDHAUS7\Guard7\Tools\Helper;
+use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
@@ -36,8 +37,11 @@ class PageRenderer
         $extensionConfig = Helper::getExtensionConfig();
         if (!$extensionConfig['usejavascriptdecodinginbackend']) {
             $key = $GLOBALS['BE_USER']->getSessionData('privatekey');
+            $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
-                $GLOBALS['GUARD7_PRIVATEKEY']=$key;
+                $privateKey->setKey($key);
+            } else {
+                $privateKey->setKey();
             }
             $pageRenderer->addJsInlineCode(
                 __METHOD__,

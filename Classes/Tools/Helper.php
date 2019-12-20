@@ -297,22 +297,4 @@ class Helper
         return $confArr;
     }
     
-    /**
-     * @return bool
-     */
-    public static function hasGlobalPrivateKey()
-    {
-        return isset($GLOBALS['GUARD7_PRIVATEKEY']) && !empty($GLOBALS['GUARD7_PRIVATEKEY']);
-    }
-    
-    /**
-     * @return string|null
-     */
-    public static function getGlobalPrivateKey()
-    {
-        if (self::hasGlobalPrivateKey()) {
-            return $GLOBALS['GUARD7_PRIVATEKEY'];
-        }
-        return null;
-    }
 }
