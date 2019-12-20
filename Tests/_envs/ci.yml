@@ -8,3 +8,11 @@ extensions:
       autostart: true
       documentRoot: .Build/public
       startDelay: 1
+modules:
+  config:
+    WebDriver:
+      url: http://127.0.0.1:8080/
+    Db:
+      dsn: 'mysql:host=localhost;dbname=dev'
+      user: 'dev'
+      password: 'dev'
