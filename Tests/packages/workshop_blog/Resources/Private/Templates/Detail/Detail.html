@@ -49,13 +49,13 @@
 
 
             <div class="form-group">
-                <label>Your name <f:form.textfield additionalAttributes="{required:1}" class="form-control" property="commentor"/></label>
+                <label>Your name <f:form.textfield additionalAttributes="{required:1}" class="form-control" id="newcommentor" property="commentor"/></label>
             </div>
             <div class="form-group">
-                <label>Your comment <f:form.textarea additionalAttributes="{required:1}" class="form-control" property="comment"/></label>
+                <label>Your comment <f:form.textarea additionalAttributes="{required:1}" class="form-control" id="newcomment" property="comment"/></label>
             </div>
             <div class="form-group">
-                <f:form.submit class="btn btn-primary" value="Save comment"/>
+                <f:form.submit class="btn btn-primary" id="savenewcomment" value="Save comment"/>
             </div>
         </f:form>
     </div>

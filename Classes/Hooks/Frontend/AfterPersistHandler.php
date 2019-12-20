@@ -41,7 +41,7 @@ class AfterPersistHandler
         try {
             $table = Helper::getModelTable($object);
             $fields = Helper::getModelFields($object, $table);
-            $pubKeys = Keys::collectPublicKeys($table, 0, (int)$object->getPid(), true);
+            $pubKeys = Keys::collectPublicKeysForModel($object, false);
             Storage::lockModel($object, $fields, $pubKeys, false);
             if ($object->_isDirty()) {
                 $om = GeneralUtility::makeInstance(ObjectManager::class);
@@ -50,7 +50,7 @@ class AfterPersistHandler
                 $pm->persistAll();
             }
         } catch (\Exception $e) {
-            $x=1;
+        
         }
     }
 }

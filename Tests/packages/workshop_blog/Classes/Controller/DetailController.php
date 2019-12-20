@@ -58,6 +58,10 @@ class DetailController extends ActionController
         $comment->setDate(new \DateTime());
         $comment->setComment(\strip_tags($comment->getComment()));
         $comment->setCommentor(\strip_tags($comment->getCommentor()));
+        
+        if ($GLOBALS['TSFE']->loginUser) {
+            $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] = true;
+        }
       
         $this->commentRepository->add($comment);
         $this->redirect('detail', null, null, ['blog'=>$comment->getBlog()]);

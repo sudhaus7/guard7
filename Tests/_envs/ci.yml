@@ -1,0 +1,10 @@
+extensions:
+  enabled:
+    - Codeception\Extension\PhpBuiltinServer
+  config:
+    Codeception\Extension\PhpBuiltinServer:
+      hostname: 127.0.0.1
+      port: 8080
+      autostart: true
+      documentRoot: .Build/public
+      startDelay: 1

@@ -4,9 +4,20 @@
 # Perform tests in browser using the WebDriver or PhpBrowser.
 # If you need both WebDriver and PHPBrowser tests - create a separate suite.
 
+
+
 class_name: AcceptanceTester
 modules:
     enabled:
-        - PhpBrowser:
-            url: http://localhost/myapp
+        - WebDriver:
+            browser: chrome
+            url: http://127.0.0.1:8080/
+        - Db:
+            dump: Tests/_data/typo3.sql
+            populate: true
+            cleanup: true
         - \Helper\Acceptance
+    step_decorators:
+        - Codeception\Step\ConditionalAssertion
+        - Codeception\Step\TryTo
+        - Codeception\Step\Retry

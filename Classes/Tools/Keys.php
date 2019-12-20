@@ -29,8 +29,13 @@ class Keys
     public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
     {
         $class = \get_class($obj);
-        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
-        $table = $dataMapper->getDataMap($class)->getTableName();
+        $table = Helper::getClassTable($class);
+        
+        if (!$checkFEuser && $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] === true) {
+            $checkFEuser = true;
+            $GLOBALS['GUARD7_CHECKFEUSERONNEXTSAVE'] = false;
+        }
+        
         return self::collectPublicKeys($table, (int)$obj->getUid(), (int)$obj->getPid(), $checkFEuser, $aPubkeys);
     }
     
