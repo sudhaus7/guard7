@@ -46,7 +46,7 @@ class FeLogin
         $extConfig = Helper::getExtensionConfig();
         
         if ($extConfig['populatefeuserprivatekeytofrontend']) {
-            $key = $GLOBALS['TSFE']->fe_user->getKey('user','tx_guard7_privatekey');
+            $key = $GLOBALS['TSFE']->fe_user->getKey('user', 'tx_guard7_privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
                 $privateKey->setKey($key);
@@ -54,11 +54,9 @@ class FeLogin
                 $privateKey->setKey();
             }
         }
-        
     }
     public function handleBeUser($ar)
     {
-        
         if (isset($ar['BE_USER'])) {
             $key = $ar['BE_USER']->getSessionData('privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);

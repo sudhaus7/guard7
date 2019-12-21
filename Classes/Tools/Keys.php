@@ -13,6 +13,11 @@ use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
+/**
+ * Class Keys
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Keys
 {
     

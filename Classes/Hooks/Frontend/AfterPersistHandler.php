@@ -50,7 +50,6 @@ class AfterPersistHandler
                 $pm->persistAll();
             }
         } catch (\Exception $e) {
-        
         }
     }
 }

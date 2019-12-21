@@ -10,6 +10,11 @@ namespace SUDHAUS7\Guard7\Tools;
 
 use SUDHAUS7\Guard7\SealException;
 
+/**
+ * Class Encoder
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Encoder
 {
     
@@ -29,6 +34,13 @@ class Encoder
      */
     protected $method = 'RC4';
     
+    /**
+     * Encoder constructor.
+     *
+     * @param $content
+     * @param array $pubKeys
+     * @param null $method
+     */
     public function __construct($content, $pubKeys = [], $method = null)
     {
         if ($method === null) {
@@ -46,6 +58,9 @@ class Encoder
         $this->setMethod($method);
     }
     
+    /**
+     * @param $content
+     */
     public function setContent($content)
     {
         $this->content = $content;
@@ -85,12 +100,18 @@ class Encoder
         return $this->method.':'.$b64_iv.':'.$b64_envelope.':'.$b64_data;
     }
     
+    /**
+     * @param $key
+     */
     public function addPubkey($key)
     {
         $checksum = Keys::getChecksum($key);
         $this->pubkeys[$checksum] = $key;
     }
     
+    /**
+     * @return array
+     */
     public function getChecksums()
     {
         return array_keys($this->pubkeys);

@@ -74,8 +74,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
             ->setTitle($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.createkey')),
             ButtonBar::BUTTON_POSITION_LEFT
-        
-        
         );
         
         /*
@@ -88,11 +86,10 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
             ->setTitle($this->getLanguageService()
                 ->sL('LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:module.action.listrencode')),
             ButtonBar::BUTTON_POSITION_LEFT
-        
+
         );
         $this->view->assign('reenocenum', $this->dataRepository->findByNeedsreencode(1)->count());
         */
-        
     }
     
     /**
@@ -125,7 +122,6 @@ class ModuleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControlle
         $post = $request->getParsedBody();
         if (isset($post['key'])) {
             $GLOBALS['BE_USER']->setAndSaveSessionData('privatekey', $post['key']);
-            
         }
         
         $response->getBody()->write(\json_encode(['ok'=>1]));

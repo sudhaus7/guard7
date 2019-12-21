@@ -7,6 +7,11 @@ use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
 
+/**
+ * Trait Guard7Trait
+ *
+ * @package SUDHAUS7\Guard7\Traits
+ */
 trait Guard7Trait
 {
     
@@ -14,17 +19,30 @@ trait Guard7Trait
      * @var bool
      */
     private $_needsPersisting = false;
-
+    
+    /**
+     * @return bool
+     */
     final public function _hasNeedForPersisting()
     {
         return $this->_needsPersisting;
     }
     
+    /**
+     *
+     */
     final public function _removeNeedForPersisting()
     {
         $this->_needsPersisting = false;
     }
     
+    /**
+     * @return bool
+     * @throws \SUDHAUS7\Guard7\SealException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
+     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     */
     public function _isNew()
     {
         $isNew = parent::_isNew();

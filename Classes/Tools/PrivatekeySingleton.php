@@ -3,7 +3,11 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
-
+/**
+ * Class PrivatekeySingleton
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 final class PrivatekeySingleton implements \TYPO3\CMS\Core\SingletonInterface
 {
     /**
@@ -45,5 +49,4 @@ final class PrivatekeySingleton implements \TYPO3\CMS\Core\SingletonInterface
     {
         return $this->key === null;
     }
-    
 }

@@ -296,5 +296,4 @@ class Helper
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
         return $confArr;
     }
-    
 }

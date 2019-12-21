@@ -15,8 +15,16 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Class Storage
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Storage
 {
+    /**
+     * @param $signature
+     */
     public static function markForReencode($signature)
     {
         /** @var Connection $connection */
@@ -29,6 +37,10 @@ class Storage
         }
     }
     
+    /**
+     * @param $tx_guard7_domain_model_data_uid
+     * @param $pubkeys
+     */
     public static function updateKeyLog($tx_guard7_domain_model_data_uid, $pubkeys)
     {
         /** @var Connection $connection */
@@ -238,6 +250,10 @@ class Storage
     }
     
     
+    /**
+     * @param $path
+     * @return false|string|null
+     */
     private static function sanitizePath($path)
     {
         str_replace('../', '', $path);
@@ -248,6 +264,11 @@ class Storage
         return null;
     }
     
+    /**
+     * @param $filepath
+     * @param $pubKeys
+     * @return bool
+     */
     public static function lockFile($filepath, $pubKeys)
     {
         $filepath = self::sanitizePath($filepath);
@@ -267,6 +288,12 @@ class Storage
         return false;
     }
     
+    /**
+     * @param $filepath
+     * @param $privateKey
+     * @param $password
+     * @return bool
+     */
     public static function unlockFile($filepath, $privateKey, $password)
     {
         $filepath = self::sanitizePath($filepath) . '.s7sec';
@@ -289,6 +316,12 @@ class Storage
         return false;
     }
     
+    /**
+     * @param $filepath
+     * @param $pubKeys
+     * @return string|null
+     * @throws \SUDHAUS7\Guard7\SealException
+     */
     public static function encodeFile($filepath, $pubKeys)
     {
         $filepath = self::sanitizePath($filepath);
