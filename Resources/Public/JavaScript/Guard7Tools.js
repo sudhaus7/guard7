@@ -9,13 +9,13 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         var data = '';
         a.forEach(function(e) {
 
-            if (active && (e.trim()=='-----END PUBLIC KEY-----' || e.trim()=='-----END PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
+            if (active && (e.trim()=='-----END PUBLIC KEY-----' || e.trim()=='-----END RSA PRIVATE KEY-----' ||e.trim()=='-----END PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
                 active = false;
             }
             if (active) {
                 data = data+e.trim();
             }
-            if (!active && (e.trim()=='-----BEGIN PUBLIC KEY-----' || e.trim()=='-----BEGIN PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
+            if (!active && (e.trim()=='-----BEGIN PUBLIC KEY-----' || e.trim()=='-----BEGIN PRIVATE KEY-----' || e.trim()=='-----BEGIN RSA PRIVATE KEY-----' || e.trim()=='-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
                 active = true;
             }
         });

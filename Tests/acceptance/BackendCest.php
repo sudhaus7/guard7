@@ -38,9 +38,51 @@ class BackendCest
         $I->wait(2);
         $I->see('Generate a new Key');
         $I->click('Generate a new Key');
+        $I->wait(2);
         $I->see('Generate a new Keypair with 2048 bytes');
         $I->click('Generate a new Keypair with 2048 bytes');
+    /*
+        $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
+            return $el->isDisplayed();
+        }, 1000);
+    */
+        $I->wait(5);
+    
         
+        assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
         
+        assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN RSA PRIVATE KEY-----')!==false);
+     
+        $I->click('Generate a new Keypair with 4096 bytes (more secure, but slower)');
+        /*
+        $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
+            return $el->isDisplayed();
+        }, 1000);
+        */
+        $I->wait(5);
+    
+        assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
+    
+        assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN RSA PRIVATE KEY-----')!==false);
+        //$I->seeInField('publickey', '-----BEGIN PUBLIC KEY-----');
+        //$I->seeInField('privatekey', '-----BEGIN RSA PRIVATE KEY-----');
+    
+    
+        $I->fillField('//input[@name="password"]', 'test');
+        $I->click('Generate a new Keypair with 2048 bytes');
+    
+        /*
+        $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
+            return $el->isDisplayed();
+        }, 1000);
+        */
+        $I->wait(5);
+        assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
+    
+        assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN ENCRYPTED PRIVATE KEY-----')!==false);
+       // $I->seeInField('publickey', '-----BEGIN PUBLIC KEY-----');
+        //$I->seeInField('privatekey', '-----BEGIN ENCRYPTED PRIVATE KEY-----');
+    
+    
     }
 }

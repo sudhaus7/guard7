@@ -206,7 +206,7 @@ class Keys
         foreach ($a as $line) {
             $line = trim($line);
             
-            if ($active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----')) {
+            if ($active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END RSA PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----')) {
                 $active = false;
             }
             
@@ -214,7 +214,7 @@ class Keys
                 $core .= $line;
             }
             
-            if (!$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
+            if (!$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN RSA PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
                 $active = true;
             }
         }

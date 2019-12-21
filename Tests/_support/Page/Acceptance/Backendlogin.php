@@ -38,10 +38,15 @@ class Backendlogin
     public function login($name,$password)
     {
         $I = $this->acceptanceTester;
+   //     if ($I->loadSessionSnapshot('login')) {
+   //         return;
+    //    }
         $I->amOnPage(self::$URL);
         $I->fillField(self::$usernameField,$name);
         $I->fillField(self::$passwordField,$password);
         $I->click(self::$formSubmitButton);
+      //  $I->saveSessionSnapshot('login');
+    
     }
 
 }
