@@ -98,7 +98,7 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
         $I->click('Schlüssel aktivieren');
         $I->wait(5);
         $I->switchToIFrame('#typo3-contentIframe');
-        $I->see('testusertestuser');
+        $I->see('testuser');
     }
     public function canCreateKeyInGuardModule(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
     {
