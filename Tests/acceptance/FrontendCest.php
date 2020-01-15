@@ -46,12 +46,16 @@ class FrontendCest
         $I->amOnPage('/');
         $I->click('read more');
         $I->see('test');
-        $I->fillField('#newcommentor', 'testcomment');
-        $I->fillField('#newcomment', 'testcomment');
+        $I->wait(1);
+        $I->fillField('#newcommentor', 'test-comment-123');
+        $I->fillField('#newcomment', 'test-comment-123');
+        $I->wait(1);
         $I->click('#savenewcomment');
+        $I->wait(1);
         $I->amOnPage('/');
         $I->click('read more');
-        $I->see('testcomment');
+        $I->wait(1);
+        $I->see('test-comment-123');
     }
     
     public function commentIsEncrypted(AcceptanceTester $I)

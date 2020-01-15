@@ -25,24 +25,36 @@ class BackendCest
         $I->see('User');
         $I->click('User');
         $I->switchToIFrame('#typo3-contentIframe');
-        $I->wait(2);
-    
+        $I->wait(4);
+        
         $I->see('Website User (1)');
         $I->click('Website User (1)');
         $I->wait(2);
-        $I->see('&#128274;');
+        $I->see('🔒');
         
         $I->see('testuser');
         $I->click('testuser');
         $I->wait(2);
         $I->see('Personal Data');
         $I->click('Personal Data');
-        $I->see('Activate your private key to view content');
+        $I->wait(2);
         
-        $I->switchToIFrame();
-        $I->see('.t3-icon.fa.fa-lock');
-        $I->click('.t3-icon.fa.fa-lock');
+        $x = $I->grabAttributeFrom('input[data-formengine-input-name="data[fe_users][1][company]"]', 'placeholder');
+        assert(false !== strpos( $x,'Activate your private key to view content'));
         
+        
+    }
+    
+    
+    public function _canSeeDecryptedContent(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
+    {
+        $loginPage->login('admin','adminadmin');
+    
+        $I->wait(1);
+
+        
+        $I->click('//body/div[1]/div[2]/div[1]/ul[1]/li[1]/a');
+    
         $I->fillField('textarea[name=newkey]', '-----BEGIN PRIVATE KEY-----
 MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQCvQqL4fGioRInB
 7orBLxyl0chRPk1uBAAhxwjD+Fup0+sq2vQgLmZAU3U6tI31abDHvanGC1GVkX7T
@@ -97,9 +109,35 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
 -----END PRIVATE KEY-----');
         $I->click('Activate key');
         $I->wait(5);
+        
+        
+        $I->click('List');
+        $I->wait(2);
+        $I->see('User');
+        $I->click('User');
         $I->switchToIFrame('#typo3-contentIframe');
-        $I->dontSee('Activate your private key to view content');
+        $I->wait(4);
+        
+        $I->see('Website User (1)');
+        $I->click('Website User (1)');
+        $I->wait(4);
+        $I->dontSee('🔒');
+        
+        $I->see('testuser');
+        $I->click('testuser');
+        $I->wait(4);
+        $I->see('Personal Data');
+        $I->click('Personal Data');
+        $I->wait(4);
+        
+        $x = $I->grabAttributeFrom('input[data-formengine-input-name="data[fe_users][1][company]"]', 'placeholder');
+        assert(false === strpos( $x,'Activate your private key to view content'));
+        
+        
     }
+    
+    
+    
     public function canCreateKeyInGuardModule(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
     {
         $loginPage->login('admin','adminadmin');
