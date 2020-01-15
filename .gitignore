@@ -58,3 +58,4 @@ fabric.properties
 /.Build/
 
 tests/_output/*
+/Documentation-GENERATED-temp

@@ -1,6 +1,6 @@
 {
     "name": "SUDHAUS7/guard7",
-    "description": "(Sudhaus7) Plugin and framework for encrypting and decrypting data in Typo3, inkluding a RSA public and private key management.",
+    "description": "A TYPO3 extension for encrypting and decrypting data in frontend and backend, including public and private key management.",
     "version": "8.0.0",
     "type": "typo3-cms-extension",
     "repositories": [
