@@ -36,9 +36,9 @@ class CreatekeypairCommand extends Command
         $size = (int)$input->getOption('size');
         
         if (!empty($password)) {
-            $pair = Keys::createKey();
+            $pair = Keys::createKey(null,$size);
         } else {
-            $pair = Keys::createKey($password);
+            $pair = Keys::createKey($password,$size);
         }
         
         $output->write($pair);

@@ -104,14 +104,14 @@ class Keys
     
     /**
      * @param null $password
-     *
+     * @param int $length
      * @return array
      */
-    public static function createKey($password = null): array
+    public static function createKey($password = null, $length = 4096): array
     {
         $config = [
             "digest_alg" => "sha512",
-            "private_key_bits" => 4096,
+            "private_key_bits" => $length,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         ];
         
