@@ -43,7 +43,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         sudhaus7guard7data.forEach(function (data) {
             switch (data.method) {
                 case 'val':
-                    $(data.identifier).val('').attr('placeholder', '🔒 Bitte Privaten Schlüssel angeben').prop('disabled', true).data('locked', 1).change();
+                    $(data.identifier).val('').attr('placeholder', '🔒 '+top.TYPO3.l10n.localize('guard7_usekeytounlock')).prop('disabled', true).data('locked', 1).change();
                     window.setTimeout(function () {
                         $(data.identifier).parents('.has-error').removeClass('has-error');
                     }, 500);
@@ -69,7 +69,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
             switch (data.method) {
                 case 'val':
                     if (parseInt($(data.identifier).data('locked')) === 0 || isNaN($(data.identifier).data('locked'))) {
-                        $(data.identifier).val('').attr('placeholder', '🔒 Bitte Privaten Schlüssel angeben').prop('disabled', 'disabled').data('locked', 1);
+                        $(data.identifier).val('').attr('placeholder', '🔒 '+top.TYPO3.l10n.localize('guard7_usekeytounlock')).prop('disabled', 'disabled').data('locked', 1);
                         window.setTimeout(function () {
                             $(data.identifier).parents('.has-error').removeClass('has-error');
                         }, 500);

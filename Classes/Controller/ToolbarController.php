@@ -14,6 +14,7 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class ToolbarController implements ToolbarItemInterface
 {
@@ -87,8 +88,8 @@ class ToolbarController implements ToolbarItemInterface
         
         $dropdown[] = '<ul class="dropdown-list">';
 
-        $dropdown[] = '<li class="clearKey"><button >Schlüssel löschen</button></li>';
-        $dropdown[] = '<li class="newkey-elem"><textarea name="newkey"></textarea><br/><button>Schlüssel aktivieren</button></li>';
+        $dropdown[] = '<li class="clearKey"><button>'.LocalizationUtility::translate('toolbar.deactivatekey', 'guard7').'</button></li>';
+        $dropdown[] = '<li class="newkey-elem"><textarea name="newkey"></textarea><br/><button>'.LocalizationUtility::translate('toolbar.activatekey', 'guard7').'</button></li>';
         
         $dropdown[] = '</ul>';
         

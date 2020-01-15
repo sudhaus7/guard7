@@ -74,7 +74,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
             keyconfig.privateKeypem = privkey;
         } catch (e) {
             while (!keyconfig.privateKey) {
-                var password = prompt('Passwort des Privaten Schlüssels?');
+                var password = prompt(top.TYPO3.l10n.localize('guard7_providepassword'));
                 keyconfig.privateKey = forge.pki.decryptRsaPrivateKey(privkey, password);
                 keyconfig.privateKeypem = forge.pki.privateKeyToPem(keyconfig.privateKey,64);
             }

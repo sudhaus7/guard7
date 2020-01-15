@@ -34,6 +34,14 @@ class PageRenderer
      */
     public function addJSCSS(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
+    
+        // Add language labels for ExtDirect
+        $pageRenderer->addInlineLanguageLabelArray([
+            'guard7_usekeytounlock'  => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:usekeytounlock',
+            'guard7_providepassword'  => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:providepassword',
+        ], true);
+    
+    
         $extensionConfig = Helper::getExtensionConfig();
         if (!$extensionConfig['usejavascriptdecodinginbackend']) {
             $key = $GLOBALS['BE_USER']->getSessionData('privatekey');

@@ -37,7 +37,7 @@ class BackendCest
         $I->wait(2);
         $I->see('Personal Data');
         $I->click('Personal Data');
-        $I->see('Bitte Privaten Schlüssel angeben');
+        $I->see('Activate your private key to view content');
         
         $I->switchToIFrame();
         $I->see('.t3-icon.fa.fa-lock');
@@ -95,10 +95,10 @@ a9HPW4+8gajslXQKuBaUfJ08PBZBFroIakqyahs+1R0GUNwvqDxNQli/ggP58JeU
 jNZsKOcIulYdhyrgRuprhGxf6ynmArfi7G8bRf4Jhikt0Lk70ereQnzJ+6OJB3bn
 VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
 -----END PRIVATE KEY-----');
-        $I->click('Schlüssel aktivieren');
+        $I->click('Activate key');
         $I->wait(5);
         $I->switchToIFrame('#typo3-contentIframe');
-        $I->see('testuser');
+        $I->dontSee('Activate your private key to view content');
     }
     public function canCreateKeyInGuardModule(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
     {

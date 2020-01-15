@@ -14,7 +14,6 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
         Guard7Tools.createPrivateKey(password, depth)
         .then(function(keypair) {
-            console.log(keypair, $('#createkey textarea[name="privatekey"]'));
             $('#createkey textarea[name="privatekey"]').val(keypair.privateKey);
             $('#createkey textarea[name="publickey"]').val(keypair.publicKey);
             $('#loading').addClass('off');
