@@ -58,4 +58,3 @@ fabric.properties
 /.Build/
 
 tests/_output/*
-private.key
