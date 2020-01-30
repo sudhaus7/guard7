@@ -3,11 +3,11 @@
 .. --------------------------------------------------
 .. -*- coding: utf-8 -*- with BOM.
 
-.. include:: ../../Includes.txt
+.. include:: ../Includes.txt
 
 .. _usersManual:
 
-Using Guard7 in the backend
+Users Manual
 ===========================
 This walkthrough will help you navigate the extensions feature in your
 TYPO3 site. The installation is covered :ref:`here <installation>`.
@@ -22,3 +22,5 @@ TYPO3 site. The installation is covered :ref:`here <installation>`.
 
 The backend elements
 --------------------
+
+TBD
