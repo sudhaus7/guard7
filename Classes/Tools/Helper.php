@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\RootlineUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class Helper
 {
@@ -202,7 +203,8 @@ class Helper
         }
         
         if ($table === null) {
-            $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
+            $om = GeneralUtility::makeInstance(ObjectManager::class);
+            $dataMapper = $om->get(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
             $table = $dataMapper->getDataMap($class)->getTableName();
         }
         return $table;
