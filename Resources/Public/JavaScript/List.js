@@ -4,7 +4,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         if (Guard7Tools.hasPrivateKey()) {
             if (sudhaus7guard7tables && sudhaus7guard7tables.length > 0) {
 
-                var ajaxUrl = TYPO3.settings.ajaxUrls['Guard7Backend::getListData'];
+                var ajaxUrl = TYPO3.settings.ajaxUrls['guard7_backend_list_data'];
 
 
                 sudhaus7guard7tables.forEach(function (tablename) {
@@ -21,6 +21,8 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                             sudhaus7guard7data.forEach(function (e) {
                                 Guard7Tools.decode(privkey, e, function (data) {
                                     $('table[data-table="' + e.tablename + '"] tr[data-uid="' + e.tableuid + '"] td:nth-child(2) span').attr('title', data).text(data);
+
+                                    $('table[data-table="' + e.tablename + '"] tr[data-uid="' + e.tableuid + '"] td:nth-child(2) a').attr('title', data).text(data);
                                 });
                             });
                         });
@@ -35,13 +37,34 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
     var lockData = function () {
         sudhaus7guard7tables.forEach(function (e) {
-            $('table[data-table="'+e+'"] tr[data-uid] td.col-title span').attr('title',"🔒").text("🔒");
+            //$('table[data-table="'+e+'"] tr[data-uid] td.col-title span').attr('title',"🔒").text("🔒");
+            //$('table[data-table="'+e+'"] tr[data-uid] td.col-title a').attr('title',"🔒").text("🔒");
+
+            $('table[data-table="'+e+'"] tr[data-uid] td.needslocked').each(function(ii,ee) {
+                $(ee).text("🔒");
+            });
+
+        });
+    };
+    var cleanLock = function () {
+        sudhaus7guard7tables.forEach(function (e) {
+
+            $('table[data-table="'+e+'"] tr[data-uid] td').each(function(ii,ee) {
+                if ($(ee).text()==='&amp;#128274;' || $(ee).text()==='&#128274;') {
+                    $(ee).text("🔒").addClass('needslocked');
+                }
+            });
+
         });
     };
 
     if (sudhaus7guard7tables) {
+        cleanLock();
         if (Guard7Tools.hasPrivateKey()) {
             unlockData();
+        } else {
+
+            lockData();
         }
     }
 

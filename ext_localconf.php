@@ -3,6 +3,9 @@
 if (!defined('TYPO3_MODE')) {
     die();
 }
+
+$guard7ExtensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
+
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
     'guard7',
     'auth',
@@ -23,6 +26,9 @@ if (!defined('TYPO3_MODE')) {
     ]
 );
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ $_EXTKEY ] = \SUDHAUS7\Guard7\Hooks\Backend\FeLogin::class . '->handle';
+if ($guard7ExtensionConfiguration['populatebeuserprivatekeytofrontend']) {
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser'][$_EXTKEY] = \SUDHAUS7\Guard7\Hooks\Backend\FeLogin::class . '->handleBeUser';
+}
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ $_EXTKEY ] = \SUDHAUS7\Guard7\Hooks\Frontend\Userchangepassword::class . '->handle';
 
@@ -38,34 +44,42 @@ $signalSlotDispatcher->connect(
     false
 );
 
+$signalSlotDispatcher->connect(
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+    'afterPersistObject',
+    \SUDHAUS7\Guard7\Hooks\Frontend\AfterPersistHandler::class,
+    'handle',
+    false
+);
 
-// Register the Scheduler as a possible key for CLI calls
-// Using cliKeys is deprecated as of TYPO3 v8 and will be removed in TYPO3 v9, use Configuration/Commands.php instead
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['guard7_tablelock']   = [
-    function ($input, $output) {
-        $app = new \Symfony\Component\Console\Application('Guard7 DB', TYPO3_version);
-        $app->add(new \SUDHAUS7\Guard7\Commands\DblocktableCommand());
-        $app->setDefaultCommand('lock');
-        $app->run($input, $output);
-    }
-];
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['guard7_tableunlock'] = [
-    function ($input, $output) {
-        $app = new \Symfony\Component\Console\Application('Guard7 DB', TYPO3_version);
-        $app->add(new \SUDHAUS7\Guard7\Commands\DbunlocktableCommand());
-        $app->setDefaultCommand('unlock');
-        $app->run($input, $output);
-    }
-];
-
-
-if (TYPO3_MODE === 'BE') {
-    $class = \TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class;
-    $dispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance($class);
-    $dispatcher->connect(
-        \TYPO3\CMS\Extensionmanager\Service\ExtensionManagementService::class,
-        'hasInstalledExtensions',
-        \SUDHAUS7\Guard7\Install\UpgradeFromDatavault::class,
-        'onInstall'
+if ($guard7ExtensionConfiguration['destroyencodeddataondelete'] === true) {
+    $signalSlotDispatcher->connect(
+        \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+        'afterRemoveObject',
+        \SUDHAUS7\Guard7\Hooks\Frontend\AfterRemoveHandler::class,
+        'handle',
+        false
     );
 }
+$signalSlotDispatcher->connect(
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
+    'afterGettingObjectData',
+    \SUDHAUS7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler::class,
+    'handle',
+    false
+);
+
+
+/**
+ * Format:
+ * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'][]=[
+ *  'className'=>\Vendor\Ext\Domain\Model\Mymodel::class, //optional used when persisting Extbase Models
+ *  'tableName'=>'tx_my_table',
+ *  'fields'=>'name,email,phone'
+ * ];
+ *
+ */
+if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] = [];
+}
+

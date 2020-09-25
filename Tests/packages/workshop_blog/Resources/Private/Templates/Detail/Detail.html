@@ -1,0 +1,68 @@
+<html data-namespace-typo3-fluid="true"
+      f:schemaLocation="https://fluidtypo3.org/schemas/vhs-master.xsd"
+      lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers">
+
+<div class="row">
+    <div class="col-12">
+        <h5><f:format.date date="{blog.date}" format="%d.%m.%Y"/></h5>
+    </div>
+    <div class="col-12">
+        <h1><f:format.raw>{blog.title}</f:format.raw></h1>
+    </div>
+
+    <div class="col-12">
+        <f:format.html>{blog.teaser}</f:format.html>
+    </div>
+
+    <div class="col-12">
+        <f:format.html>{blog.bodytext}</f:format.html>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h5>Comments</h5>
+    </div>
+    <f:for as="comment" each="{comments}">
+        <div class="col-12">
+            <h6>(<f:format.date date="{comment.date}" format="%d.%m.%Y %H:%M"/>) <f:format.raw>{comment.commentor}</f:format.raw></h6>
+        </div>
+        <div class="col-12">
+            <p><f:format.html><f:format.nl2br>{comment.comment}</f:format.nl2br></f:format.html></p>
+        </div>
+        <div class="col-12">
+            <hr/>
+        </div>
+    </f:for>
+
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h5>New comment</h5>
+    </div>
+    <div class="col-12">
+        <f:form action="savecomment" method="post" name="comment" object="{newcomment}">
+            <f:form.hidden property="blog" value="{blog}"/>
+
+
+            <div class="form-group">
+                <label>Your name <f:form.textfield additionalAttributes="{required:1}" class="form-control" id="newcommentor" property="commentor"/></label>
+            </div>
+            <div class="form-group">
+                <label>Your comment <f:form.textarea additionalAttributes="{required:1}" class="form-control" id="newcomment" property="comment"/></label>
+            </div>
+            <div class="form-group">
+                <f:form.submit class="btn btn-primary" id="savenewcomment" value="Save comment"/>
+            </div>
+        </f:form>
+    </div>
+</div>
+<style>
+    label {
+        width: 100%;
+    }
+</style>
+</html>

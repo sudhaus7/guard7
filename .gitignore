@@ -53,3 +53,9 @@ fabric.properties
 
 .scannerwork
 /.php_cs.cache
+/.scannerwork/
+/composer.lock
+/.Build/
+
+tests/_output/*
+/Documentation-GENERATED-temp

@@ -16,7 +16,7 @@
 				<source>Generate a new Key</source>
 			</trans-unit>
             <trans-unit id="module.action.listrencode" xml:space="preserve">
-				<source>Generate a new Key</source>
+				<source>List records marked dirty</source>
 			</trans-unit>
             <trans-unit id="module.createkey.button" xml:space="preserve">
 				<source>Generate a new Key now</source>
@@ -27,6 +27,28 @@
             <trans-unit id="module.createkey.button.4096" xml:space="preserve">
 				<source>Generate a new Keypair with 4096 bytes (more secure, but slower)</source>
 			</trans-unit>
+			<trans-unit id="tx_guard7_domain_model_data" xml:space="preserve">
+				<source>Guard7 Record</source>
+			</trans-unit>
+			<trans-unit id="tx_guard7_domain_model_data" xml:space="preserve">
+				<source>Guard7 Record</source>
+			</trans-unit>
+			<trans-unit id="tx_guard7_domain_model_data.tablename" xml:space="preserve">
+				<source>Guard7 Record</source>
+			</trans-unit>
+			<trans-unit id="toolbar.activatekey" xml:space="preserve">
+				<source>Activate key</source>
+			</trans-unit>
+			<trans-unit id="toolbar.deactivatekey" xml:space="preserve">
+				<source>Deactivate key</source>
+			</trans-unit>
+			<trans-unit id="usekeytounlock" xml:space="preserve">
+				<source>Activate your private key to view content</source>
+			</trans-unit>
+			<trans-unit id="providepassword" xml:space="preserve">
+				<source>Password of the private key?</source>
+			</trans-unit>
+
         </body>
     </file>
 </xliff>

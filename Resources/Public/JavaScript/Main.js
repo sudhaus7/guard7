@@ -22,8 +22,8 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                         break;
                     case 'label':
                         if (parseInt($(e.identifier).data('locked')) === 1) {
-                            var arr = e.secretdata.split('|');
-                            for (var i = 0, l = arr.length; i < l; i++) {
+                            let arr = e.secretdata.split('|');
+                            for (let i = 0, l = arr.length; i < l; i++) {
                                 Guard7Tools.decode(privkey, {'secretdata': arr[i]}, function (data) {
                                     arr[i] = data;
                                 });
@@ -43,15 +43,15 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         sudhaus7guard7data.forEach(function (data) {
             switch (data.method) {
                 case 'val':
-                    $(data.identifier).val('').attr('placeholder', '🔒 Bitte Privaten Schlüssel angeben').prop('disabled', true).data('locked', 1).change();
+                    $(data.identifier).val('').attr('placeholder', '🔒 '+top.TYPO3.l10n.localize('guard7_usekeytounlock')).prop('disabled', true).data('locked', 1).change();
                     window.setTimeout(function () {
                         $(data.identifier).parents('.has-error').removeClass('has-error');
                     }, 500);
                     break;
                 case 'label':
                     const count = data.secretdata.split('|').length;
-                    var txt = [];
-                    for (var i = 0; i < count; i++) {
+                    let txt = [];
+                    for (let i=0;i<count;i++) {
                         txt.push('🔒');
                     }
                     $(data.identifier).text(txt.join(',')).data('locked', 1);
@@ -64,12 +64,12 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
     const initFields = function () {
 
-        for (var i = 0, l = sudhaus7guard7data.length; i < l; i++) {
-            var data = sudhaus7guard7data[i];
+        for (let i = 0, l = sudhaus7guard7data.length; i < l; i++) {
+            const data = sudhaus7guard7data[i];
             switch (data.method) {
                 case 'val':
                     if (parseInt($(data.identifier).data('locked')) === 0 || isNaN($(data.identifier).data('locked'))) {
-                        $(data.identifier).val('').attr('placeholder', '🔒 Bitte Privaten Schlüssel angeben').prop('disabled', 'disabled').data('locked', 1);
+                        $(data.identifier).val('').attr('placeholder', '🔒 '+top.TYPO3.l10n.localize('guard7_usekeytounlock')).prop('disabled', 'disabled').data('locked', 1);
                         window.setTimeout(function () {
                             $(data.identifier).parents('.has-error').removeClass('has-error');
                         }, 500);
@@ -77,7 +77,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
                     break;
                 case 'label':
                     if (parseInt($(data.identifier).data('locked')) === 0 || isNaN($(data.identifier).data('locked'))) {
-                        var txt = $(data.identifier).text();
+                        const txt = $(data.identifier).text();
                         $(data.identifier).text(txt.replace(/&#128274;/g, '🔒')).data('locked', 1);
                     }
                     break;
@@ -88,7 +88,8 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
 
     };
 
-    var handleIrreEvent = function () {
+
+    const handleIrreEvent = function() {
         if (inline.isLoading) {
             window.setTimeout(handleIrreEvent, 100);
         } else {
@@ -99,7 +100,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Guard7Tools'], function ($, Guard7Tools) {
         }
     };
 
-    var toggleEvent = function (event) {
+    const toggleEvent = function (event) {
 
         var $triggerElement = TYPO3.jQuery(event.target);
         if ($triggerElement.parents('.t3js-formengine-irre-control').length == 1) {

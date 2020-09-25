@@ -97,7 +97,7 @@ class DbunlocktableCommand extends Command
                 foreach ($vaultfields as $f) {
                     $fieldArray[$f] = $row[$f];
                 }
-                $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $row['uid'], $password);
+                $fieldArray = Storage::unlockRecord($table, $fieldArray, $key, $password, $row['uid']);
                 $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
                 
                 

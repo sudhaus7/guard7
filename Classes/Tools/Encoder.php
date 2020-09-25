@@ -10,6 +10,11 @@ namespace SUDHAUS7\Guard7\Tools;
 
 use SUDHAUS7\Guard7\SealException;
 
+/**
+ * Class Encoder
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Encoder
 {
     
@@ -29,23 +34,33 @@ class Encoder
      */
     protected $method = 'RC4';
     
+    /**
+     * Encoder constructor.
+     *
+     * @param $content
+     * @param array $pubKeys
+     * @param null $method
+     */
     public function __construct($content, $pubKeys = [], $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+            $confArr = Helper::getExtensionConfig();
             $method  = $confArr['defaultmethod'];
         }
         if (is_array($content)) {
             $content = \json_encode($content);
         }
         if (\is_object($content)) {
-            throw new \Exception('No support for Objects');
+            throw new \RuntimeException('No support for Objects');
         }
         $this->content = $content;
         $this->setPubkeys($pubKeys);
         $this->setMethod($method);
     }
     
+    /**
+     * @param $content
+     */
     public function setContent($content)
     {
         $this->content = $content;
@@ -59,7 +74,10 @@ class Encoder
     {
         $signatures = array_keys($this->pubkeys);
         $pubkeys = array_values($this->pubkeys);
-        $iv = \openssl_random_pseudo_bytes(32);
+        $iv = \openssl_random_pseudo_bytes(32, $isSourceStrong);
+        if (false === $isSourceStrong || false === $iv) {
+            throw new \RuntimeException('IV generation failed');
+        }
         foreach ($pubkeys as $idx => $key) {
             $pubkeys[$idx] = \openssl_get_publickey($key);
         }
@@ -82,12 +100,18 @@ class Encoder
         return $this->method.':'.$b64_iv.':'.$b64_envelope.':'.$b64_data;
     }
     
+    /**
+     * @param $key
+     */
     public function addPubkey($key)
     {
         $checksum = Keys::getChecksum($key);
         $this->pubkeys[$checksum] = $key;
     }
     
+    /**
+     * @return array
+     */
     public function getChecksums()
     {
         return array_keys($this->pubkeys);
@@ -128,24 +152,24 @@ class Encoder
         
         //$valid = ['RC4','AES128','AES256','DES'];
         $valid = openssl_get_cipher_methods(true);
-        if (\in_array($method, $valid)) {
+        if (\in_array($method, $valid, true)) {
             $this->method = $method;
         }
     }
     
     
     /**
-     * @param $row array
-     * @param $fields array
-     * @param $publicKeys array
-     * @param string $method
-     *
+     * @param $row
+     * @param $fields
+     * @param $publicKeys
+     * @param null $method
      * @return array
+     * @throws SealException
      */
     public static function encodeArray($row, $fields, $publicKeys, $method = null)
     {
         if ($method === null) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+            $confArr = Helper::getExtensionConfig();
             $method  = $confArr['defaultmethod'];
         }
         $checksums = null;

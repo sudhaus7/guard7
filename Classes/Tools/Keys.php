@@ -13,6 +13,11 @@ use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
+/**
+ * Class Keys
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Keys
 {
     
@@ -29,8 +34,14 @@ class Keys
     public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
     {
         $class = \get_class($obj);
-        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
-        $table = $dataMapper->getDataMap($class)->getTableName();
+        $table = Helper::getClassTable($class);
+        $encodeStorage = GeneralUtility::makeInstance(AddLoggedInFrontendUserPublicKeySingleton::class);
+    
+        if (!$checkFEuser && $encodeStorage->has($obj)) {
+            $checkFEuser = true;
+            $encodeStorage->remove($obj);
+        }
+        
         return self::collectPublicKeys($table, (int)$obj->getUid(), (int)$obj->getPid(), $checkFEuser, $aPubkeys);
     }
     
@@ -47,19 +58,21 @@ class Keys
      */
     public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = [])
     {
-        $keysFromSignalslot = [];
+
         /** @var Dispatcher $signalSlotDispatcher */
         $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
         
-        // Signal Name for example: collectPublicKeys_fe_users
-        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__ . '_' . $table, [
-            $keysFromSignalslot,
-            $uid,
-            $pid
-        ]);
-        
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+        $confArr = Helper::getExtensionConfig();
         $pubKeys = [];
+    
+        // Signal Global
+        $keysFromSignalslot = [];
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, 'global', [$keysFromSignalslot,$uid,$pid]);
+       
+        
+        // Signal Name by table for example: collectPublicKeys_fe_users
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__.'_'.$table, [$keysFromSignalslot,$uid,$pid]);
+        
         if (!empty($keysFromSignalslot)) {
             foreach ($keysFromSignalslot as $key) {
                 $pubKeys[self::getChecksum($key)] = $key;
@@ -91,14 +104,14 @@ class Keys
     
     /**
      * @param null $password
-     *
+     * @param int $length
      * @return array
      */
-    public static function createKey($password = null): array
+    public static function createKey($password = null, $length = 4096): array
     {
         $config = [
             "digest_alg" => "sha512",
-            "private_key_bits" => 4096,
+            "private_key_bits" => $length,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         ];
         
@@ -133,6 +146,11 @@ class Keys
         return $ret;
     }
     
+    /**
+     * @param keyresource $key
+     * @param $password
+     * @return mixed
+     */
     public static function lockPrivateKey($key, $password)
     {
         \openssl_pkey_export($key, $privatekey, $password);
@@ -157,8 +175,8 @@ class Keys
     }
     
     /**
-     * @param $key
-     * @param $password
+     * @param string $key
+     * @param string|null $password
      *
      * @return bool|resource
      * @throws WrongKeyPassException
@@ -166,7 +184,7 @@ class Keys
      */
     public static function unlockKey($key, $password)
     {
-        if ($password) {
+        if ($password !== null) {
             if (!$privkey = openssl_pkey_get_private($key, $password)) {
                 throw new WrongKeyPassException("Can not read Private Key (password given)");
             }
@@ -188,7 +206,7 @@ class Keys
         foreach ($a as $line) {
             $line = trim($line);
             
-            if ($active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----')) {
+            if ($active && ($line == '-----END PUBLIC KEY-----' || $line == '-----END PRIVATE KEY-----' || $line == '-----END RSA PRIVATE KEY-----' || $line == '-----END ENCRYPTED PRIVATE KEY-----')) {
                 $active = false;
             }
             
@@ -196,7 +214,7 @@ class Keys
                 $core .= $line;
             }
             
-            if (!$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
+            if (!$active && ($line == '-----BEGIN PUBLIC KEY-----' || $line == '-----BEGIN PRIVATE KEY-----' || $line == '-----BEGIN RSA PRIVATE KEY-----' || $line == '-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
                 $active = true;
             }
         }

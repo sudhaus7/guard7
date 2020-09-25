@@ -1,8 +1,14 @@
 {
     "name": "SUDHAUS7/guard7",
-    "description": "(Sudhaus7) Plugin and framework for encrypting and decrypting data in Typo3, inkluding a RSA public and private key management.",
+    "description": "A TYPO3 extension for encrypting and decrypting data in frontend and backend, including public and private key management.",
     "version": "8.0.0",
     "type": "typo3-cms-extension",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "Tests/packages/*"
+        }
+    ],
     "authors": [
         {
             "name": "Frank Berger",
@@ -16,14 +22,52 @@
         }
     ],
     "require": {
-        "typo3/cms-core": ">=8.0,<9.0"
+        "typo3/cms-core": "^8.7.0"
+    },
+    "require-dev": {
+        "typo3/cms-fluid-styled-content": "^8.7.0",
+        "typo3/cms-tstemplate": "^8.7.0",
+        "typo3/cms-felogin": "^8.7.0",
+        "nimut/testing-framework": "^4.1",
+        "phpstan/phpstan": "^0.11",
+        "codeception/codeception": "^3.1",
+        "georgringer/backend-debug": "^1.1",
+        "workshop/blog": "@dev",
+        "helhum/typo3-console": "^5.7",
+        "codeception/phpbuiltinserver": "^1.5"
     },
     "replace": {
-      "guard7": "self.version"
+        "guard7": "self.version"
+
     },
     "autoload": {
         "psr-4": {
             "SUDHAUS7\\Guard7\\": "Classes/"
         }
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "8.0.x-dev"
+        },
+        "typo3/cms": {
+            "extension-key": "guard7",
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
+            "web-dir": ".Build/public"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "mkdir -p .Build/public/typo3conf/ext/",
+            "[ -L .Build/public/typo3conf/ext/guard7 ] || ln -snvf ../../../../. .Build/public/typo3conf/ext/guard7"
+        ],
+        "test-local": "@php .Build/vendor/bin/codecept run --env local",
+        "test-ci": "@php .Build/vendor/bin/codecept run --env ci"
     }
 }

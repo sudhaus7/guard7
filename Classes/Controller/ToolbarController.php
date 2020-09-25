@@ -8,11 +8,13 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
+use SUDHAUS7\Guard7\Tools\Helper;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class ToolbarController implements ToolbarItemInterface
 {
@@ -33,6 +35,22 @@ class ToolbarController implements ToolbarItemInterface
     {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $pageRenderer = $this->getPageRenderer();
+        $config = Helper::getExtensionConfig();
+        $inlinecode = '';
+        if ($config['usejavascriptdecodinginbackend']) {
+            $inlinecode .= 'var sudhaus7guard7data_DISABLED = false;';
+        } else {
+            $inlinecode .= 'var sudhaus7guard7data_DISABLED = true;';
+        }
+        if ($config['populatebeuserprivatekeytofrontend']) {
+            $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = true;';
+        } else {
+            $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = false';
+        }
+        $pageRenderer->addJsInlineCode(
+            __METHOD__,
+            $inlinecode
+        );
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Toolbar');
         $pageRenderer->addCssFile('../' . ExtensionManagementUtility::siteRelPath('guard7') . 'Resources/Public/Css/styles.css');
     }
@@ -67,13 +85,15 @@ class ToolbarController implements ToolbarItemInterface
     public function getDropDown()
     {
         $dropdown = [];
+        
         $dropdown[] = '<ul class="dropdown-list">';
-        
-        $dropdown[] = '<li class="clearKey"><button >Schlüssel löschen</button></li>';
-        
-        $dropdown[] = '<li class="newkey-elem"><textarea name="newkey"></textarea><br/><button>Schlüssel aktivieren</button></li>';
+
+        $dropdown[] = '<li class="clearKey"><button>'.LocalizationUtility::translate('toolbar.deactivatekey', 'guard7').'</button></li>';
+        $dropdown[] = '<li class="newkey-elem"><textarea name="newkey"></textarea><br/><button>'.LocalizationUtility::translate('toolbar.activatekey', 'guard7').'</button></li>';
         
         $dropdown[] = '</ul>';
+        
+        
         return implode(LF, $dropdown);
     }
     

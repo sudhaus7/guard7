@@ -1,0 +1,23 @@
+{
+  "name": "workshop/blog",
+  "description": "Workshop Blog",
+  "version": "1.0.0",
+  "type": "typo3-cms-extension",
+  "authors": [
+    {
+      "name": "Frank Berger",
+      "role": "Developer",
+      "email": "f.berger@sudhaus7.de"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "WORKSHOP\\WorkshopBlog\\": "Classes/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "workshop_blog"
+    }
+  }
+}

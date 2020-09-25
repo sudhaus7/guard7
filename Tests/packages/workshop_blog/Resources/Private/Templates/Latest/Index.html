@@ -1,0 +1,25 @@
+<html data-namespace-typo3-fluid="true"
+      f:schemaLocation="https://fluidtypo3.org/schemas/vhs-master.xsd"
+      lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers">
+
+<f:for as="blog" each="{blogs}">
+    <div class="row">
+        <div class="col-12">
+            <h5><f:link.action action="detail" arguments="{blog:blog}" controller="Detail" pageUid="{settings.detailPage}">
+                {blog.title} -
+                <f:format.date date="{blog.date}" format="%d.%m.%Y"/>
+            </f:link.action>
+            </h5>
+        </div>
+        <div class="col-12">
+            <p>{blog.teaser}</p>
+        </div>
+        <div class="col-12" style="margin-bottom:2em;">
+            <f:link.action action="detail" arguments="{blog:blog}" class="btn btn-primary" controller="Detail" pageUid="{settings.detailPage}">read more</f:link.action>
+        </div>
+    </div>
+</f:for>
+
+</html>

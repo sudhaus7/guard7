@@ -1,6 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
       xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
-      xmlns:s7="http://sudhaus7.de/ns/SUDHAUS7/Sudhaus7Viewhelpers/ViewHelpers" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/xhtml"
       lang="en"
       f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
       v:schemaLocation="https://fluidtypo3.org/schemas/vhs-master.xsd"
@@ -13,12 +13,11 @@
 		0:'{f:uri.resource(path:\'Css/styles.css\')}'
 	}"
     includeRequireJsModules="{
-		0:'TYPO3/CMS/Viewpage/Main',
-		1:'TYPO3/CMS/Guard7/Backend'
+		0:'TYPO3/CMS/Guard7/Backend'
 	}"
 />
 
-    <div class="tx-bfactor-template">
+    <div class="tx-sudhaus7-template">
         <f:render section="main" />
         <div id="loading" class="off">
             <i class="fa fa-spinner fa-spin fa-5x"></i>

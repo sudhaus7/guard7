@@ -37,17 +37,30 @@ class ExttemplateMethods
      */
     public function render(array $parameter = array(), TypoScriptConstantsViewHelper $parentObject)
     {
-        $list = openssl_get_cipher_methods(true);
-        foreach ($list as $k => $v) {
-            $up = \strtoupper($v);
-            if ($up != $v) {
-                unset($list[$k]);
+        $content = '<option value="">Please choose</option>';
+        /* TODO: implemenet sodium support
+        if (defined('SODIUM_LIBRARY_VERSION')) {
+            $content .= '<optgroup label="Sodium">';
+            $content .= '<option value="libsodium">Sodium '.SODIUM_LIBRARY_VERSION.'</option>';
+            $content .= '</optgroup>';
+        }
+        */
+        if (\function_exists('openssl_get_cipher_methods')) {
+            $content .= '<optgroup label="OpenSSL">';
+            $availablelist = openssl_get_cipher_methods(true);
+            if (PHP_MAJOR_VERSION < 7) {
+                $list = ['RC4','DES'];
+            } else {
+                $list = ['RC4','AES128','AES192','AES256','AES512','DES']; //to ensure Javascript compatibility
             }
+            foreach ($list as $method) {
+                if (in_array(\strtolower($method), $availablelist, true)) {
+                    $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method === $parameter['fieldValue'] ? 'selected' : '');
+                }
+            }
+            $content .= '</optgroup>';
         }
-        $content = '';
-        foreach ($list as $method) {
-            $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method == $parameter['fieldValue'] ? 'selected' : '');
-        }
+        
         
         $this->tag->setTagName('select');
         $this->tag->forceClosingTag(true);

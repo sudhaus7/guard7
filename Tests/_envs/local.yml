@@ -1,0 +1,9 @@
+modules:
+  config:
+    WebDriver:
+      url: http://127.0.0.1:8080/
+    Db:
+      dsn: 'mysql:host=localhost;dbname=guard7testdb'
+      user: 'root'
+      password: ''
+

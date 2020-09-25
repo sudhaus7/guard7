@@ -1,0 +1,5 @@
+tx_sudhaus7guard7 {
+    fe_users {
+        fields = company,title,name,first_name,middle_name,last_name,address,zip,city,country,telephone,fax,email,www
+    }
+}

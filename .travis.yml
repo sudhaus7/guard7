@@ -1,0 +1,33 @@
+language: php
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7.2
+      env: TYPO3_VERSION=^8
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - parallel
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_install:
+  - composer self-update
+  - composer --version
+
+before_script:
+  - composer require typo3/minimal=$TYPO3_VERSION
+  # Restore composer.json
+  - git checkout composer.json
+  - export TYPO3_PATH_WEB=$PWD/.Build/Web
+
+script:
+  - >
+    echo;
+    echo "Running unit tests";
+    composer unittest

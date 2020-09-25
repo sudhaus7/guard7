@@ -2,11 +2,15 @@
 
 call_user_func(
     function () {
+        //$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7']);
+
+
+        $languageFilePrefix = 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:';
         $tempColumns = [
             'tx_guard7_publickey' => [
                 
                 'exclude' => 0,
-                'label' => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:fe_users.tx_guard7_publickey',
+                'label'   => $languageFilePrefix . 'fe_users.tx_guard7_publickey',
                 'config' => [
                     'type' => 'text',
                 ],
@@ -14,7 +18,7 @@ call_user_func(
             'tx_guard7_privatekey' => [
                 
                 'exclude' => 0,
-                'label' => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:fe_users.tx_guard7_privatekey',
+                'label'   => $languageFilePrefix . 'fe_users.tx_guard7_privatekey',
                 'config' => [
                     'type' => 'text',
                 ],

@@ -8,14 +8,23 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
+use SUDHAUS7\Guard7\MissingKeyException;
 use SUDHAUS7\Guard7\UnlockException;
 use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Class Storage
+ *
+ * @package SUDHAUS7\Guard7\Tools
+ */
 class Storage
 {
+    /**
+     * @param $signature
+     */
     public static function markForReencode($signature)
     {
         /** @var Connection $connection */
@@ -28,6 +37,10 @@ class Storage
         }
     }
     
+    /**
+     * @param $tx_guard7_domain_model_data_uid
+     * @param $pubkeys
+     */
     public static function updateKeyLog($tx_guard7_domain_model_data_uid, $pubkeys)
     {
         /** @var Connection $connection */
@@ -47,6 +60,7 @@ class Storage
     }
     
     
+    
     /**
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
      * @param array $fields
@@ -54,11 +68,10 @@ class Storage
      * @throws \SUDHAUS7\Guard7\SealException
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity &$obj, array $fields, array $pubKeys)
+    public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, array $fields, array $pubKeys, $store = true)
     {
-        $class = \get_class($obj);
-        $dataMapper = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper::class);
-        $table = $dataMapper->getDataMap($class)->getTableName();
+        $table = Helper::getModelTable($obj);
+        
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($table);
@@ -69,7 +82,7 @@ class Storage
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
             if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ($value == '&#128274;' || $value == '🔒' || empty($value)) {
+                if (Helper::checkLockedValue($value) || empty($value)) {
                     continue;
                 }
                 $connection->delete(
@@ -115,7 +128,7 @@ class Storage
         foreach ($data as $fieldname => $value) {
             if (in_array($fieldname, $fields)) {
                 $data[$fieldname] = '&#128274;';
-                if ($value == '&#128274;' || $value == '🔒') {
+                if (Helper::checkLockedValue($value)) {
                     continue;
                 }
                 $fieldArray[$fieldname] = '&#128274;'; // 🔒
@@ -145,10 +158,17 @@ class Storage
     
     /**
      * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
-     * @param $table
+     * @param string|null $table
+     * @param string|null $privateKey
+     * @param string|null $password
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function unlockModel(&$obj, $table, $privateKey, $password = null)
+    public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table=null, $privateKey=null, $password = null)
     {
+        if ($table===null) {
+            $table = Helper::getModelTable($obj);
+        }
+        
         $uid = $obj->getUid();
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -166,7 +186,7 @@ class Storage
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($row['fieldname']);
             if (\method_exists($obj, $getter)) {
                 $value = $obj->$getter();
-                if ($value == '&#128274;' || $value == '🔒') {
+                if (Helper::checkLockedValue($value)) {
                     try {
                         $newvalue = Decoder::decode($row['secretdata'], $privateKey, $password);
                         
@@ -174,14 +194,23 @@ class Storage
                             $obj->$setter($newvalue);
                         }
                     } catch (\Exception $e) {
-                        //$data[ $fieldname ] = '🔒';
+                        //$data[ $fieldname ] = '&#128274;';
                     }
                 }
             }
         }
     }
     
-    public static function unlockRecord($table, $data, $privateKey, $uid = 0, $password = null)
+    /**
+     * @param string $table Tablename of the locked Record
+     * @param array $data The locked data-row
+     * @param string|null $privateKey
+     * @param string|null $password
+     * @param int $uid
+     * @return array
+     * @throws \SUDHAUS7\Guard7\KeyNotReadableException
+     */
+    public static function unlockRecord($table, $data, $privateKey=null, $password = null, $uid = 0)
     {
         if ($uid == 0) {
             $uid = $data['uid'];
@@ -191,7 +220,7 @@ class Storage
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
         foreach ($data as $fieldname => $value) {
-            if ($value == '&#128274;' || $value == '🔒') {
+            if (Helper::checkLockedValue($value)) {
                 $row = $connection->select(
                     ['secretdata'],
                     'tx_guard7_domain_model_data',
@@ -208,11 +237,11 @@ class Storage
                     ->fetch(\PDO::FETCH_ASSOC);
                 if ($row && $row['secretdata']) {
                     try {
-                        //$privateKey='xxx';
                         $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
+                    } catch (MissingKeyException $e) {
                     } catch (WrongKeyPassException $e) {
                     } catch (UnlockException $e) {
-                        //$data[ $fieldname ] = '🔒';
+                        //$data[ $fieldname ] = '&#128274;';
                     }
                 }
             }
@@ -221,6 +250,10 @@ class Storage
     }
     
     
+    /**
+     * @param $path
+     * @return false|string|null
+     */
     private static function sanitizePath($path)
     {
         str_replace('../', '', $path);
@@ -231,6 +264,11 @@ class Storage
         return null;
     }
     
+    /**
+     * @param $filepath
+     * @param $pubKeys
+     * @return bool
+     */
     public static function lockFile($filepath, $pubKeys)
     {
         $filepath = self::sanitizePath($filepath);
@@ -250,6 +288,12 @@ class Storage
         return false;
     }
     
+    /**
+     * @param $filepath
+     * @param $privateKey
+     * @param $password
+     * @return bool
+     */
     public static function unlockFile($filepath, $privateKey, $password)
     {
         $filepath = self::sanitizePath($filepath) . '.s7sec';
@@ -272,15 +316,24 @@ class Storage
         return false;
     }
     
+    /**
+     * @param $filepath
+     * @param $pubKeys
+     * @return string|null
+     * @throws \SUDHAUS7\Guard7\SealException
+     */
     public static function encodeFile($filepath, $pubKeys)
     {
         $filepath = self::sanitizePath($filepath);
         $encoded = null;
         if (is_file($filepath)) {
-            $identifier = str_replace(PATH_site, '', $filepath);
-            $identifier = str_replace('fileadmin/', '', $identifier);
+            $identifier = str_replace(array(
+                PATH_site,
+                'fileadmin/'
+            ), '', $filepath);
+            
             $buf = \file_get_contents($filepath);
-            if ($buf == 'encoded') {
+            if ($buf === 'encoded') {
                 throw new \Exception('already encoded');
             }
             $data = [
@@ -301,10 +354,11 @@ class Storage
      * @param $filepath
      * @param $privatekey
      * @param null $password
-     *
      * @return mixed|null
+     * @throws MissingKeyException
      * @throws UnlockException
      * @throws WrongKeyPassException
+     * @throws \SUDHAUS7\Guard7\KeyNotReadableException
      */
     public static function decodeFile($filepath, $privatekey, $password = null)
     {

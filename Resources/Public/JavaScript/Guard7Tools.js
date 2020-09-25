@@ -9,13 +9,13 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         var data = '';
         a.forEach(function(e) {
 
-            if (active && (e.trim()=='-----END PUBLIC KEY-----' || e.trim()=='-----END PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
+            if (active && (e.trim()=='-----END PUBLIC KEY-----' || e.trim()=='-----END RSA PRIVATE KEY-----' ||e.trim()=='-----END PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
                 active = false;
             }
             if (active) {
                 data = data+e.trim();
             }
-            if (!active && (e.trim()=='-----BEGIN PUBLIC KEY-----' || e.trim()=='-----BEGIN PRIVATE KEY-----' || e.trim()=='-----END ENCRYPTED PRIVATE KEY-----')) {
+            if (!active && (e.trim()=='-----BEGIN PUBLIC KEY-----' || e.trim()=='-----BEGIN PRIVATE KEY-----' || e.trim()=='-----BEGIN RSA PRIVATE KEY-----' || e.trim()=='-----BEGIN ENCRYPTED PRIVATE KEY-----')) {
                 active = true;
             }
         });
@@ -24,6 +24,8 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
 
     Guard7Tools.clearPrivateKey = function () {
         window.sessionStorage.removeItem('Guard7Privkey');
+        $(window).trigger('privatekey-has-been-cleared');
+
     };
 
 
@@ -72,7 +74,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
             keyconfig.privateKeypem = privkey;
         } catch (e) {
             while (!keyconfig.privateKey) {
-                var password = prompt('Passwort des Privaten Schlüssels?');
+                var password = prompt(top.TYPO3.l10n.localize('guard7_providepassword'));
                 keyconfig.privateKey = forge.pki.decryptRsaPrivateKey(privkey, password);
                 keyconfig.privateKeypem = forge.pki.privateKeyToPem(keyconfig.privateKey,64);
             }
@@ -82,6 +84,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         keyconfig.checksumpubkey = Guard7Tools.getCheckSum(keyconfig.publicPem);
         keyconfig.init = true;
         window.sessionStorage.setItem('Guard7Privkey', JSON.stringify(keyconfig));
+        $(window).trigger('privatekey-has-been-set');
     };
 
 
@@ -127,7 +130,7 @@ define(['jquery', 'TYPO3/CMS/Guard7/Cryptojs', 'TYPO3/CMS/Guard7/Forge'], functi
         //   console.log(publicPem,checksumpubkey,envkeyar);
 
         var runmethod = null;
-        switch (method) {
+        switch (method.toUpperCase()) {
             case 'RC4':
                 runmethod='RC4';
                 break;
