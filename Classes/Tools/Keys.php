@@ -11,7 +11,15 @@ namespace SUDHAUS7\Guard7\Tools;
 use SUDHAUS7\Guard7\KeyNotReadableException;
 use SUDHAUS7\Guard7\WrongKeyPassException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
+use function get_class;
+use function openssl_free_key;
+use function openssl_pkey_export;
+use function openssl_pkey_new;
 
 /**
  * Class Keys
@@ -23,17 +31,17 @@ class Keys
     
     
     /**
-     * @param \TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj
+     * @param AbstractEntity $obj
      * @param bool $checkFEuser
      * @param array $aPubkeys
      * @return array
-     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     * @throws Exception
+     * @throws InvalidSlotException
+     * @throws InvalidSlotReturnException
      */
-    public static function collectPublicKeysForModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
+    public static function collectPublicKeysForModel(AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
     {
-        $class = \get_class($obj);
+        $class = get_class($obj);
         $table = Helper::getClassTable($class);
         $encodeStorage = GeneralUtility::makeInstance(AddLoggedInFrontendUserPublicKeySingleton::class);
     
@@ -53,8 +61,8 @@ class Keys
      * @param array $aPubkeys
      *
      * @return array
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException
-     * @throws \TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException
+     * @throws InvalidSlotException
+     * @throws InvalidSlotReturnException
      */
     public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = [])
     {
@@ -115,14 +123,15 @@ class Keys
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         ];
         
-        $res = \openssl_pkey_new($config);
-        \openssl_pkey_export($res, $privatekey);
-        $publickey = openssl_pkey_get_details($res);
-        $publickey = $publickey["key"];
+        $res = openssl_pkey_new($config);
+        
+        openssl_pkey_export($res, $privatekey);
+        $details = openssl_pkey_get_details($res);
+        $publickey = $details["key"];
         if ($password) {
-            \openssl_pkey_export($res, $privatekey, $password);
+            openssl_pkey_export($res, $privatekey, $password);
         }
-        \openssl_free_key($res);
+        openssl_free_key($res);
         return [
             'private' => $privatekey,
             'public' => $publickey
@@ -142,7 +151,7 @@ class Keys
             throw new KeyNotReadableException("Can not read Private Key");
         }
         $ret = self::lockPrivateKey($privkey, $password);
-        \openssl_free_key($privkey);
+        openssl_free_key($privkey);
         return $ret;
     }
     
@@ -153,7 +162,7 @@ class Keys
      */
     public static function lockPrivateKey($key, $password)
     {
-        \openssl_pkey_export($key, $privatekey, $password);
+        openssl_pkey_export($key, $privatekey, $password);
         return $privatekey;
     }
     
@@ -169,7 +178,7 @@ class Keys
     {
         $privkey = self::unlockKey($key, $password);
         openssl_pkey_export($privkey, $out);
-        \openssl_free_key($privkey);
+        openssl_free_key($privkey);
         return $out;
         //return $privkey;
     }

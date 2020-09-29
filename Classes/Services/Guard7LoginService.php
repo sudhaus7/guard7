@@ -8,7 +8,9 @@
 
 namespace SUDHAUS7\Guard7\Services;
 
-class Guard7 extends \TYPO3\CMS\Sv\AuthenticationService
+use TYPO3\CMS\Sv\AuthenticationService;
+
+class Guard7LoginService extends AuthenticationService
 {
     public function processLoginData(array &$loginData, $passwordTransmissionStrategy)
     {

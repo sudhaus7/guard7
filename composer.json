@@ -1,5 +1,5 @@
 {
-    "name": "SUDHAUS7/guard7",
+    "name": "sudhaus7/guard7-typo3",
     "description": "A TYPO3 extension for encrypting and decrypting data in frontend and backend, including public and private key management.",
     "version": "8.0.0",
     "type": "typo3-cms-extension",
@@ -22,6 +22,7 @@
         }
     ],
     "require": {
+        "sudhaus7/guard7-core": "@dev",
         "typo3/cms-core": "^8.7.0"
     },
     "require-dev": {
