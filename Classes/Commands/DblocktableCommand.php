@@ -8,6 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Commands;
 
+use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
 use Symfony\Component\Console\Command\Command;
@@ -91,7 +92,7 @@ class DblocktableCommand extends Command
                 if (isset($config['publicKeys.']) && !empty($config['publicKeys.'])) {
                     $keys = \array_values($config['publicKeys.']);
                 }
-                $pubkeys = Keys::collectPublicKeys($table, $row['uid'], $pid, false, $keys);
+                $pubkeys = Helper::collectPublicKeys($table, $row['uid'], $pid, false, $keys);
             
                 $fieldArray = [];
                 $vaultfields = GeneralUtility::trimExplode(',', $config['fields']);
@@ -100,7 +101,6 @@ class DblocktableCommand extends Command
                 }
                 $fieldArray = Storage::lockRecord($table, $row['uid'], $vaultfields, $fieldArray, $pubkeys);
                 $connection->update($table, $fieldArray, ['uid' => $row['uid']]);
-                //$output->writeln(['locking ' . $row['username']]);
                 $output->write("\rLocking Record " . $counter . " of " . $count['xcount']);
                 
                 if ($lockFiles) {
@@ -114,8 +114,8 @@ class DblocktableCommand extends Command
                         ]);
                         while ($ref = $resref->fetch(\PDO::FETCH_ASSOC)) {
                             $sysfile = $connection->select(['*'], 'sys_file', ['uid' => $ref['uid_local']])->fetch(\PDO::FETCH_ASSOC);
-                            $ret = Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
-                            // $output->writeln(['locking file ' . $sysfile['identifier']]);
+                            Storage::lockFile(PATH_site . '/fileadmin' . $sysfile['identifier'], $pubkeys);
+                            
                         }
                     }
                 }
@@ -140,8 +140,9 @@ class DblocktableCommand extends Command
                 $this->configcache[$pid] = $ts['tx_sudhaus7guard7.'];
             }
         }
-        if (isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields'])) {
-            return $this->configcache[$pid][$table . '.'];
+        $tablefield = $table . '.';
+        if ( isset($this->configcache[$pid][$tablefield]['fields']) ) {
+            return $this->configcache[$pid][$tablefield];
         }
         return false;
     }

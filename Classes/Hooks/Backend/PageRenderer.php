@@ -8,6 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
 use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
@@ -41,9 +42,10 @@ class PageRenderer
             'guard7_providepassword'  => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:providepassword',
         ], true);
     
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
     
-        $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+       
+        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
             $key = $GLOBALS['BE_USER']->getSessionData('privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
@@ -73,8 +75,9 @@ class PageRenderer
     
     public function postRender(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
-        $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+    
+        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
             return;
         }
         if ($GLOBALS['SOBE']) {
@@ -108,8 +111,8 @@ class PageRenderer
      */
     private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
     {
-        $extensionConfig = Helper::getExtensionConfig();
-        if (!$extensionConfig['usejavascriptdecodinginbackend']) {
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
             return;
         }
         

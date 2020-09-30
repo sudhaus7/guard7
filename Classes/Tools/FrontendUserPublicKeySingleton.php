@@ -11,7 +11,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  *
  * @package SUDHAUS7\Guard7\Tools
  */
-final class AddLoggedInFrontendUserPublicKeySingleton implements SingletonInterface
+final class FrontendUserPublicKeySingleton implements SingletonInterface
 {
     /**
      * @var array
@@ -19,32 +19,32 @@ final class AddLoggedInFrontendUserPublicKeySingleton implements SingletonInterf
     private $list = [];
     
     /**
-     * @param AbstractEntity $o
+     * @param AbstractEntity $entity
      */
-    public function add(AbstractEntity $o)
+    public function add(AbstractEntity $entity): void
     {
-        if (!$this->has($o)) {
-            $this->list[]=$o;
+        if (!$this->has($entity)) {
+            $this->list[]=$entity;
         }
     }
     
     /**
-     * @param AbstractEntity $o
+     * @param AbstractEntity $entity
      * @return bool
      */
-    public function has(AbstractEntity $o)
+    public function has(AbstractEntity $entity):bool
     {
-        return \in_array($o, $this->list, true);
+        return \in_array($entity, $this->list, true);
     }
     
     /**
-     * @param AbstractEntity $o
+     * @param AbstractEntity $entity
      */
-    public function remove(AbstractEntity $o)
+    public function remove(AbstractEntity $entity):void
     {
-        if ($this->has($o)) {
+        if ($this->has($entity)) {
             foreach ($this->list as $k=>$e) {
-                if ($e === $o) {
+                if ($e === $entity) {
                     unset($this->list[$k]);
                 }
             }

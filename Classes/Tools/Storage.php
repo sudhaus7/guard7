@@ -8,9 +8,11 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
-use SUDHAUS7\Guard7\MissingKeyException;
-use SUDHAUS7\Guard7\UnlockException;
-use SUDHAUS7\Guard7\WrongKeyPassException;
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
+use SUDHAUS7\Guard7Core\Exceptions\UnlockException;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
+use SUDHAUS7\Guard7Core\Tools\Decoder;
+use SUDHAUS7\Guard7Core\Tools\Encoder;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -70,6 +72,10 @@ class Storage
      */
     public static function lockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, array $fields, array $pubKeys, $store = true)
     {
+        
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        
         $table = Helper::getModelTable($obj);
         
         /** @var Connection $connection */
@@ -95,15 +101,17 @@ class Storage
                 );
                 $obj->$setter('&#128274;'); // 🔒
                 
-                $encoder = new Encoder($value, $pubKeys);
+                $encoder = new Encoder($configuration, $pubKeys, $value);
                 $encoded = $encoder->run();
                 unset($encoder);
+                
                 $connection->insert('tx_guard7_domain_model_data', [
                     'tablename' => $table,
                     'tableuid' => $obj->getUid(),
                     'fieldname' => $fieldname,
                     'secretdata' => $encoded,
                 ]);
+                
                 $insertid = $connection->lastInsertId();
                 self::updateKeyLog($insertid, $pubKeys);
                 $connection->update($table, [$fieldname => '&#128274;'], ['uid' => $obj->getUid()]);// 🔒
@@ -122,6 +130,9 @@ class Storage
      */
     public static function lockRecord($table, $uid, $fields, $data, $pubKeys)
     {
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
@@ -131,10 +142,12 @@ class Storage
                 if (Helper::checkLockedValue($value)) {
                     continue;
                 }
+                
                 $fieldArray[$fieldname] = '&#128274;'; // 🔒
-                $encoder = new Encoder($value, $pubKeys);
+                $encoder = new Encoder($configuration, $pubKeys, $value);
                 $encoded = $encoder->run();
                 unset($encoder);
+                
                 $connection->delete(
                     'tx_guard7_domain_model_data',
                     [
@@ -165,6 +178,11 @@ class Storage
      */
     public static function unlockModel(\TYPO3\CMS\Extbase\DomainObject\AbstractEntity $obj, $table=null, $privateKey=null, $password = null)
     {
+    
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        $key = KeyFactory::readFromString($configuration, $privateKey, $password);
+        
         if ($table===null) {
             $table = Helper::getModelTable($obj);
         }
@@ -188,8 +206,7 @@ class Storage
                 $value = $obj->$getter();
                 if (Helper::checkLockedValue($value)) {
                     try {
-                        $newvalue = Decoder::decode($row['secretdata'], $privateKey, $password);
-                        
+                        $newvalue = Decoder::decode($configuration,$key,$row['secretdata']);
                         if (\method_exists($obj, $setter)) {
                             $obj->$setter($newvalue);
                         }
@@ -207,11 +224,15 @@ class Storage
      * @param string|null $privateKey
      * @param string|null $password
      * @param int $uid
+     * @throws \SUDHAUS7\Guard7Core\Exceptions\MissingKeyException
      * @return array
-     * @throws \SUDHAUS7\Guard7\KeyNotReadableException
      */
     public static function unlockRecord($table, $data, $privateKey=null, $password = null, $uid = 0)
     {
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        $key = KeyFactory::readFromString($configuration, $privateKey, $password);
+        
         if ($uid == 0) {
             $uid = $data['uid'];
         }
@@ -237,9 +258,7 @@ class Storage
                     ->fetch(\PDO::FETCH_ASSOC);
                 if ($row && $row['secretdata']) {
                     try {
-                        $data[$fieldname] = Decoder::decode($row['secretdata'], $privateKey, $password);
-                    } catch (MissingKeyException $e) {
-                    } catch (WrongKeyPassException $e) {
+                        $data[$fieldname] = Decoder::decode($configuration, $key, $row['secretdata']);
                     } catch (UnlockException $e) {
                         //$data[ $fieldname ] = '&#128274;';
                     }
@@ -322,8 +341,11 @@ class Storage
      * @return string|null
      * @throws \SUDHAUS7\Guard7\SealException
      */
-    public static function encodeFile($filepath, $pubKeys)
+    public static function encodeFile($filepath, $pubKeys): ?string
     {
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+    
         $filepath = self::sanitizePath($filepath);
         $encoded = null;
         if (is_file($filepath)) {
@@ -344,7 +366,7 @@ class Storage
                 'identifier_hash' => \sha1($identifier)
             ];
             
-            $encoder = new Encoder(\json_encode($data), $pubKeys);
+            $encoder = new Encoder($configuration, $pubKeys, \json_encode($data));
             $encoded = $encoder->run();
         }
         return $encoded;
@@ -362,11 +384,14 @@ class Storage
      */
     public static function decodeFile($filepath, $privatekey, $password = null)
     {
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        $key = KeyFactory::readFromString($configuration, $privatekey, $password);
         $filepath = self::sanitizePath($filepath);
         $data = null;
         if (is_file($filepath)) {
             $enc = \file_get_contents($filepath);
-            $json = Decoder::decode($enc, $privatekey, $password);
+            $json = Decoder::decode($configuration, $key, $enc);
             $data = \json_decode($json, true);
         }
         return $data;

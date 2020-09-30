@@ -8,8 +8,8 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
 use SUDHAUS7\Guard7\KeyNotReadableException;
-use SUDHAUS7\Guard7\Tools\Helper;
 use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
 use SUDHAUS7\Guard7\WrongKeyPassException;
@@ -43,9 +43,10 @@ class FeLogin
             unset($GLOBALS['guard7_temp_pass']);
         }
     
-        $extConfig = Helper::getExtensionConfig();
-        
-        if ($extConfig['populatefeuserprivatekeytofrontend']) {
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+    
+    
+        if ($configadapter->config['populatefeuserprivatekeytofrontend']) {
             $key = $GLOBALS['TSFE']->fe_user->getKey('user', 'tx_guard7_privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {

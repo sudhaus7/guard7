@@ -8,7 +8,7 @@
 
 namespace SUDHAUS7\Guard7\Controller;
 
-use SUDHAUS7\Guard7\Tools\Helper;
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -35,14 +35,14 @@ class ToolbarController implements ToolbarItemInterface
     {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $pageRenderer = $this->getPageRenderer();
-        $config = Helper::getExtensionConfig();
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
         $inlinecode = '';
-        if ($config['usejavascriptdecodinginbackend']) {
+        if ($configadapter->config['usejavascriptdecodinginbackend']) {
             $inlinecode .= 'var sudhaus7guard7data_DISABLED = false;';
         } else {
             $inlinecode .= 'var sudhaus7guard7data_DISABLED = true;';
         }
-        if ($config['populatebeuserprivatekeytofrontend']) {
+        if ($configadapter->config['populatebeuserprivatekeytofrontend']) {
             $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = true;';
         } else {
             $inlinecode .= 'var sudhaus7guard7data_privatekeytofrontend = false';

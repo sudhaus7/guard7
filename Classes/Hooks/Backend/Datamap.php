@@ -110,7 +110,7 @@ class Datamap implements SingletonInterface
             $pid = $pObj->getPID($table, $id);
             $vaultfields = $this->getTableFields($table, $pid);
             if (!empty($vaultfields)) {
-                $pubkeys = Keys::collectPublicKeys($table, $id, $pid, false, $extraPubkeys);
+                $pubkeys = Helper::collectPublicKeys($table, $id, $pid, false, $extraPubkeys);
                 $fieldArray = Storage::lockRecord($table, $id, $vaultfields, $fieldArray, $pubkeys);
             }
         }
@@ -133,7 +133,7 @@ class Datamap implements SingletonInterface
             $extraPubkeys[] = $fieldArray['tx_guard7_publickey'];
         }
         
-        $pubkeys = Keys::collectPublicKeys($table, 0, $fieldArray['pid'], false, $extraPubkeys);
+        $pubkeys = Helper::collectPublicKeys($table, 0, $fieldArray['pid'], false, $extraPubkeys);
         
         if (!isset($this->insertCache[$table])) {
             $this->insertCache[$table] = [];

@@ -8,6 +8,8 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
+use SUDHAUS7\Guard7Core\Service\ChecksumService;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -16,6 +18,10 @@ use TYPO3\CMS\Core\Utility\RootlineUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 
 class Helper
 {
@@ -28,10 +34,7 @@ class Helper
         if (!isset($GLOBALS[$cacheKey][$pid])) {
             $ts = BackendUtility::getPagesTSconfig($pid);
             if (isset($ts['tx_sudhaus7guard7.'])) {
-                // if ( isset($ts['tx_sudhaus7guard7.'][$table.'.']) && !empty($ts['tx_sudhaus7guard7.'][$table.'.'])) {
                 $GLOBALS[$cacheKey][$pid] = $ts['tx_sudhaus7guard7.'];
-                //$GLOBALS['__METHOD__'.'-CACHE'][$table.'-'.$pid] = GeneralUtility::trimExplode(',', $ts['tx_sudhaus7guard7.'][$table.'.']['fields'],true)
-                //}
             }
         }
         if ($table !== null) {
@@ -108,7 +111,7 @@ class Helper
         return isset($GLOBALS[$cacheKey][$pid]) ? $GLOBALS[$cacheKey][$pid] : [];
     }
     
-    public static function getTsPubkeys($pid, $table = null)
+    public static function getTsPubkeys($pid, $table = null) : array
     {
         $ts = self::getTsConfig($pid);
         $ret = [];
@@ -133,7 +136,7 @@ class Helper
      * @param int $pid
      * @return array
      */
-    public static function getFields($table, $pid = 0)
+    public static function getFields($table, $pid = 0) : array
     {
         $fields = [];
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
@@ -168,7 +171,7 @@ class Helper
      * @return array
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function getModelFields(AbstractEntity $obj, $table = null)
+    public static function getModelFields(AbstractEntity $obj, $table = null): array
     {
         if ($table === null) {
             $table = self::getModelTable($obj);
@@ -181,7 +184,7 @@ class Helper
      * @return string
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function getModelTable(AbstractEntity $obj)
+    public static function getModelTable(AbstractEntity $obj) : ?string
     {
         return self::getClassTable(\get_class($obj));
     }
@@ -191,7 +194,7 @@ class Helper
      * @return string|null
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function getClassTable($class)
+    public static function getClassTable($class) : ?string
     {
         $table = null;
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
@@ -215,7 +218,7 @@ class Helper
      * @return bool
      * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception
      */
-    public static function classIsGuard7Element($className, $pid=0)
+    public static function classIsGuard7Element($className, $pid=0) : bool
     {
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
@@ -240,7 +243,7 @@ class Helper
         return false;
     }
     
-    public static function tableIsGuard7Element($tableName, $pid=0)
+    public static function tableIsGuard7Element($tableName, $pid=0) : bool
     {
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
@@ -260,7 +263,7 @@ class Helper
         }
     }
     
-    public static function getAllGuard7Tables($pid=0)
+    public static function getAllGuard7Tables($pid=0) : array
     {
         $tables = [];
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
@@ -290,12 +293,88 @@ class Helper
         return $value === '&#128274;' || $value === '🔒';
     }
     
+    
     /**
+     * @param AbstractEntity $obj
+     * @param bool $checkFEuser
+     * @param array $aPubkeys
      * @return array
+     * @throws Exception
+     * @throws InvalidSlotException
+     * @throws InvalidSlotReturnException
      */
-    public static function getExtensionConfig()
+    public static function collectPublicKeysForModel(AbstractEntity $obj, $checkFEuser = false, $aPubkeys = [])
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
-        return $confArr;
+        $class = get_class($obj);
+        $table = Helper::getClassTable($class);
+        $encodeStorage = GeneralUtility::makeInstance(FrontendUserPublicKeySingleton::class);
+        
+        if (!$checkFEuser && $encodeStorage->has($obj)) {
+            $checkFEuser = true;
+            $encodeStorage->remove($obj);
+        }
+        
+        return self::collectPublicKeys($table, (int)$obj->getUid(), (int)$obj->getPid(), $checkFEuser, $aPubkeys);
     }
+    
+    /**
+     * @param null $table
+     * @param mixed $uid
+     * @param int $pid
+     * @param bool $checkFEuser
+     * @param array $aPubkeys
+     *
+     * @return array
+     * @throws InvalidSlotException
+     * @throws InvalidSlotReturnException
+     */
+    public static function collectPublicKeys($table = null, $uid = 0, $pid = 0, $checkFEuser = false, $aPubkeys = []) : array
+    {
+        
+        /** @var Dispatcher $signalSlotDispatcher */
+        $signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
+        
+        /** @var ChecksumService $checksumService */
+        $checksumService = GeneralUtility::makeInstance(ChecksumService::class);
+        /** @var ConfigurationAdapter $configadapter */
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        
+        $pubKeys = [];
+        
+        // Signal Global
+        $keysFromSignalslot = [];
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, 'global', [$keysFromSignalslot,$uid,$pid]);
+        
+        
+        // Signal Name by table for example: collectPublicKeys_fe_users
+        list($keysFromSignalslot) = $signalSlotDispatcher->dispatch(__CLASS__, __FUNCTION__.'_'.$table, [$keysFromSignalslot,$uid,$pid]);
+        
+        if (!empty($keysFromSignalslot)) {
+            foreach ($keysFromSignalslot as $key) {
+                $pubKeys[$checksumService->calculate($key)] = $key;
+            }
+        }
+        if (!empty($aPubkeys)) {
+            foreach ($aPubkeys as $key) {
+                $pubKeys[$checksumService->calculate($key)] = $key;
+            }
+        }
+        if (!empty($configadapter->config['masterkeypublic'])) {
+            $checksum = $checksumService->calculate($configadapter->config['masterkeypublic']);
+            $pubKeys[$checksum] = $configadapter->config['masterkeypublic']['masterkeypublic'];
+        }
+        if ($pid > 0) {
+            $tskeys = Helper::getTsPubkeys($pid, $table);
+            foreach ($tskeys as $key) {
+                $pubKeys[$checksumService->calculate($key)] = $key;
+            }
+        }
+        if ($checkFEuser && isset($GLOBALS['TSFE']) && $GLOBALS['TSFE']->loginUser) {
+            if (isset($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey']) && !empty($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'])) {
+                $pubKeys[$checksumService->calculate($GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'])] = $GLOBALS['TSFE']->fe_user->user['tx_guard7_publickey'];
+            }
+        }
+        return $pubKeys;
+    }
+    
 }

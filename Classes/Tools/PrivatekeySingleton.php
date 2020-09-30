@@ -3,6 +3,9 @@
 
 namespace SUDHAUS7\Guard7\Tools;
 
+use SUDHAUS7\Guard7Core\Service\ChecksumService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class PrivatekeySingleton
  *
@@ -37,7 +40,9 @@ final class PrivatekeySingleton implements \TYPO3\CMS\Core\SingletonInterface
     public function checksum()
     {
         if ($this->hasKey()) {
-            return Keys::getChecksum($this->key);
+            /** @var ChecksumService $checksumService */
+            $checksumService = GeneralUtility::makeInstance(ChecksumService::class);
+            return $checksumService->calculate($this->key);
         }
         return null;
     }

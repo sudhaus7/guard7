@@ -52,7 +52,7 @@ trait Guard7Trait
             // we hijack this function, as it is called just before persisting an object. We actually don't care if it is new..
             $table = Helper::getModelTable($this);
             $fields = Helper::getModelFields($this, $table);
-            $pubKeys = Keys::collectPublicKeys($table, 0, (int)$this->getPid(), true);
+            $pubKeys = Helper::collectPublicKeys($table, 0, (int)$this->getPid(), true);
             Storage::lockModel($this, $fields, $pubKeys, false);
         }
         return $isNew;

@@ -3,11 +3,14 @@
 
 namespace SUDHAUS7\Guard7\Commands;
 
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
 use SUDHAUS7\Guard7\Tools\Keys;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CreatekeypairCommand extends Command
 {
@@ -27,6 +30,13 @@ class CreatekeypairCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Keysize (default 4096)',
                 4096
+            )
+            ->addOption(
+                'method',
+                's',
+                InputOption::VALUE_OPTIONAL,
+                'The Method to be used (default RC4)',
+                'RC4'
             );
     }
     
@@ -34,13 +44,22 @@ class CreatekeypairCommand extends Command
     {
         $password = $input->getOption('password');
         $size = (int)$input->getOption('size');
+        $method = (string)$input->getOption('method');
+        
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        $configuration->setKeySize($size);
+        $configuration->setDefaultMethod($method);
         
         if (!empty($password)) {
-            $pair = Keys::createKey(null,$size);
+            $pair = KeyFactory::newKey($configuration);
+            $pair->unlock();
         } else {
-            $pair = Keys::createKey($password,$size);
+            $pair = KeyFactory::newKey($configuration, $password);
+            $pair->unlock($password);
         }
-        
-        $output->write($pair);
+    
+        $output->writeln($pair->getKey());
+        $output->writeln($pair->getPublicKey());
     }
 }

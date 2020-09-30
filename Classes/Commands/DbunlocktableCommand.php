@@ -22,7 +22,7 @@ class DbunlocktableCommand extends Command
 {
     public function configure()
     {
-        $this->setDescription('Lock all Datafields for a table and pid')
+        $this->setDescription('Unlock all Datafields for a table and pid')
             ->setHelp('call it like this typo3/sysext/core/bin/typo3 guard7:db:unlock --pid=123 --table=fe_users --keyfile=/path/to/key.pem')
             ->addOption(
                 'table',
@@ -73,7 +73,7 @@ class DbunlocktableCommand extends Command
             }
         }
     
-        $output->write("\nStart locking (get a coffee, this can take a while..)", true);
+        $output->write("\nStart unlocking (get a coffee, this can take a while..)", true);
         
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -137,7 +137,7 @@ class DbunlocktableCommand extends Command
                 $this->configcache[$pid] = $ts['tx_sudhaus7guard7.'];
             }
         }
-        if (isset($this->configcache[$pid]) && isset($this->configcache[$pid][$table . '.']) && isset($this->configcache[$pid][$table . '.']['fields'])) {
+        if (isset($this->configcache[$pid][$table . '.']['fields'])) {
             return $this->configcache[$pid][$table . '.'];
         }
         return false;

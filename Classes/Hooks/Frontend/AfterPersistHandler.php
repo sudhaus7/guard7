@@ -41,7 +41,7 @@ class AfterPersistHandler
         try {
             $table = Helper::getModelTable($object);
             $fields = Helper::getModelFields($object, $table);
-            $pubKeys = Keys::collectPublicKeysForModel($object, false);
+            $pubKeys = Helper::collectPublicKeysForModel($object, false);
             Storage::lockModel($object, $fields, $pubKeys, false);
             if ($object->_isDirty()) {
                 $objectmanager = GeneralUtility::makeInstance(ObjectManager::class);
