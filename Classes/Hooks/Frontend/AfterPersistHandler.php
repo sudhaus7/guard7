@@ -44,10 +44,10 @@ class AfterPersistHandler
             $pubKeys = Keys::collectPublicKeysForModel($object, false);
             Storage::lockModel($object, $fields, $pubKeys, false);
             if ($object->_isDirty()) {
-                $om = GeneralUtility::makeInstance(ObjectManager::class);
-                $pm = $om->get(PersistenceManager::class);
-                $pm->add($object);
-                $pm->persistAll();
+                $objectmanager = GeneralUtility::makeInstance(ObjectManager::class);
+                $persistencemanager = $objectmanager->get(PersistenceManager::class);
+                $persistencemanager->add($object);
+                $persistencemanager->persistAll();
             }
         } catch (\Exception $e) {
         }

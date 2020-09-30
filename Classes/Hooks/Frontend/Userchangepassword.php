@@ -8,8 +8,8 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Frontend;
 
-use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\Storage;
+use SUDHAUS7\Guard7Core\Service\ChecksumService;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -31,10 +31,17 @@ class Userchangepassword
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('fe_users');
         $user = $params['user'];
-        $signature_old = Keys::getChecksum($user['tx_guard7_publickey']);
-        Storage::markForReencode($signature_old);
+        /** @var ChecksumService $checksumService */
+        $checksumService = GeneralUtility::makeInstance(ChecksumService::class);
+        $signatureOld =  $checksumService->calculate($user['tx_guard7_publickey']);
+        
+        Storage::markForReencode($signatureOld);
         
         $password = $params['newPassword'];
+        
+        
+        
+        
         $keypair = Keys::createKey($password);
         $data = [];
         $data['tx_guard7_publickey'] = $keypair['public'];
