@@ -9,50 +9,51 @@
 namespace SUDHAUS7\Guard7\Hooks\Backend;
 
 use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
-use SUDHAUS7\Guard7\KeyNotReadableException;
-use SUDHAUS7\Guard7\Tools\Keys;
 use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
-use SUDHAUS7\Guard7\WrongKeyPassException;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class FeLogin
 {
-    public function handle($ar)
+    public function handle($parameters)
     {
         
         /** @var TypoScriptFrontendController $pObj */
-        $pObj = $ar['pObj'];
-        
+        $pObj = $parameters['pObj'];
+        /** @var ConfigurationAdapter $configadapter */
+        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
         if (isset($GLOBALS['guard7_temp_pass'])) {
             if (!empty($pObj->fe_user->user['tx_guard7_privatekey'])) {
                 try {
-                    $privkey = Keys::unlockKeyToPem(
-                        $pObj->fe_user->user['tx_guard7_privatekey'],
-                        $GLOBALS['guard7_temp_pass']
-                    );
-                    $GLOBALS['TSFE']->fe_user->setKey('user', 'tx_guard7_privatekey', $privkey);
+                    
+                    
+                    
+                    $privateKey = KeyFactory::readFromString($configadapter, $pObj->fe_user->user['tx_guard7_privatekey'])
+                        ->export($GLOBALS['guard7_temp_pass'])
+                        ->getKey();
+                    
+                    $GLOBALS['TSFE']->fe_user->setKey('user', 'tx_guard7_privatekey', $privateKey);
                     $GLOBALS['TSFE']->fe_user->storeSessionData('guard7');
                     
                     
                     //$pObj->fe_user->setAndSaveSessionData( 'tx_guard7_privatekey', $privkey);
-                } catch (WrongKeyPassException $e) {
-                } catch (KeyNotReadableException $e) {
+                } catch (\SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException $exception) {
+                    //msg user
+                } catch (\SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException $exception) {
+                    // msg user
                 }
             }
             unset($GLOBALS['guard7_temp_pass']);
         }
-    
-        $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
-    
-    
+
         if ($configadapter->config['populatefeuserprivatekeytofrontend']) {
             $key = $GLOBALS['TSFE']->fe_user->getKey('user', 'tx_guard7_privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
                 $privateKey->setKey($key);
             } else {
-                $privateKey->setKey();
+                $privateKey->setKey(null);
             }
         }
     }

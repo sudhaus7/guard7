@@ -9,13 +9,10 @@
 namespace SUDHAUS7\Guard7\Tools;
 
 use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
+use SUDHAUS7\Guard7\Interfaces\Guard7Interface;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\RootlineUtility;
-use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception;
@@ -25,6 +22,11 @@ use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 
 class Helper
 {
+    /**
+     * @param $pid
+     * @param null $table
+     * @return array|mixed
+     */
     public static function getTsConfig($pid, $table = null)
     {
         $cacheKey = __METHOD__ . '-CACHE';
@@ -32,98 +34,36 @@ class Helper
             $GLOBALS[$cacheKey] = [];
         }
         if (!isset($GLOBALS[$cacheKey][$pid])) {
-            $ts = BackendUtility::getPagesTSconfig($pid);
-            if (isset($ts['tx_sudhaus7guard7.'])) {
-                $GLOBALS[$cacheKey][$pid] = $ts['tx_sudhaus7guard7.'];
+            $pageTs = BackendUtility::getPagesTSconfig($pid);
+            if (isset($pageTs['tx_sudhaus7guard7.'])) {
+                $GLOBALS[$cacheKey][$pid] = $pageTs['tx_sudhaus7guard7.'];
             }
         }
         if ($table !== null) {
-            $tableKey = $table.'.';
-            return isset($GLOBALS[$cacheKey][$pid][$tableKey]) ? $GLOBALS[$cacheKey][$pid][$tableKey] : [];
+            return $GLOBALS[$cacheKey][$pid][$table.'.'] ?? [];
         }
-        return isset($GLOBALS[$cacheKey][$pid]) ? $GLOBALS[$cacheKey][$pid] : [];
+        return $GLOBALS[$cacheKey][$pid] ?? [];
     }
     
     /**
      * @param $pid
-     * @param null|string $table
-     * @return array|mixed
+     * @param null $table
+     * @return array
      */
-    public static function getTsConfigCustom($pid, $table = null)
+    public static function getTsPublicKeys($pid, $table = null) : array
     {
-        $cacheKey = __METHOD__ . '-CACHE';
-        
-        if (!isset($GLOBALS[$cacheKey])) {
-            $GLOBALS[$cacheKey] = [];
-        }
-        if (!isset($GLOBALS[$cacheKey][$pid])) {
-            $rootline = GeneralUtility::makeInstance(RootlineUtility::class, $pid, '', null);
-            try {
-                $rl = $rootline->get();
-            } catch (\RuntimeException $ex) {
-                return [];
-            }
-            
-            ksort($rl);
-            //tsconfig_includes
-            $code = $GLOBALS['TYPO3_CONF_VARS']['BE']['defaultPageTSconfig'];
-            foreach ($rl as $p) {
-                if (trim($p['tsconfig_includes'])) {
-                    $includeTsConfigFileList = GeneralUtility::trimExplode(',', $p['tsconfig_includes'], true);
-                    // Traversing list
-                    foreach ($includeTsConfigFileList as $key => $includeTsConfigFile) {
-                        if (StringUtility::beginsWith($includeTsConfigFile, 'EXT:')) {
-                            list($includeTsConfigFileExtensionKey, $includeTsConfigFilename) = explode(
-                                '/',
-                                substr($includeTsConfigFile, 4),
-                                2
-                            );
-                            if (
-                                (string)$includeTsConfigFileExtensionKey !== ''
-                                && ExtensionManagementUtility::isLoaded($includeTsConfigFileExtensionKey)
-                                && (string)$includeTsConfigFilename !== ''
-                            ) {
-                                $includeTsConfigFileAndPath = ExtensionManagementUtility::extPath($includeTsConfigFileExtensionKey) .
-                                    $includeTsConfigFilename;
-                                if (file_exists($includeTsConfigFileAndPath)) {
-                                    $code .= "\n" . GeneralUtility::getUrl($includeTsConfigFileAndPath);
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                $code .= "\n" . $p['TSconfig'];
-            }
-            
-            /** @var  TypoScriptParser $oTSparser */
-            $oTSparser = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\TypoScript\\Parser\\TypoScriptParser');
-            $oTSparser->parse($code);
-            $ts = $oTSparser->setup;
-            if (isset($ts['tx_sudhaus7guard7.'])) {
-                $GLOBALS[$cacheKey][$pid] = $ts['tx_sudhaus7guard7.'];
-            }
-        }
-        if ($table !== null) {
-            $tableKey = $table.'.';
-            return isset($GLOBALS[$cacheKey][$pid][$tableKey]) ? $GLOBALS[$cacheKey][$pid][$tableKey] : [];
-        }
-        return isset($GLOBALS[$cacheKey][$pid]) ? $GLOBALS[$cacheKey][$pid] : [];
-    }
-    
-    public static function getTsPubkeys($pid, $table = null) : array
-    {
-        $ts = self::getTsConfig($pid);
+        $pageTs = self::getTsConfig($pid);
         $ret = [];
         
-        if (isset($ts['generalPublicKeys.']) && !empty($ts['generalPublicKeys.'])) {
-            foreach ($ts['generalPublicKeys.'] as $key) {
+        if (isset($pageTs['generalPublicKeys.']) && !empty($pageTs['generalPublicKeys.'])) {
+            foreach ($pageTs['generalPublicKeys.'] as $key) {
                 $ret[] = $key;
             }
         }
         if ($table) {
-            if (isset($ts[$table . '.']) && isset($ts[$table . '.']['publicKeys.']) && is_array($ts[$table . '.']['publicKeys.'])) {
-                foreach ($ts[$table . '.']['publicKeys.'] as $key) {
+            $tabledot = $table . '.';
+            if (isset($pageTs[$tabledot]['publicKeys.']) && is_array($pageTs[$tabledot]['publicKeys.'])) {
+                foreach ($pageTs[$tabledot]['publicKeys.'] as $key) {
                     $ret[] = $key;
                 }
             }
@@ -154,9 +94,9 @@ class Helper
         }
         
         if ($pid > 0) {
-            $ts = self::getTsConfig($pid, $table);
-            if (isset($ts['fields'])) {
-                $myfields = GeneralUtility::trimExplode(',', $ts['fields'], true);
+            $pageTS = self::getTsConfig($pid, $table);
+            if (isset($pageTS['fields'])) {
+                $myfields = GeneralUtility::trimExplode(',', $pageTS['fields'], true);
                 if (!empty($myfields)) {
                     $fields = \array_merge($fields, $myfields);
                 }
@@ -220,6 +160,10 @@ class Helper
      */
     public static function classIsGuard7Element($className, $pid=0) : bool
     {
+        if (in_array(Guard7Interface::class, \class_implements($className), true)) {
+            return true;
+        }
+        
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
                 if (isset($config['className']) && $className === $config['className']) {
@@ -364,7 +308,7 @@ class Helper
             $pubKeys[$checksum] = $configadapter->config['masterkeypublic']['masterkeypublic'];
         }
         if ($pid > 0) {
-            $tskeys = Helper::getTsPubkeys($pid, $table);
+            $tskeys = Helper::getTsPublicKeys($pid, $table);
             foreach ($tskeys as $key) {
                 $pubKeys[$checksumService->calculate($key)] = $key;
             }

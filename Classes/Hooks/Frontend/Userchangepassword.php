@@ -8,7 +8,9 @@
 
 namespace SUDHAUS7\Guard7\Hooks\Frontend;
 
+use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
 use SUDHAUS7\Guard7\Tools\Storage;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -39,13 +41,13 @@ class Userchangepassword
         
         $password = $params['newPassword'];
         
+        /** @var ConfigurationAdapter $configuration */
+        $configuration = GeneralUtility::makeInstance(ConfigurationAdapter::class);
+        $keypair = KeyFactory::newKey($configuration, $password);
         
-        
-        
-        $keypair = Keys::createKey($password);
         $data = [];
-        $data['tx_guard7_publickey'] = $keypair['public'];
-        $data['tx_guard7_privatekey'] = $keypair['private'];
+        $data['tx_guard7_publickey'] = $keypair->getPublicKey();
+        $data['tx_guard7_privatekey'] = $keypair->getKey();
         $connection->update('fe_users', $data, ['uid' => $user['uid']]);
     }
 }

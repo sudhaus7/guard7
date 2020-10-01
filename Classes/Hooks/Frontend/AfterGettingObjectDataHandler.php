@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace SUDHAUS7\Guard7\Hooks\Frontend;
 

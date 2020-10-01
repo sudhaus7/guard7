@@ -259,7 +259,7 @@ class Storage
                 if ($row && $row['secretdata']) {
                     try {
                         $data[$fieldname] = Decoder::decode($configuration, $key, $row['secretdata']);
-                    } catch (UnlockException $e) {
+                    } catch (UnlockException $exception) {
                         //$data[ $fieldname ] = '&#128274;';
                     }
                 }

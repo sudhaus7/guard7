@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace SUDHAUS7\Guard7\Hooks\Frontend;
 
@@ -14,14 +14,14 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class AfterPersistHandler
 {
-    public function handle(AbstractEntity $object)
+    /**
+     * @param AbstractEntity $object
+     * @return AbstractEntity[]
+     */
+    public function handle(AbstractEntity $object) : array
     {
-        //if(property_exists($object,'_needsPersisting')) {
         if ($object instanceof Guard7Interface) {
-            if ($object->_hasNeedForPersisting()) {
-                $object->_removeNeedForPersisting();
                 $this->dopersist($object);
-            }
         } elseif (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             $classname = get_class($object);
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
@@ -49,7 +49,8 @@ class AfterPersistHandler
                 $persistencemanager->add($object);
                 $persistencemanager->persistAll();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
+            // we ignore this
         }
     }
 }

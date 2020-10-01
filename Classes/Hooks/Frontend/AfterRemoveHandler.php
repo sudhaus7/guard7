@@ -14,7 +14,6 @@ class AfterRemoveHandler
 {
     public function handle(AbstractEntity $object)
     {
-        //if(property_exists($object,'_needsPersisting')) {
         if ($object instanceof Guard7Interface) {
             $this->cleanup($object);
         } elseif (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
