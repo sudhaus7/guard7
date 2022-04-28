@@ -14,22 +14,22 @@
 
 namespace Sudhaus7\Guard7\Tools;
 
-use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper;
+use function array_merge;
+use function class_implements;
+use function get_class;
 use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
 use Sudhaus7\Guard7\Interfaces\Guard7Interface;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception;
+use TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
 use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
-use function array_merge;
-use function class_implements;
-use function get_class;
 
 final class Helper
 {
@@ -188,7 +188,7 @@ final class Helper
      */
     public static function getModelTable(AbstractEntity $obj): ?string
     {
-        return self::getClassTable( get_class($obj));
+        return self::getClassTable(get_class($obj));
     }
 
     /**

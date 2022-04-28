@@ -14,9 +14,9 @@
 
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
-use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extensionmanager\ViewHelpers\Form\TypoScriptConstantsViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 
 final class ExttemplateTextarea
 {

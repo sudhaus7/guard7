@@ -14,10 +14,10 @@
 
 namespace Sudhaus7\Guard7\Adapter;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use SUDHAUS7\Guard7Core\Interfaces\ConfigurationAdapterInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class ConfigurationAdapter implements ConfigurationAdapterInterface, SingletonInterface
 {

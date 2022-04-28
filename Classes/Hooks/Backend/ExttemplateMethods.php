@@ -14,11 +14,11 @@
 
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
-use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extensionmanager\ViewHelpers\Form\TypoScriptConstantsViewHelper;
 use function function_exists;
 use function strtolower;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extensionmanager\ViewHelpers\Form\TypoScriptConstantsViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 
 final class ExttemplateMethods
 {
@@ -50,7 +50,7 @@ final class ExttemplateMethods
             $content .= '</optgroup>';
         }
         */
-        if ( function_exists('openssl_get_cipher_methods')) {
+        if (function_exists('openssl_get_cipher_methods')) {
             $content .= '<optgroup label="OpenSSL">';
             $availablelist = openssl_get_cipher_methods(true);
             if (PHP_MAJOR_VERSION < 7) {
@@ -60,7 +60,7 @@ final class ExttemplateMethods
             }
 
             foreach ($list as $method) {
-                if (in_array( strtolower($method), $availablelist, true)) {
+                if (in_array(strtolower($method), $availablelist, true)) {
                     $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method === $parameter['fieldValue'] ? 'selected' : '');
                 }
             }

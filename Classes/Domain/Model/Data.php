@@ -15,6 +15,7 @@
 namespace Sudhaus7\Guard7\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 final class Data extends AbstractEntity
 {
 

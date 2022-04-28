@@ -16,18 +16,18 @@ declare(strict_types=1);
 
 namespace Sudhaus7\Guard7\Controller;
 
-use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
-use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
+use function json_encode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
+use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
+use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function json_encode;
 
 /**
  * Class AjaxController
@@ -51,7 +51,7 @@ final class AjaxController
             $GLOBALS['BE_USER']->setAndSaveSessionData('privatekey', $post['key']);
         }
 
-        $response->getBody()->write( json_encode([ 'ok' =>1]));
+        $response->getBody()->write(json_encode([ 'ok' =>1]));
         return $response;
     }
 
@@ -90,7 +90,7 @@ final class AjaxController
             'public'=>$key->getPublicKey(),
         ];
         $response = GeneralUtility::makeInstance(Response::class);
-        $response->getBody()->write( json_encode($payload, JSON_THROW_ON_ERROR));
+        $response->getBody()->write(json_encode($payload, JSON_THROW_ON_ERROR));
         return $response->withHeader('Content-Type', 'application/json; charset=utf-8');
     }
 
@@ -126,7 +126,7 @@ final class AjaxController
         $result = $query->execute();
         $data = $result->fetchAllAssociative();
 
-        $response->getBody()->write( json_encode($data, JSON_THROW_ON_ERROR));
+        $response->getBody()->write(json_encode($data, JSON_THROW_ON_ERROR));
         return $response;
     }
 }

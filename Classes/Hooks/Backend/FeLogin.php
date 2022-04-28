@@ -14,10 +14,10 @@
 
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
-use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
-use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
 use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
 use Sudhaus7\Guard7\Tools\PrivatekeySingleton;
+use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
+use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;

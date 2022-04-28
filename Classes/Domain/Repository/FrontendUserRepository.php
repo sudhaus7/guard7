@@ -15,6 +15,7 @@
 namespace Sudhaus7\Guard7\Domain\Repository;
 
 use TYPO3\CMS\Extbase\Persistence\Repository;
+
 final class FrontendUserRepository extends Repository
 {
 }

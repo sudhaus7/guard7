@@ -14,13 +14,13 @@
 
 namespace Sudhaus7\Guard7\Controller;
 
-use TYPO3\CMS\Core\Utility\PathUtility;
 use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
 use TYPO3\CMS\Backend\Toolbar\ToolbarItemInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 final class ToolbarController implements ToolbarItemInterface

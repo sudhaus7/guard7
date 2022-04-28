@@ -14,8 +14,8 @@
 
 namespace Sudhaus7\Guard7\Tools;
 
-use TYPO3\CMS\Core\SingletonInterface;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**

@@ -22,7 +22,6 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 final class Comment extends AbstractEntity implements Guard7Interface
 {
-
     private ?int $tstamp = null;
 
     private ?string $commentor = null;
@@ -86,7 +85,7 @@ final class Comment extends AbstractEntity implements Guard7Interface
     /**
      * @param DateTime|DateTimeImmutable $date
      */
-    public function setDate( DateTimeInterface $date): void
+    public function setDate(DateTimeInterface $date): void
     {
         $this->date = $date;
     }

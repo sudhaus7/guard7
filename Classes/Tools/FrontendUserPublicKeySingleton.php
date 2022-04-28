@@ -14,9 +14,9 @@
 
 namespace Sudhaus7\Guard7\Tools;
 
+use function in_array;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
-use function in_array;
 
 /**
  * Class AddLoggedInFrontendUserPublicKeySingleton

@@ -14,8 +14,8 @@
 
 namespace Sudhaus7\Guard7\Domain\Repository;
 
-use TYPO3\CMS\Extbase\Persistence\Repository;
 use TYPO3\CMS\Extbase\Persistence\Generic\Typo3QuerySettings;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 final class DataRepository extends Repository
 {

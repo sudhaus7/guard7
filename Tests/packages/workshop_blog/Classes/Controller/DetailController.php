@@ -15,18 +15,18 @@
 namespace WORKSHOP\WorkshopBlog\Controller;
 
 use DateTime;
+use function strip_tags;
+use Sudhaus7\Guard7\Tools\FrontendUserPublicKeySingleton;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
-use TYPO3\CMS\Core\Context\Context;
-use Sudhaus7\Guard7\Tools\FrontendUserPublicKeySingleton;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use WORKSHOP\WorkshopBlog\Domain\Model\Blog;
 use WORKSHOP\WorkshopBlog\Domain\Model\Comment;
 use WORKSHOP\WorkshopBlog\Domain\Repository\BlogRepository;
 use WORKSHOP\WorkshopBlog\Domain\Repository\CommentRepository;
-use function strip_tags;
 
 final class DetailController extends ActionController
 {
@@ -64,8 +64,8 @@ final class DetailController extends ActionController
     public function savecommentAction(Comment $comment): void
     {
         $comment->setDate(new DateTime());
-        $comment->setComment( strip_tags($comment->getComment()));
-        $comment->setCommentor( strip_tags($comment->getCommentor()));
+        $comment->setComment(strip_tags($comment->getComment()));
+        $comment->setCommentor(strip_tags($comment->getCommentor()));
 
         if (GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('frontend.user', 'isLoggedIn')) {
             $encodeStorage = GeneralUtility::makeInstance(FrontendUserPublicKeySingleton::class);

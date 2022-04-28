@@ -45,7 +45,7 @@ final class SignalHandler
             $connection = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getConnectionForTable('fe_users');
             $row = $connection->select([self::TX_GUARD7_PUBLICKEY], 'fe_users', ['uid' => $uid])
-                ->fetch( PDO::FETCH_ASSOC);
+                ->fetch(PDO::FETCH_ASSOC);
             if ($row && !empty($row[self::TX_GUARD7_PUBLICKEY])) {
                 $keys[] = $row[self::TX_GUARD7_PUBLICKEY];
             }

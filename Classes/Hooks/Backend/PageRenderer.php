@@ -14,8 +14,9 @@
 
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
+use function implode;
+use function in_array;
 use PDO;
-use TYPO3\CMS\Recordlist\Controller\RecordListController;
 use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
 use Sudhaus7\Guard7\Tools\Helper;
 use Sudhaus7\Guard7\Tools\PrivatekeySingleton;
@@ -24,8 +25,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function implode;
-use function in_array;
+use TYPO3\CMS\Recordlist\Controller\RecordListController;
 
 final class PageRenderer
 {
@@ -263,7 +263,7 @@ final class PageRenderer
 
         if (!empty($this->editconf)) {
             foreach ($this->editconf as $table => $config) {
-                if ( in_array('edit', $config)) {
+                if (in_array('edit', $config)) {
                     $idlist = GeneralUtility::trimExplode(',', array_keys($config)[0], true);
                     $id = array_shift($idlist);
                     $rec = BackendUtility::getRecord($table, $id, '*');
@@ -293,7 +293,7 @@ final class PageRenderer
                             ]
                         );
 
-                        while ($row = $result->fetch( PDO::FETCH_ASSOC)) {
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                             $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row[self::TABLENAME], $row[self::TABLEUID], $row[self::FIELDNAME]);
                             $data[] = [
                                 self::IDENTIFIER => $identifier,
@@ -338,7 +338,7 @@ final class PageRenderer
                                         ->addOrderBy(self::TABLEUID, 'ASC')
                                         ->execute();
 
-                                    while ($row = $irreres->fetch( PDO::FETCH_ASSOC)) {
+                                    while ($row = $irreres->fetch(PDO::FETCH_ASSOC)) {
                                         // $data[]=$row;
 
                                         if (in_array($row[self::FIELDNAME], $labelfields, true)) {

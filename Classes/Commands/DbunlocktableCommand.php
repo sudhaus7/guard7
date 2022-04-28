@@ -14,18 +14,18 @@
 
 namespace Sudhaus7\Guard7\Commands;
 
+use function file_get_contents;
 use PDO;
-use TYPO3\CMS\Core\Core\Environment;
 use Sudhaus7\Guard7\Tools\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function file_get_contents;
 
 final class DbunlocktableCommand extends Command
 {
@@ -125,7 +125,7 @@ final class DbunlocktableCommand extends Command
         $count = $connection->count(self::UID, $table, $where);
         $res = $connection->select(['*'], $table, $where);
         $counter = 1;
-        while ($row = $res->fetch( PDO::FETCH_ASSOC)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $output->write("\rUnlocking Record " . $counter . ' of ' . $count['xcount']);
 
             $config = $this->getConfig($row[self::PID], $table);
@@ -148,8 +148,8 @@ final class DbunlocktableCommand extends Command
                             'fieldname' => $reffield,
                             'uid_foreign' => $row[self::UID],
                         ]);
-                        while ($ref = $resref->fetch( PDO::FETCH_ASSOC)) {
-                            $sysfile = $connection->select(['*'], 'sys_file', [self::UID => $ref['uid_local']])->fetch( PDO::FETCH_ASSOC);
+                        while ($ref = $resref->fetch(PDO::FETCH_ASSOC)) {
+                            $sysfile = $connection->select(['*'], 'sys_file', [self::UID => $ref['uid_local']])->fetch(PDO::FETCH_ASSOC);
                             $ret = Storage::unlockFile(Environment::getPublicPath() . '/' . '/fileadmin' . $sysfile['identifier'], $key, $password);
                             //  $output->writeln(['unlocking file ' . $sysfile['identifier']]);
                         }

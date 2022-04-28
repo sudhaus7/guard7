@@ -14,11 +14,11 @@
 
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\BackendWorkspaceRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\Database\Query\QueryHelper;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class Guard7BackendUtility extends BackendUtility
 {
@@ -53,10 +53,10 @@ final class Guard7BackendUtility extends BackendUtility
         if ($limit !== '') {
             if (strpos($limit, ',')) {
                 $limitOffsetAndMax = GeneralUtility::intExplode(',', $limit);
-                $queryBuilder->setFirstResult((int) $limitOffsetAndMax[0]);
-                $queryBuilder->setMaxResults((int) $limitOffsetAndMax[1]);
+                $queryBuilder->setFirstResult((int)$limitOffsetAndMax[0]);
+                $queryBuilder->setMaxResults((int)$limitOffsetAndMax[1]);
             } else {
-                $queryBuilder->setMaxResults((int) $limit);
+                $queryBuilder->setMaxResults((int)$limit);
             }
         }
 
@@ -84,10 +84,10 @@ final class Guard7BackendUtility extends BackendUtility
         if ($limit !== '') {
             if (strpos($limit, ',')) {
                 $limitOffsetAndMax = GeneralUtility::intExplode(',', $limit);
-                $queryBuilder->setFirstResult((int) $limitOffsetAndMax[0]);
-                $queryBuilder->setMaxResults((int) $limitOffsetAndMax[1]);
+                $queryBuilder->setFirstResult((int)$limitOffsetAndMax[0]);
+                $queryBuilder->setMaxResults((int)$limitOffsetAndMax[1]);
             } else {
-                $queryBuilder->setMaxResults((int) $limit);
+                $queryBuilder->setMaxResults((int)$limit);
             }
         }
 

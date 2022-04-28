@@ -14,10 +14,8 @@
 
 namespace Sudhaus7\Guard7\Commands;
 
+use function array_values;
 use PDO;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
-use TYPO3\CMS\Core\Core\Environment;
 use Sudhaus7\Guard7\Tools\Helper;
 use Sudhaus7\Guard7\Tools\Storage;
 use Symfony\Component\Console\Command\Command;
@@ -25,10 +23,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function array_values;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 
 final class DblocktableCommand extends Command
 {
@@ -114,7 +114,7 @@ final class DblocktableCommand extends Command
 
         $output->write("\nStart locking (get a coffee, this can take a while..)", true);
         $counter = 1;
-        while ($row = $res->fetch( PDO::FETCH_ASSOC)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $config = $this->getConfig($row[self::PID], $table);
             if ($config) {
                 $keys = [];
@@ -143,8 +143,8 @@ final class DblocktableCommand extends Command
                             'fieldname' => $reffield,
                             'uid_foreign' => $row[self::UID],
                         ]);
-                        while ($ref = $resref->fetch( PDO::FETCH_ASSOC)) {
-                            $sysfile = $connection->select(['*'], 'sys_file', [self::UID => $ref['uid_local']])->fetch( PDO::FETCH_ASSOC);
+                        while ($ref = $resref->fetch(PDO::FETCH_ASSOC)) {
+                            $sysfile = $connection->select(['*'], 'sys_file', [self::UID => $ref['uid_local']])->fetch(PDO::FETCH_ASSOC);
                             Storage::lockFile(Environment::getPublicPath() . '/' . '/fileadmin' . $sysfile['identifier'], $pubkeys);
                         }
                     }

@@ -63,7 +63,7 @@ final class AfterPersistHandler
                 $persistencemanager->add($object);
                 $persistencemanager->persistAll();
             }
-        } catch ( Exception $exception) {
+        } catch (Exception $exception) {
             // we ignore this
         }
     }

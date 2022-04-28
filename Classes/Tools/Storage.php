@@ -14,30 +14,30 @@
 
 namespace Sudhaus7\Guard7\Tools;
 
-use Exception;
-use PDO;
-use Sudhaus7\Guard7\KeyNotReadableException;
-use Sudhaus7\Guard7\SealException;
-use SUDHAUS7\Guard7Core\Exceptions\MissingKeyException;
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
-use TYPO3\CMS\Core\Core\Environment;
-use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
-use SUDHAUS7\Guard7Core\Exceptions\UnlockException;
-use SUDHAUS7\Guard7Core\Factory\KeyFactory;
-use SUDHAUS7\Guard7Core\Tools\Decoder;
-use SUDHAUS7\Guard7Core\Tools\Encoder;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function base64_decode;
+use Exception;
 use function file_get_contents;
 use function file_put_contents;
 use function json_decode;
 use function json_encode;
 use function method_exists;
+use PDO;
 use function realpath;
 use function sha1;
 use function sha1_file;
+use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
+use Sudhaus7\Guard7\KeyNotReadableException;
+use Sudhaus7\Guard7\SealException;
+use SUDHAUS7\Guard7Core\Exceptions\MissingKeyException;
+use SUDHAUS7\Guard7Core\Exceptions\UnlockException;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
+use SUDHAUS7\Guard7Core\Tools\Decoder;
+use SUDHAUS7\Guard7Core\Tools\Encoder;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
  * Class Storage
@@ -93,7 +93,7 @@ final class Storage
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable(self::TX_GUARD7_SIGNATURES);
         $res = $connection->select([self::PARENT], self::TX_GUARD7_SIGNATURES, ['signature' => $signature]);
-        $list = $res->fetchAll( PDO::FETCH_ASSOC);
+        $list = $res->fetchAll(PDO::FETCH_ASSOC);
         foreach ($list as $row) {
             $connection->update(self::TX_GUARD7_DOMAIN_MODEL_DATA, ['needsreencode' => 1], [self::UID => $row[self::PARENT]]);
         }
@@ -140,7 +140,7 @@ final class Storage
         foreach ($fields as $fieldname) {
             $setter = 'set' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($fieldname);
-            if ( method_exists($obj, $getter)) {
+            if (method_exists($obj, $getter)) {
                 $value = $obj->$getter();
                 if (Helper::checkLockedValue($value) || empty($value)) {
                     continue;
@@ -255,18 +255,18 @@ final class Storage
                 self::TABLEUID => $uid,
             ]
         );
-        while ($row = $res->fetch( PDO::FETCH_ASSOC)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $setter = 'set' . GeneralUtility::underscoredToUpperCamelCase($row[self::FIELDNAME]);
             $getter = 'get' . GeneralUtility::underscoredToUpperCamelCase($row[self::FIELDNAME]);
-            if ( method_exists($obj, $getter)) {
+            if (method_exists($obj, $getter)) {
                 $value = $obj->$getter();
                 if (Helper::checkLockedValue($value)) {
                     try {
                         $newvalue = Decoder::decode($configuration, $key, $row[self::SECRETDATA]);
-                        if ( method_exists($obj, $setter)) {
+                        if (method_exists($obj, $setter)) {
                             $obj->$setter($newvalue);
                         }
-                    } catch ( Exception $exception) {
+                    } catch (Exception $exception) {
                         //$data[ $fieldname ] = '&#128274;';
                     }
                 }
@@ -310,7 +310,7 @@ final class Storage
                     0,
                     1
                 )
-                    ->fetch( PDO::FETCH_ASSOC);
+                    ->fetch(PDO::FETCH_ASSOC);
                 if ($row && $row[self::SECRETDATA]) {
                     try {
                         $data[$fieldname] = Decoder::decode($configuration, $key, $row[self::SECRETDATA]);
@@ -332,7 +332,7 @@ final class Storage
     {
         str_replace('../', '', $path);
         $path = realpath($path);
-        if (strpos($path, (string) (Environment::getPublicPath() . '/')) === 0) {
+        if (strpos($path, (string)(Environment::getPublicPath() . '/')) === 0) {
             return $path;
         }
 
@@ -355,7 +355,7 @@ final class Storage
                     file_put_contents($filepath . '.s7sec', $encoded);
                     return true;
                 }
-            } catch ( Exception $exception) {
+            } catch (Exception $exception) {
                 return false;
             }
         }
@@ -383,7 +383,7 @@ final class Storage
                     );
                     return true;
                 }
-            } catch ( Exception $exception) {
+            } catch (Exception $exception) {
                 return false;
             }
         }

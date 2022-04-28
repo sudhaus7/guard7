@@ -42,7 +42,7 @@ final class AfterGettingObjectDataHandler
                         $result[$idx] = Storage::unlockRecord($table, $row, $privateKey->getKey());
                     }
                 }
-            } catch ( Exception $exception) {
+            } catch (Exception $exception) {
                 // ignore for now
             }
         }

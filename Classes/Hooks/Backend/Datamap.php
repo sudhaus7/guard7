@@ -15,17 +15,17 @@
 namespace Sudhaus7\Guard7\Hooks\Backend;
 
 use Sudhaus7\Guard7\SealException;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
-use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 use Sudhaus7\Guard7\Tools\Encoder;
 use Sudhaus7\Guard7\Tools\Keys;
 use Sudhaus7\Guard7\Tools\Storage;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotException;
+use TYPO3\CMS\Extbase\SignalSlot\Exception\InvalidSlotReturnException;
 
 final class Datamap implements SingletonInterface
 {

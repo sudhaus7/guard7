@@ -21,7 +21,6 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 final class Blog extends AbstractEntity
 {
-
     private ?int $tstamp = null;
 
     private ?string $title = null;
@@ -59,7 +58,7 @@ final class Blog extends AbstractEntity
     /**
      * @param DateTime $date
      */
-    public function setDate( DateTimeInterface $date): void
+    public function setDate(DateTimeInterface $date): void
     {
         $this->date = $date;
     }
