@@ -12,30 +12,16 @@
  * @author Frank Berger <fberger@b-factor.de>
  */
 
-use Sudhaus7\Guard7\Hooks\Backend\FeLogin;
-use Sudhaus7\Guard7\Hooks\Backend\SignalHandler;
-use Sudhaus7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler;
-use Sudhaus7\Guard7\Hooks\Frontend\AfterPersistHandler;
-use Sudhaus7\Guard7\Hooks\Frontend\AfterRemoveHandler;
-use Sudhaus7\Guard7\Hooks\Frontend\Userchangepassword;
-use Sudhaus7\Guard7\Services\Guard7LoginService;
-use Sudhaus7\Guard7\Tools\Keys;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\Backend;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-
 if (!defined('TYPO3_MODE')) {
     die();
 }
 
-$guard7ExtensionConfiguration = GeneralUtility::makeInstance( ExtensionConfiguration::class)->get('guard7');
+$guard7ExtensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('guard7');
 
-ExtensionManagementUtility::addService(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
     'guard7',
     'auth',
-    Guard7LoginService::class,
+    \Sudhaus7\Guard7\Services\Guard7LoginService::class,
     [
         'title' => 'Guard7 FE User Key Unlock',
         'description' => 'Unlocks Private Keys stored in the FE User Data',
@@ -48,48 +34,48 @@ ExtensionManagementUtility::addService(
         'os' => '',
         'exec' => '',
         // Do not put a dependency on openssh here or service loading will fail!
-        'className' => Guard7LoginService::class,
+        'className' => \Sudhaus7\Guard7\Services\Guard7LoginService::class,
     ]
 );
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ 'guard7' ] = FeLogin::class . '->handle';
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ 'guard7' ] = \Sudhaus7\Guard7\Hooks\Backend\FeLogin::class . '->handle';
 if ($guard7ExtensionConfiguration['populatebeuserprivatekeytofrontend']) {
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser']['guard7'] = FeLogin::class . '->handleBeUser';
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser']['guard7'] = \Sudhaus7\Guard7\Hooks\Backend\FeLogin::class . '->handleBeUser';
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ 'guard7' ] = Userchangepassword::class . '->handle';
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ 'guard7' ] = \Sudhaus7\Guard7\Hooks\Frontend\Userchangepassword::class . '->handle';
 
 /** @var Dispatcher $signalSlotDispatcher */
-$signalSlotDispatcher = GeneralUtility::makeInstance( Dispatcher::class);
+$signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 $signalSlotDispatcher->connect(
-    Keys::class,
+    \Sudhaus7\Guard7\Tools\Keys::class,
     'collectPublicKeys_fe_users',
-    SignalHandler::class,
+    \Sudhaus7\Guard7\Hooks\Backend\SignalHandler::class,
     'FeuserFetchkey',
     false
 );
 
 $signalSlotDispatcher->connect(
-    Backend::class,
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
     'afterPersistObject',
-    AfterPersistHandler::class,
+    \Sudhaus7\Guard7\Hooks\Frontend\AfterPersistHandler::class,
     'handle',
     false
 );
 
 if ($guard7ExtensionConfiguration['destroyencodeddataondelete'] === true) {
     $signalSlotDispatcher->connect(
-        Backend::class,
+        \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
         'afterRemoveObject',
-        AfterRemoveHandler::class,
+        \Sudhaus7\Guard7\Hooks\Frontend\AfterRemoveHandler::class,
         'handle',
         false
     );
 }
 
 $signalSlotDispatcher->connect(
-    Backend::class,
+    \TYPO3\CMS\Extbase\Persistence\Generic\Backend::class,
     'afterGettingObjectData',
-    AfterGettingObjectDataHandler::class,
+    \Sudhaus7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler::class,
     'handle',
     false
 );

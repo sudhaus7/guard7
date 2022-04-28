@@ -12,30 +12,21 @@
  * @author Frank Berger <fberger@b-factor.de>
  */
 
-use Sudhaus7\Guard7\Controller\ModuleController;
-use Sudhaus7\Guard7\Controller\ToolbarController;
-use Sudhaus7\Guard7\Hooks\Backend\Datamap;
-use TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider;
-use TYPO3\CMS\Core\Imaging\IconRegistry;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
-
 if (!defined('TYPO3_MODE')) {
     die();
 }
 
 //\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY,'Configuration/TypoScript/','B-Factor Template');
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][]    = Datamap::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][]    = \Sudhaus7\Guard7\Hooks\Backend\Datamap::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_pagerenderer.php']['render-preProcess'][] = Sudhaus7\Guard7\Hooks\Backend\PageRenderer::class . '->addJSCSS';
 //$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_pagerenderer.php']['render-postProcess'][] = Sudhaus7\Guard7\Hooks\Backend\PageRenderer::class.'->postRender';
 
-ExtensionUtility::registerModule(
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
     'Guard7',
     'system',
     'guard7',
     'top',
-    [ ModuleController::class => 'index,createkey,listrencode'],
+    [\Sudhaus7\Guard7\Controller\ModuleController::class => 'index,createkey,listrencode'],
     [
         'access' => 'user,group',
         'icon' => 'EXT:guard7/Resources/Public/Icons/locked.svg',
@@ -43,7 +34,7 @@ ExtensionUtility::registerModule(
     ]
 );
 
-/** @var Dispatcher $signalSlotDispatcher */
+/** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
 /*
 $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 $signalSlotDispatcher->connect(
@@ -55,11 +46,11 @@ $signalSlotDispatcher->connect(
 );
 */
 
-/** @var IconRegistry $iconRegistry */
-$iconRegistry = GeneralUtility::makeInstance( IconRegistry::class);
+/** @var \TYPO3\CMS\Core\Imaging\IconRegistry $iconRegistry */
+$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
 $iconRegistry->registerIcon(
     'cdnkey',
-    FontawesomeIconProvider::class,
+    \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
     [
         'name' => 'cdnkey',
         //'spinning' => true
@@ -67,7 +58,7 @@ $iconRegistry->registerIcon(
 );
 $iconRegistry->registerIcon(
     'key',
-    FontawesomeIconProvider::class,
+    \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
     [
         'name' => 'key',
         //'spinning' => true
@@ -75,7 +66,7 @@ $iconRegistry->registerIcon(
 );
 $iconRegistry->registerIcon(
     'lock',
-    FontawesomeIconProvider::class,
+    \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
     [
         'name' => 'lock',
         //'spinning' => true
@@ -83,7 +74,7 @@ $iconRegistry->registerIcon(
 );
 $iconRegistry->registerIcon(
     'lock-open',
-    FontawesomeIconProvider::class,
+    \TYPO3\CMS\Core\Imaging\IconProvider\FontawesomeIconProvider::class,
     [
         'name' => 'lock-open',
         //'spinning' => true
@@ -91,5 +82,5 @@ $iconRegistry->registerIcon(
 );
 
 if (TYPO3_MODE === 'BE') {
-    $GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][] = ToolbarController::class;
+    $GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][] = \Sudhaus7\Guard7\Controller\ToolbarController::class;
 }
