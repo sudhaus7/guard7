@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
 return [
     'ctrl' => [
@@ -13,19 +24,16 @@ return [
         'rootLevel' => 0,
         'iconfile' => 'EXT:workshop_blog/Resources/Public/Icons/Extension.svg',
         'enablecolumns' => [
-            'disabled' => 'hidden'
+            'disabled' => 'hidden',
         ],
         'title' => 'Blogentry',
-        'searchFields' => 'hidden,date,title,teaser,bodytext'
-    ],
-    'interface' => [
-        'showRecordFieldList' => 'hidden,date,title,teaser,bodytext'
+        'searchFields' => 'hidden,date,title,teaser,bodytext',
     ],
     'palettes' => [],
     'types' => [
         1 => [
-            'showitem' => 'hidden,date,title,teaser,bodytext'
-        ]
+            'showitem' => 'hidden,date,title,teaser,bodytext',
+        ],
     ],
     'columns' => [
         'tstamp' => [
@@ -44,31 +52,31 @@ return [
                     [
                         0 => '',
                         1 => '',
-                        'invertStateDisplay' => true
-                    ]
+                        'invertStateDisplay' => true,
+                    ],
                 ],
-            ]
+            ],
         ],
         'title' => [
             'label' => 'Title',
             'config' => [
-                'type' => 'input'
-            ]
+                'type' => 'input',
+            ],
         ],
         'date' => [
             'label' => 'Date',
             'config' => [
                 'type' => 'input',
                 'eval' => 'datetime',
-                'renderType' => 'inputDateTime'
-            ]
+                'renderType' => 'inputDateTime',
+            ],
         ],
 
         'teaser' => [
             'label' => 'Teaser',
             'config' => [
-                'type' => 'text'
-            ]
+                'type' => 'text',
+            ],
         ],
 
         'bodytext' => [
@@ -76,9 +84,8 @@ return [
             'config' => [
                 'type' => 'text',
                 'enableRichtext' => true,
-            ]
+            ],
         ],
 
-
-    ]
+    ],
 ];

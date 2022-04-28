@@ -1,13 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frank
- * Date: 26.02.18
- * Time: 16:54
+
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace SUDHAUS7\Guard7\Commands;
+namespace Sudhaus7\Guard7\Commands;
 
-class DblistdirtyCommand
+final class DblistdirtyCommand
 {
 }

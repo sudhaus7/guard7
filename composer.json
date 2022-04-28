@@ -1,74 +1,72 @@
 {
     "name": "sudhaus7/guard7-typo3",
     "description": "A TYPO3 extension for encrypting and decrypting data in frontend and backend, including public and private key management.",
-    "version": "8.0.0",
+    "license": "GPL-2.0-or-later",
     "type": "typo3-cms-extension",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "Tests/packages/*"
-        }
-    ],
     "authors": [
         {
             "name": "Frank Berger",
             "role": "Developer",
             "email": "fberger@sudhaus7.de"
-        },
-        {
-            "name": "Markus Hofmann",
-            "role": "Developer",
-            "email": "mhofmann@sudhaus7.de"
         }
     ],
-    "require": {
-        "sudhaus7/guard7-core": "@dev",
-        "typo3/cms-core": "^8.7.0"
-    },
-    "require-dev": {
-        "typo3/cms-fluid-styled-content": "^8.7.0",
-        "typo3/cms-tstemplate": "^8.7.0",
-        "typo3/cms-felogin": "^8.7.0",
-        "nimut/testing-framework": "^4.1",
-        "phpstan/phpstan": "^0.11",
-        "codeception/codeception": "^3.1",
-        "georgringer/backend-debug": "^1.1",
-        "workshop/blog": "@dev",
-        "helhum/typo3-console": "^5.7",
-        "codeception/phpbuiltinserver": "^1.5"
-    },
-    "replace": {
-        "guard7": "self.version"
-
-    },
-    "autoload": {
-        "psr-4": {
-            "SUDHAUS7\\Guard7\\": "Classes/"
-        }
-    },
     "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.23"
+        },
+        "allow-plugins": {
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true,
+            "cweagans/composer-patches": true,
+            "helhum/typo3-console-plugin": true
+        },
         "preferred-install": {
             "*": "dist"
         },
         "vendor-dir": ".Build/vendor",
         "bin-dir": ".Build/bin"
     },
+    "require": {
+        "php": "7.4.* || 8.0.*",
+        "sudhaus7/guard7-core": "*",
+        "typo3/cms-core": "10.4.*"
+    },
+    "require-dev": {
+        "codeception/codeception": "*",
+        "helhum/typo3-console": "*",
+        "nimut/testing-framework": "*",
+        "phpstan/phpstan": "*",
+        "rector/rector": "*",
+        "typo3/cms-felogin": "10.4.*",
+        "typo3/cms-fluid-styled-content": "10.4.*",
+        "typo3/cms-styleguide": "^10",
+        "typo3/cms-tstemplate": "10.4.*",
+        "typo3/coding-standards": "^0.5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sudhaus7\\Guard7\\": "Classes/"
+        }
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.0.x-dev"
+            "dev-master": "10.0.x-dev"
         },
         "typo3/cms": {
             "extension-key": "guard7",
-            "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".Build/public"
         }
     },
     "scripts": {
         "post-autoload-dump": [
             "mkdir -p .Build/public/typo3conf/ext/",
-            "[ -L .Build/public/typo3conf/ext/guard7 ] || ln -snvf ../../../../. .Build/public/typo3conf/ext/guard7"
+            "[ -L .Build/public/typo3conf/ext/guard7 ] || ln -snvf ../../../../. .Build/public/typo3conf/ext/guard7",
+			"[ -L .Build/public/typo3conf/ext/workshop_blog ] || ln -snvf ../../../../Tests/packages/workshop_blog .Build/public/typo3conf/ext/workshop_blog"
         ],
-        "test-local": "@php .Build/vendor/bin/codecept run --env local",
-        "test-ci": "@php .Build/vendor/bin/codecept run --env ci"
+        "test-local": "@php .Build/bin/codecept run --env local",
+        "test-ci": "@php .Build/bin/codecept run --env ci",
+        "csfixer": "@php .Build/bin/php-cs-fixer fix"
     }
 }

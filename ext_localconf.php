@@ -1,13 +1,14 @@
 <?php
 
-use SUDHAUS7\Guard7\Hooks\Backend\FeLogin;
-use SUDHAUS7\Guard7\Hooks\Backend\SignalHandler;
-use SUDHAUS7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler;
-use SUDHAUS7\Guard7\Hooks\Frontend\AfterPersistHandler;
-use SUDHAUS7\Guard7\Hooks\Frontend\AfterRemoveHandler;
-use SUDHAUS7\Guard7\Hooks\Frontend\Userchangepassword;
-use SUDHAUS7\Guard7\Services\Guard7LoginService;
-use SUDHAUS7\Guard7\Tools\Keys;
+use Sudhaus7\Guard7\Hooks\Backend\FeLogin;
+use Sudhaus7\Guard7\Hooks\Backend\SignalHandler;
+use Sudhaus7\Guard7\Hooks\Frontend\AfterGettingObjectDataHandler;
+use Sudhaus7\Guard7\Hooks\Frontend\AfterPersistHandler;
+use Sudhaus7\Guard7\Hooks\Frontend\AfterRemoveHandler;
+use Sudhaus7\Guard7\Hooks\Frontend\Userchangepassword;
+use Sudhaus7\Guard7\Services\Guard7LoginService;
+use Sudhaus7\Guard7\Tools\Keys;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\Backend;
@@ -17,7 +18,7 @@ if (!defined('TYPO3_MODE')) {
     die();
 }
 
-$guard7ExtensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['guard7'], ['allowed_classes'=>[]]);
+$guard7ExtensionConfiguration = GeneralUtility::makeInstance( ExtensionConfiguration::class)->get('guard7');
 
 ExtensionManagementUtility::addService(
     'guard7',
@@ -38,17 +39,15 @@ ExtensionManagementUtility::addService(
         'className' => Guard7LoginService::class,
     ]
 );
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ $_EXTKEY ] = FeLogin::class . '->handle';
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['initFEuser'][ 'guard7' ] = FeLogin::class . '->handle';
 if ($guard7ExtensionConfiguration['populatebeuserprivatekeytofrontend']) {
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser'][$_EXTKEY] = FeLogin::class . '->handleBeUser';
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/index_ts.php']['postBeUser']['guard7'] = FeLogin::class . '->handleBeUser';
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ $_EXTKEY ] = Userchangepassword::class . '->handle';
-
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['password_changed'][ 'guard7' ] = Userchangepassword::class . '->handle';
 
 /** @var Dispatcher $signalSlotDispatcher */
-
-$signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
+$signalSlotDispatcher = GeneralUtility::makeInstance( Dispatcher::class);
 $signalSlotDispatcher->connect(
     Keys::class,
     'collectPublicKeys_fe_users',
@@ -74,6 +73,7 @@ if ($guard7ExtensionConfiguration['destroyencodeddataondelete'] === true) {
         false
     );
 }
+
 $signalSlotDispatcher->connect(
     Backend::class,
     'afterGettingObjectData',
@@ -82,7 +82,6 @@ $signalSlotDispatcher->connect(
     false
 );
 
-
 /**
  * Format:
  * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'][]=[
@@ -90,9 +89,7 @@ $signalSlotDispatcher->connect(
  *  'tableName'=>'tx_my_table',
  *  'fields'=>'name,email,phone'
  * ];
- *
  */
 if (!is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] = [];
 }
-

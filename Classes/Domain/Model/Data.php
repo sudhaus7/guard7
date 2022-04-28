@@ -1,148 +1,134 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frank
- * Date: 22.02.18
- * Time: 17:59
+
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace SUDHAUS7\Guard7\Domain\Model;
+namespace Sudhaus7\Guard7\Domain\Model;
 
-class Data extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+final class Data extends AbstractEntity
 {
-    
+
     /**
      * Tablename
-     *
-     * @var \string
      */
-    protected $tablename;
+    private ?string $tablename = null;
+
     /**
      * Tableuid
-     *
-     * @var \string
      */
-    protected $tableuid;
+    private ?string $tableuid = null;
+
     /**
      * Fieldname
-     *
-     * @var \string
      */
-    protected $fieldname;
+    private ?string $fieldname = null;
+
     /**
      * Secretdata
-     *
-     * @var \string
      */
-    protected $secretdata;
+    private ?string $secretdata = null;
+
     /**
      * Needsreencode
-     *
-     * @var \string
      */
-    protected $needsreencode;
-    
+    private ?string $needsreencode = null;
+
     /**
      * Returns the Tablename
      *
-     * @return \string $tablename
+     * @return string|null $tablename
      */
-    public function getTablename()
+    public function getTablename(): ?string
     {
         return $this->tablename;
     }
-    
+
     /**
      * Sets the Tablename
-     *
-     * @param \string $tablename
-     * @return void
      */
-    public function setTablename($tablename)
+    public function setTablename(string $tablename): void
     {
         $this->tablename = $tablename;
     }
-    
+
     /**
      * Returns the Tableuid
      *
-     * @return \string $tableuid
+     * @return string|null $tableuid
      */
-    public function getTableuid()
+    public function getTableuid(): ?string
     {
         return $this->tableuid;
     }
-    
+
     /**
      * Sets the Tableuid
-     *
-     * @param \string $tableuid
-     * @return void
      */
-    public function setTableuid($tableuid)
+    public function setTableuid(string $tableuid): void
     {
         $this->tableuid = $tableuid;
     }
-    
+
     /**
      * Returns the Fieldname
      *
-     * @return \string $fieldname
+     * @return string|null $fieldname
      */
-    public function getFieldname()
+    public function getFieldname(): ?string
     {
         return $this->fieldname;
     }
-    
+
     /**
      * Sets the Fieldname
-     *
-     * @param \string $fieldname
-     * @return void
      */
-    public function setFieldname($fieldname)
+    public function setFieldname(string $fieldname): void
     {
         $this->fieldname = $fieldname;
     }
-    
+
     /**
      * Returns the Secretdata
      *
-     * @return \string $secretdata
+     * @return string|null $secretdata
      */
-    public function getSecretdata()
+    public function getSecretdata(): ?string
     {
         return $this->secretdata;
     }
-    
+
     /**
      * Sets the Secretdata
-     *
-     * @param \string $secretdata
-     * @return void
      */
-    public function setSecretdata($secretdata)
+    public function setSecretdata(string $secretdata): void
     {
         $this->secretdata = $secretdata;
     }
-    
+
     /**
      * Returns the Needsreencode
      *
-     * @return \string $needsreencode
+     * @return string|null $needsreencode
      */
-    public function getNeedsreencode()
+    public function getNeedsreencode(): ?string
     {
         return $this->needsreencode;
     }
-    
+
     /**
      * Sets the Needsreencode
-     *
-     * @param \string $needsreencode
-     * @return void
      */
-    public function setNeedsreencode($needsreencode)
+    public function setNeedsreencode(string $needsreencode): void
     {
         $this->needsreencode = $needsreencode;
     }

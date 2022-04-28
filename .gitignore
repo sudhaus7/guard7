@@ -59,3 +59,4 @@ fabric.properties
 
 tests/_output/*
 /Documentation-GENERATED-temp
+.php-cs-fixer.cache

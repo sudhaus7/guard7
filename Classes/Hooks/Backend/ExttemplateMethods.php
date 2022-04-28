@@ -1,41 +1,46 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frank
- * Date: 21.02.18
- * Time: 16:48
+
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace SUDHAUS7\Guard7\Hooks\Backend;
+namespace Sudhaus7\Guard7\Hooks\Backend;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extensionmanager\ViewHelpers\Form\TypoScriptConstantsViewHelper;
+use function function_exists;
+use function strtolower;
 
-class ExttemplateMethods
+final class ExttemplateMethods
 {
     /**
      * Tag builder instance
-     *
-     * @var \TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder
      */
-    protected $tag = null;
-    
+    private TagBuilder $tag;
+
     /**
      * constructor of this class
      */
     public function __construct()
     {
-        $this->tag = GeneralUtility::makeInstance('TYPO3\\CMS\\Fluid\\Core\\ViewHelper\\TagBuilder');
+        $this->tag = GeneralUtility::makeInstance(TagBuilder::class);
     }
-    
+
     /**
      * render textarea for extConf
      *
-     * @param array $parameter
      * @param TypoScriptConstantsViewHelper $parentObject
-     * @return string
      */
-    public function render(array $parameter = array(), TypoScriptConstantsViewHelper $parentObject)
+    public function render(array $parameter = [], TypoScriptConstantsViewHelper $parentObject): string
     {
         $content = '<option value="">Please choose</option>';
         /* TODO: implemenet sodium support
@@ -45,23 +50,24 @@ class ExttemplateMethods
             $content .= '</optgroup>';
         }
         */
-        if (\function_exists('openssl_get_cipher_methods')) {
+        if ( function_exists('openssl_get_cipher_methods')) {
             $content .= '<optgroup label="OpenSSL">';
             $availablelist = openssl_get_cipher_methods(true);
             if (PHP_MAJOR_VERSION < 7) {
-                $list = ['RC4','DES'];
+                $list = ['RC4', 'DES'];
             } else {
-                $list = ['RC4','AES128','AES192','AES256','AES512','DES']; //to ensure Javascript compatibility
+                $list = ['RC4', 'AES128', 'AES192', 'AES256', 'AES512', 'DES']; //to ensure Javascript compatibility
             }
+
             foreach ($list as $method) {
-                if (in_array(\strtolower($method), $availablelist, true)) {
+                if (in_array( strtolower($method), $availablelist, true)) {
                     $content .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $method, $method === $parameter['fieldValue'] ? 'selected' : '');
                 }
             }
+
             $content .= '</optgroup>';
         }
-        
-        
+
         $this->tag->setTagName('select');
         $this->tag->forceClosingTag(true);
         $this->tag->addAttribute('name', $parameter['fieldName']);

@@ -1,60 +1,88 @@
 <?php
 
-class BackendCest
+use Page\Acceptance\Backendlogin;
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
+final class BackendCest
 {
-    public function _before(AcceptanceTester $I)
+    /**
+     * @var string
+     */
+    private const ADMIN = 'admin';
+
+    /**
+     * @var string
+     */
+    private const ADMINADMIN = 'adminadmin';
+
+    /**
+     * @var string
+     */
+    private const USER = 'User';
+
+    /**
+     * @var string
+     */
+    private const TESTUSER = 'testuser';
+
+    public function _before(AcceptanceTester $I): void
     {
     }
 
-    public function _after(AcceptanceTester $I)
+    public function _after(AcceptanceTester $I): void
     {
     }
 
     // tests
-    public function canLogIn(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
+    public function canLogIn(AcceptanceTester $I, Backendlogin $loginPage): void
     {
-        $loginPage->login('admin','adminadmin');
+        $loginPage->login(self::ADMIN, self::ADMINADMIN);
         $I->see('Guard7 Testdb');
     }
-    
-    public function canSeeEncryptedContent(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
+
+    public function canSeeEncryptedContent(AcceptanceTester $I, Backendlogin $loginPage): void
     {
-        $loginPage->login('admin','adminadmin');
+        $loginPage->login(self::ADMIN, self::ADMINADMIN);
         $I->click('List');
         $I->wait(2);
-        $I->see('User');
-        $I->click('User');
+        $I->see(self::USER);
+        $I->click(self::USER);
         $I->switchToIFrame('#typo3-contentIframe');
         $I->wait(4);
-        
+
         $I->see('Website User (1)');
         $I->click('Website User (1)');
         $I->wait(2);
         $I->see('🔒');
-        
-        $I->see('testuser');
-        $I->click('testuser');
+
+        $I->see(self::TESTUSER);
+        $I->click(self::TESTUSER);
         $I->wait(2);
         $I->see('Personal Data');
         $I->click('Personal Data');
         $I->wait(2);
-        
+
         $x = $I->grabAttributeFrom('input[data-formengine-input-name="data[fe_users][1][company]"]', 'placeholder');
-        assert(false !== strpos( $x,'Activate your private key to view content'));
-        
-        
+        assert(false !== strpos($x, 'Activate your private key to view content'));
     }
-    
-    
-    public function _canSeeDecryptedContent(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
+
+    public function _canSeeDecryptedContent(AcceptanceTester $I, Backendlogin $loginPage): void
     {
-        $loginPage->login('admin','adminadmin');
-    
+        $loginPage->login(self::ADMIN, self::ADMINADMIN);
+
         $I->wait(1);
 
-        
         $I->click('//body/div[1]/div[2]/div[1]/ul[1]/li[1]/a');
-    
+
         $I->fillField('textarea[name=newkey]', '-----BEGIN PRIVATE KEY-----
 MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQCvQqL4fGioRInB
 7orBLxyl0chRPk1uBAAhxwjD+Fup0+sq2vQgLmZAU3U6tI31abDHvanGC1GVkX7T
@@ -109,41 +137,35 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
 -----END PRIVATE KEY-----');
         $I->click('Activate key');
         $I->wait(5);
-        
-        
+
         $I->click('List');
         $I->wait(2);
-        $I->see('User');
-        $I->click('User');
+        $I->see(self::USER);
+        $I->click(self::USER);
         $I->switchToIFrame('#typo3-contentIframe');
         $I->wait(4);
-        
+
         $I->see('Website User (1)');
         $I->click('Website User (1)');
         $I->wait(4);
         $I->dontSee('🔒');
-        
-        $I->see('testuser');
-        $I->click('testuser');
+
+        $I->see(self::TESTUSER);
+        $I->click(self::TESTUSER);
         $I->wait(4);
         $I->see('Personal Data');
         $I->click('Personal Data');
         $I->wait(4);
-        
+
         $x = $I->grabAttributeFrom('input[data-formengine-input-name="data[fe_users][1][company]"]', 'placeholder');
-        assert(false === strpos( $x,'Activate your private key to view content'));
-        
-        
+        assert(false === strpos($x, 'Activate your private key to view content'));
     }
-    
-    
-    
-    public function canCreateKeyInGuardModule(AcceptanceTester $I, \Page\Acceptance\Backendlogin $loginPage)
+
+    public function canCreateKeyInGuardModule(AcceptanceTester $I, Backendlogin $loginPage): void
     {
-        $loginPage->login('admin','adminadmin');
+        $loginPage->login(self::ADMIN, self::ADMINADMIN);
         $I->click('Guard7');
-        
-        
+
         $I->switchToIFrame('#typo3-contentIframe');
         $I->wait(2);
         $I->see('Generate a new Key');
@@ -151,18 +173,17 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
         $I->wait(2);
         $I->see('Generate a new Keypair with 2048 bytes');
         $I->click('Generate a new Keypair with 2048 bytes');
-    /*
-        $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
-            return $el->isDisplayed();
-        }, 1000);
-    */
+        /*
+            $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
+                return $el->isDisplayed();
+            }, 1000);
+        */
         $I->wait(5);
-    
-        
+
         assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
-        
+
         assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN RSA PRIVATE KEY-----')!==false);
-     
+
         $I->click('Generate a new Keypair with 4096 bytes (more secure, but slower)');
         /*
         $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
@@ -170,17 +191,16 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
         }, 1000);
         */
         $I->wait(5);
-    
+
         assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
-    
+
         assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN RSA PRIVATE KEY-----')!==false);
         //$I->seeInField('publickey', '-----BEGIN PUBLIC KEY-----');
         //$I->seeInField('privatekey', '-----BEGIN RSA PRIVATE KEY-----');
-    
-    
+
         $I->fillField('//input[@name="password"]', 'test');
         $I->click('Generate a new Keypair with 2048 bytes');
-    
+
         /*
         $I->waitForElementChange('//textarea[@name="publickey"]', function(WebDriverElement $el) {
             return $el->isDisplayed();
@@ -188,11 +208,9 @@ VDT6kGX96gj3JnCvFDy/iTZbCu+1duU=
         */
         $I->wait(5);
         assert(strpos($I->grabValueFrom('textarea[name=publickey]'), '-----BEGIN PUBLIC KEY-----')!==false);
-    
+
         assert(strpos($I->grabValueFrom('textarea[name=privatekey]'), '-----BEGIN ENCRYPTED PRIVATE KEY-----')!==false);
-       // $I->seeInField('publickey', '-----BEGIN PUBLIC KEY-----');
+        // $I->seeInField('publickey', '-----BEGIN PUBLIC KEY-----');
         //$I->seeInField('privatekey', '-----BEGIN ENCRYPTED PRIVATE KEY-----');
-    
-    
     }
 }

@@ -1,50 +1,46 @@
 <?php
 
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
 namespace WORKSHOP\WorkshopBlog\Domain\Model;
 
-use SUDHAUS7\Guard7\Interfaces\Guard7Interface;
-use SUDHAUS7\Guard7\Traits\Guard7Trait;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Sudhaus7\Guard7\Interfaces\Guard7Interface;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-class Comment extends AbstractEntity implements Guard7Interface
+final class Comment extends AbstractEntity implements Guard7Interface
 {
-    use Guard7Trait;
-    
+
+    private ?int $tstamp = null;
+
+    private ?string $commentor = null;
+
+    private ?string $comment = null;
+
     /**
-     * @var int
+     * @var DateTime|DateTimeImmutable|null
      */
-    protected $tstamp;
-    
-    
-    /**
-     * @var string
-     */
-    protected $commentor;
-    
-    /**
-     * @var string
-     */
-    protected $comment;
-    
-    /**
-     * @var \DateTime
-     */
-    protected $date;
-    
-    /**
-     * @var \WORKSHOP\WorkshopBlog\Domain\Model\Blog
-     */
-    protected $blog;
-    
-    /**
-     * @return string
-     */
+    private ?DateTimeInterface $date = null;
+
+    private ?Blog $blog = null;
+
     public function getCommentor(): ?string
     {
         return $this->commentor;
     }
-    
+
     /**
      * @param string $commentor
      */
@@ -52,15 +48,12 @@ class Comment extends AbstractEntity implements Guard7Interface
     {
         $this->commentor = $commentor;
     }
-    
-    /**
-     * @return string
-     */
+
     public function getComment(): ?string
     {
         return $this->comment;
     }
-    
+
     /**
      * @param string $comment
      */
@@ -68,15 +61,12 @@ class Comment extends AbstractEntity implements Guard7Interface
     {
         $this->comment = $comment;
     }
-    
-    /**
-     * @return Blog
-     */
+
     public function getBlog(): ?Blog
     {
         return $this->blog;
     }
-    
+
     /**
      * @param Blog $blog
      */
@@ -84,29 +74,28 @@ class Comment extends AbstractEntity implements Guard7Interface
     {
         $this->blog = $blog;
     }
-    
+
     /**
-     * @return \DateTime
+     * @return DateTime|DateTimeImmutable
      */
-    public function getDate(): ?\DateTime
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
-    
 
-    public function setDate(\DateTime $date): void
+    /**
+     * @param DateTime|DateTimeImmutable $date
+     */
+    public function setDate( DateTimeInterface $date): void
     {
         $this->date = $date;
     }
-    
-    /**
-     * @return int
-     */
-    public function getTstamp(): int
+
+    public function getTstamp(): ?int
     {
         return $this->tstamp;
     }
-    
+
     /**
      * @param int $tstamp
      */

@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
 return [
     'ctrl' => [
@@ -13,19 +24,16 @@ return [
         'rootLevel' => 0,
         'iconfile' => 'EXT:workshop_blog/Resources/Public/Icons/Extension.svg',
         'enablecolumns' => [
-            'disabled' => 'hidden'
+            'disabled' => 'hidden',
         ],
         'title' => 'Comment',
-        'searchFields' => 'hidden,date,commentor,comment,blog'
-    ],
-    'interface' => [
-        'showRecordFieldList' => 'hidden,date,commentor,comment,blog'
+        'searchFields' => 'hidden,date,commentor,comment,blog',
     ],
     'palettes' => [],
     'types' => [
         1 => [
-            'showitem' => 'hidden,date,commentor,comment,blog'
-        ]
+            'showitem' => 'hidden,date,commentor,comment,blog',
+        ],
     ],
     'columns' => [
         'tstamp' => [
@@ -44,33 +52,33 @@ return [
                     [
                         0 => '',
                         1 => '',
-                        'invertStateDisplay' => true
-                    ]
+                        'invertStateDisplay' => true,
+                    ],
                 ],
-            ]
+            ],
         ],
         'commentor' => [
             'label' => 'Commentor',
             'config' => [
-                'type' => 'input'
-            ]
+                'type' => 'input',
+            ],
         ],
         'date' => [
             'label' => 'Date',
             'config' => [
                 'type' => 'input',
                 'eval' => 'datetime',
-                'renderType' => 'inputDateTime'
-            ]
+                'renderType' => 'inputDateTime',
+            ],
         ],
 
         'comment' => [
             'label' => 'Comment',
             'config' => [
-                'type' => 'text'
-            ]
+                'type' => 'text',
+            ],
         ],
-        
+
         'blog'=> [
             'label' => 'Blog',
             'config' => [
@@ -80,7 +88,7 @@ return [
                 'foreign_table'=> 'tx_workshopblog_domain_model_blog',
                 'minitems'=>1,
                 'maxitems'=>1,
-            ]
-        ]
-    ]
+            ],
+        ],
+    ],
 ];

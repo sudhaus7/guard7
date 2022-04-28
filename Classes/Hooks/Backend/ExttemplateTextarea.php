@@ -1,41 +1,44 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frank
- * Date: 16.02.18
- * Time: 13:26
+
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace SUDHAUS7\Guard7\Hooks\Backend;
+namespace Sudhaus7\Guard7\Hooks\Backend;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\TagBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extensionmanager\ViewHelpers\Form\TypoScriptConstantsViewHelper;
 
-class ExttemplateTextarea
+final class ExttemplateTextarea
 {
     /**
      * Tag builder instance
-     *
-     * @var \TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder
      */
-    protected $tag = null;
-    
+    private TagBuilder $tag;
+
     /**
      * constructor of this class
      */
     public function __construct()
     {
-        $this->tag = GeneralUtility::makeInstance('TYPO3\\CMS\\Fluid\\Core\\ViewHelper\\TagBuilder');
+        $this->tag = GeneralUtility::makeInstance(TagBuilder::class);
     }
-    
+
     /**
      * render textarea for extConf
      *
-     * @param array $parameter
      * @param TypoScriptConstantsViewHelper $parentObject
-     * @return string
      */
-    public function render(array $parameter = array(), TypoScriptConstantsViewHelper $parentObject)
+    public function render(array $parameter = [], TypoScriptConstantsViewHelper $parentObject): string
     {
         $this->tag->setTagName('textarea');
         $this->tag->forceClosingTag(true);
@@ -47,6 +50,7 @@ class ExttemplateTextarea
         if ($parameter['fieldValue'] !== null) {
             $this->tag->setContent(trim($parameter['fieldValue']));
         }
+
         return $this->tag->render();
     }
 }

@@ -1,51 +1,129 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frank
- * Date: 31.01.18
- * Time: 16:25
+
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace SUDHAUS7\Guard7\Hooks\Backend;
+namespace Sudhaus7\Guard7\Hooks\Backend;
 
-use SUDHAUS7\Guard7\Adapter\ConfigurationAdapter;
-use SUDHAUS7\Guard7\Tools\Helper;
-use SUDHAUS7\Guard7\Tools\PrivatekeySingleton;
+use PDO;
+use TYPO3\CMS\Recordlist\Controller\RecordListController;
+use Sudhaus7\Guard7\Adapter\ConfigurationAdapter;
+use Sudhaus7\Guard7\Tools\Helper;
+use Sudhaus7\Guard7\Tools\PrivatekeySingleton;
 use TYPO3\CMS\Backend\Controller\EditDocumentController;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Recordlist\RecordList;
+use function implode;
+use function in_array;
 
-class PageRenderer
+final class PageRenderer
 {
-    public $editconf = [];
-    
+    public array $editconf = [];
+
     /**
      * @var EditDocumentController
      */
-    public $controller = null;
-    
+    public $controller;
+
+    /**
+     * @var string
+     */
+    private const USEJAVASCRIPTDECODINGINBACKEND = 'usejavascriptdecodinginbackend';
+
+    /**
+     * @var string
+     */
+    private const SOBE = 'SOBE';
+
+    /**
+     * @var string
+     */
+    private const UID = 'uid';
+
+    /**
+     * @var string
+     */
+    private const PID = 'pid';
+
+    /**
+     * @var string
+     */
+    private const TCA = 'TCA';
+
+    /**
+     * @var string
+     */
+    private const CTRL = 'ctrl';
+
+    /**
+     * @var string
+     */
+    private const LABEL = 'label';
+
+    /**
+     * @var string
+     */
+    private const TX_GUARD7_DOMAIN_MODEL_DATA = 'tx_guard7_domain_model_data';
+
+    /**
+     * @var string
+     */
+    private const TABLENAME = 'tablename';
+
+    /**
+     * @var string
+     */
+    private const TABLEUID = 'tableuid';
+
+    /**
+     * @var string
+     */
+    private const FIELDNAME = 'fieldname';
+
+    /**
+     * @var string
+     */
+    private const SECRETDATA = 'secretdata';
+
+    /**
+     * @var string
+     */
+    private const IDENTIFIER = 'identifier';
+
+    /**
+     * @var string
+     */
+    private const METHOD = 'method';
+
     /**
      * wrapper function called by hook (\TYPO3\CMS\Core\Page\PageRenderer->render-preProcess)
      *
      * @param array $parameters An array of available parameters
      * @param \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer The parent object that triggered this hook
      */
-    public function addJSCSS(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
+    public function addJSCSS(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer): void
     {
-    
+
         // Add language labels for ExtDirect
         $pageRenderer->addInlineLanguageLabelArray([
             'guard7_usekeytounlock'  => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:usekeytounlock',
             'guard7_providepassword'  => 'LLL:EXT:guard7/Resources/Private/Language/locallang.xlf:providepassword',
-        ], true);
-    
+        ]);
+
         $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
-    
-       
-        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
+
+        if (!$configadapter->extensionConfig[self::USEJAVASCRIPTDECODINGINBACKEND]) {
             $key = $GLOBALS['BE_USER']->getSessionData('privatekey');
             $privateKey = GeneralUtility::makeInstance(PrivatekeySingleton::class);
             if (!empty($key)) {
@@ -53,245 +131,246 @@ class PageRenderer
             } else {
                 $privateKey->setKey();
             }
+
             $pageRenderer->addJsInlineCode(
                 __METHOD__,
                 'var sudhaus7guard7data_DISABLED = true;'
             );
             return;
         }
-        
-        if ($GLOBALS['SOBE']) {
-            $class = get_class($GLOBALS['SOBE']);
-            
+
+        if ($GLOBALS[self::SOBE]) {
+            $class = get_class($GLOBALS[self::SOBE]);
+
             if ($class == EditDocumentController::class) {
                 $this->handleEditDocumentController($parameters, $pageRenderer);
             }
-            
-            if ($class == RecordList::class) {
+
+            if ($class == RecordListController::class) {
                 $this->handleRecordListLight($parameters, $pageRenderer);
             }
         }
     }
-    
-    public function postRender(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
+
+    public function postRender(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer): void
     {
         $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
-    
-        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
+
+        if (!$configadapter->extensionConfig[self::USEJAVASCRIPTDECODINGINBACKEND]) {
             return;
         }
-        if ($GLOBALS['SOBE']) {
-            $class = get_class($GLOBALS['SOBE']);
-            
-            if ($class == RecordList::class) {
+
+        if ($GLOBALS[self::SOBE]) {
+            $class = get_class($GLOBALS[self::SOBE]);
+
+            if ($class == RecordListController::class) {
                 //$this->handleRecordList( $parameters, $pageRenderer);
             }
         }
     }
-    
-    private function handleRecordListLight(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
+
+    private function handleRecordListLight(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer): void
     {
-        
-        /** @var RecordList $controller */
-        $controller = $GLOBALS['SOBE'];
-    
+
+        /** @var RecordListController $controller */
+        $controller = $GLOBALS[self::SOBE];
+
         $tables = Helper::getAllGuard7Tables($controller->id);
         if (!empty($tables)) {
             $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
             $pageRenderer->addJsInlineCode(
                 __METHOD__,
-                'var sudhaus7guard7tables = ' . json_encode($tables) . ';var sudhaus7guard7data_DISABLED = false;'
+                'var sudhaus7guard7tables = ' . json_encode($tables, JSON_THROW_ON_ERROR) . ';var sudhaus7guard7data_DISABLED = false;'
             );
         }
     }
-    
+
     /**
      * @param array $parameters
      * @param \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer
      */
-    private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
+    private function handleRecordList(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer): void
     {
         $configadapter = GeneralUtility::makeInstance(ConfigurationAdapter::class);
-        if (!$configadapter->extensionConfig['usejavascriptdecodinginbackend']) {
+        if (!$configadapter->extensionConfig[self::USEJAVASCRIPTDECODINGINBACKEND]) {
             return;
         }
-        
-        /** @var RecordList $controller */
-        $controller = $GLOBALS['SOBE'];
-        
+
+        /** @var RecordListController $controller */
+        $controller = $GLOBALS[self::SOBE];
+
         $tables = Helper::getAllGuard7Tables($controller->id);
         if (!empty($tables)) {
             $data = [];
             foreach ($tables as $table) {
                 $table = trim($table, '.');
-                
+
                 /** @var Connection $connection */
                 $connection = GeneralUtility::makeInstance(ConnectionPool::class)
                     ->getConnectionForTable($table);
-                
-                $res = $connection->select(['uid'], $table, ['pid' => $controller->id]);
+
+                $res = $connection->select([self::UID], $table, [self::PID => $controller->id]);
                 $uids = $res->fetchAll();
                 if (!empty($uids)) {
                     $idlist = [];
                     foreach ($uids as $a) {
-                        $idlist[] = $a['uid'];
+                        $idlist[] = $a[self::UID];
                     }
-                    
-                    $fields = $GLOBALS['TCA'][$table]['ctrl']['label'];
-                    $fields .= ',' . $GLOBALS['TCA'][$table]['ctrl']['label_alt'];
+
+                    $fields = $GLOBALS[self::TCA][$table][self::CTRL][self::LABEL];
+                    $fields .= ',' . $GLOBALS[self::TCA][$table][self::CTRL]['label_alt'];
                     $fields = trim($fields, ',');
                     $fields = "'" . str_replace(',', "','", $fields) . "'";
-                    
+
                     $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-                        ->getConnectionForTable('tx_guard7_domain_model_data');
+                        ->getConnectionForTable(self::TX_GUARD7_DOMAIN_MODEL_DATA);
                     $query = $connection->createQueryBuilder();
-                    $query->select(...[
-                        'tablename',
-                        'tableuid',
-                        'fieldname',
-                        'secretdata'
+                    $query->select([
+                        self::TABLENAME,
+                        self::TABLEUID,
+                        self::FIELDNAME,
+                        self::SECRETDATA,
                     ])
-                        ->from('tx_guard7_domain_model_data');
-                    
-                    
-                    $query->andWhere($query->expr()->in('tableuid', $idlist));
-                    $query->andWhere($query->expr()->in('fieldname', $fields));
-                    $query->andWhere($query->expr()->eq('tablename', $query->createNamedParameter($table)));
+                        ->from(self::TX_GUARD7_DOMAIN_MODEL_DATA);
+
+                    $query->andWhere($query->expr()->in(self::TABLEUID, $idlist));
+                    $query->andWhere($query->expr()->in(self::FIELDNAME, $fields));
+                    $query->andWhere($query->expr()->eq(self::TABLENAME, $query->createNamedParameter($table)));
                     $result = $query->execute();
                     $subdata = $result->fetchAll();
                     $data = array_merge($data, $subdata);
                 }
             }
+
             if (!empty($data)) {
                 $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/List');
                 $pageRenderer->addJsInlineCode(
                     __METHOD__,
-                    'var sudhaus7guard7data = ' . json_encode($data) . ';var sudhaus7guard7data_DISABLED = false;'
+                    'var sudhaus7guard7data = ' . json_encode($data, JSON_THROW_ON_ERROR) . ';var sudhaus7guard7data_DISABLED = false;'
                 );
             }
         }
     }
-    
+
     /**
      * @param array $parameters
      * @param \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer
      */
-    private function handleEditDocumentController(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer)
+    private function handleEditDocumentController(array $parameters, \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer): void
     {
-        $this->editconf = $GLOBALS['SOBE']->editconf;
-        $this->controller = $GLOBALS['SOBE'];
-        
-        
+        $this->editconf = $GLOBALS[self::SOBE]->editconf;
+        $this->controller = $GLOBALS[self::SOBE];
+
         if (!empty($this->editconf)) {
             foreach ($this->editconf as $table => $config) {
-                if (\in_array('edit', $config)) {
+                if ( in_array('edit', $config)) {
                     $idlist = GeneralUtility::trimExplode(',', array_keys($config)[0], true);
                     $id = array_shift($idlist);
                     $rec = BackendUtility::getRecord($table, $id, '*');
-                    
-                    if (Helper::tableIsGuard7Element($table, $rec['pid'])) {
+
+                    if (Helper::tableIsGuard7Element($table, $rec[self::PID])) {
                         $data = [
-                        
+
                         ];
-                        
+
                         //$fields = GeneralUtility::trimExplode( ',',$ts['tx_sudhaus7guard7.'][ $table . '.' ]['fields'], true );
-                        
+
                         /** @var Connection $connection */
                         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
-                            ->getConnectionForTable('tx_guard7_domain_model_data');
-                        
+                            ->getConnectionForTable(self::TX_GUARD7_DOMAIN_MODEL_DATA);
+
                         $result = $connection->select(
                             [
-                                'tablename',
-                                'tableuid',
-                                'fieldname',
-                                'secretdata'
+                                self::TABLENAME,
+                                self::TABLEUID,
+                                self::FIELDNAME,
+                                self::SECRETDATA,
                             ],
-                            'tx_guard7_domain_model_data',
+                            self::TX_GUARD7_DOMAIN_MODEL_DATA,
                             [
-                                'tablename' => $table,
-                                'tableuid' => $id
+                                self::TABLENAME => $table,
+                                self::TABLEUID => $id,
                             ]
                         );
-                        
-                        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-                            $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row['tablename'], $row['tableuid'], $row['fieldname']);
+
+                        while ($row = $result->fetch( PDO::FETCH_ASSOC)) {
+                            $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row[self::TABLENAME], $row[self::TABLEUID], $row[self::FIELDNAME]);
                             $data[] = [
-                                'identifier' => $identifier,
-                                'method' => 'val',
-                                'secretdata' => $row['secretdata']
+                                self::IDENTIFIER => $identifier,
+                                self::METHOD => 'val',
+                                self::SECRETDATA => $row[self::SECRETDATA],
                             ];
                         }
-                        
+
                         /**
                          * Handle / prepare IRRE
                          */
-                        $tcafields = GeneralUtility::trimExplode(',', $GLOBALS['TCA'][$table]['types'][0]['showitem'], true);
-                        
+                        $tcafields = GeneralUtility::trimExplode(',', $GLOBALS[self::TCA][$table]['types'][0]['showitem'], true);
+
                         foreach ($tcafields as $field) {
-                            if ($GLOBALS['TCA'][$table]['columns'][$field]['config']['type'] === 'inline') {
-                                $reltable = $GLOBALS['TCA'][$table]['columns'][$field]['config']['foreign_table'];
+                            if ($GLOBALS[self::TCA][$table]['columns'][$field]['config']['type'] === 'inline') {
+                                $reltable = $GLOBALS[self::TCA][$table]['columns'][$field]['config']['foreign_table'];
                                 $config['irre'][] = [
                                     'table' => $reltable,
-                                    'field' => $field
+                                    'field' => $field,
                                 ];
-                                $config['fields'][$reltable] = Helper::getFields($reltable, $rec['pid']);
-                                
-                                
-                                $label = $GLOBALS['TCA'][$reltable]['ctrl']['label'];
-                                if ($GLOBALS['TCA'][$reltable]['ctrl']['label_alt_force']) {
-                                    $label .= ',' . $GLOBALS['TCA'][$reltable]['ctrl']['label_alt'];
+                                $config['fields'][$reltable] = Helper::getFields($reltable, $rec[self::PID]);
+
+                                $label = $GLOBALS[self::TCA][$reltable][self::CTRL][self::LABEL];
+                                if ($GLOBALS[self::TCA][$reltable][self::CTRL]['label_alt_force']) {
+                                    $label .= ',' . $GLOBALS[self::TCA][$reltable][self::CTRL]['label_alt'];
                                 }
+
                                 $labelfields = GeneralUtility::trimExplode(',', $label, true);
                                 $labels = [];
-                                
+
                                 if (!empty($rec[$field])) {
                                     $query = $connection->createQueryBuilder();
-                                    $irreres = $query->select(...[
-                                        'tablename',
-                                        'tableuid',
-                                        'fieldname',
-                                        'secretdata'
+                                    $irreres = $query->select([
+                                        self::TABLENAME,
+                                        self::TABLEUID,
+                                        self::FIELDNAME,
+                                        self::SECRETDATA,
                                     ])
-                                        ->from('tx_guard7_domain_model_data')
-                                        ->andWhere($query->expr()->eq('tablename', $query->createNamedParameter($reltable)))
-                                        ->andWhere($query->expr()->in('tableuid', GeneralUtility::trimExplode(',', $rec[$field], true)))
-                                        ->addOrderBy('tableuid', 'ASC')
+                                        ->from(self::TX_GUARD7_DOMAIN_MODEL_DATA)
+                                        ->andWhere($query->expr()->eq(self::TABLENAME, $query->createNamedParameter($reltable)))
+                                        ->andWhere($query->expr()->in(self::TABLEUID, GeneralUtility::trimExplode(',', $rec[$field], true)))
+                                        ->addOrderBy(self::TABLEUID, 'ASC')
                                         ->execute();
-                                    
-                                    while ($row = $irreres->fetch(\PDO::FETCH_ASSOC)) {
+
+                                    while ($row = $irreres->fetch( PDO::FETCH_ASSOC)) {
                                         // $data[]=$row;
-                                        
-                                        if (in_array($row['fieldname'], $labelfields, true)) {
-                                            $labels[$row['tableuid']][] = $row['secretdata'];
+
+                                        if (in_array($row[self::FIELDNAME], $labelfields, true)) {
+                                            $labels[$row[self::TABLEUID]][] = $row[self::SECRETDATA];
                                         }
-            
-                                        $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row['tablename'], $row['tableuid'], $row['fieldname']);
+
+                                        $identifier = sprintf('[data-formengine-input-name="data[%s][%d][%s]"]', $row[self::TABLENAME], $row[self::TABLEUID], $row[self::FIELDNAME]);
                                         $data[] = [
-                                            'identifier' => $identifier,
-                                            'method' => 'val',
-                                            'secretdata' => $row['secretdata']
+                                            self::IDENTIFIER => $identifier,
+                                            self::METHOD => 'val',
+                                            self::SECRETDATA => $row[self::SECRETDATA],
                                         ];
                                     }
                                 }
+
                                 if (!empty($labels)) {
                                     foreach ($labels as $id => $label) {
-                                        $identifier = sprintf('#data-%d-%s-%d-%s-%s-%d_label', $rec['pid'], $table, $rec['uid'], $field, $reltable, $id);
+                                        $identifier = sprintf('#data-%d-%s-%d-%s-%s-%d_label', $rec[self::PID], $table, $rec[self::UID], $field, $reltable, $id);
                                         $data[] = [
-                                            'identifier' => $identifier,
-                                            'method' => 'label',
-                                            'secretdata' => \implode('|', $label)
+                                            self::IDENTIFIER => $identifier,
+                                            self::METHOD => self::LABEL,
+                                            self::SECRETDATA => implode('|', $label),
                                         ];
                                     }
                                 }
                             }
                         }
-                        
-                        
+
                         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Guard7/Main');
                         $pageRenderer->addJsInlineCode(
                             __METHOD__,
-                            'var sudhaus7guard7data = ' . json_encode($data) . ';var sudhaus7guard7data_DISABLED = false;'
+                            'var sudhaus7guard7data = ' . json_encode($data, JSON_THROW_ON_ERROR) . ';var sudhaus7guard7data_DISABLED = false;'
                         );
                     }
                 }

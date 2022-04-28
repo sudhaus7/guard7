@@ -1,27 +1,40 @@
 <?php
+
 declare(strict_types=1);
 
-namespace SUDHAUS7\Guard7\Hooks\Frontend;
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
-use SUDHAUS7\Guard7\Interfaces\Guard7Interface;
-use SUDHAUS7\Guard7\Tools\Helper;
-use SUDHAUS7\Guard7\Tools\Keys;
-use SUDHAUS7\Guard7\Tools\Storage;
+namespace Sudhaus7\Guard7\Hooks\Frontend;
+
+use Exception;
+use Sudhaus7\Guard7\Interfaces\Guard7Interface;
+use Sudhaus7\Guard7\Tools\Helper;
+use Sudhaus7\Guard7\Tools\Storage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
-class AfterPersistHandler
+final class AfterPersistHandler
 {
     /**
      * @param AbstractEntity $object
      * @return AbstractEntity[]
      */
-    public function handle(AbstractEntity $object) : array
+    public function handle(AbstractEntity $object): array
     {
         if ($object instanceof Guard7Interface) {
-                $this->dopersist($object);
+            $this->dopersist($object);
         } elseif (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'])) {
             $classname = get_class($object);
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['guard7'] as $config) {
@@ -30,13 +43,14 @@ class AfterPersistHandler
                 }
             }
         }
+
         return [$object];
     }
-    
+
     /**
      * @param AbstractEntity $object
      */
-    private function dopersist(AbstractEntity $object)
+    private function dopersist(AbstractEntity $object): void
     {
         try {
             $table = Helper::getModelTable($object);
@@ -49,7 +63,7 @@ class AfterPersistHandler
                 $persistencemanager->add($object);
                 $persistencemanager->persistAll();
             }
-        } catch (\Exception $exception) {
+        } catch ( Exception $exception) {
             // we ignore this
         }
     }

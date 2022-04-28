@@ -1,18 +1,32 @@
 <?php
 
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
-namespace SUDHAUS7\Guard7\Hooks\Frontend;
+namespace Sudhaus7\Guard7\Hooks\Frontend;
 
-use SUDHAUS7\Guard7\Interfaces\Guard7Interface;
-use SUDHAUS7\Guard7\Tools\Helper;
+use Sudhaus7\Guard7\Interfaces\Guard7Interface;
+use Sudhaus7\Guard7\Tools\Helper;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-class AfterRemoveHandler
+final class AfterRemoveHandler
 {
-    public function handle(AbstractEntity $object)
+    /**
+     * @return AbstractEntity[]
+     */
+    public function handle(AbstractEntity $object): array
     {
         if ($object instanceof Guard7Interface) {
             $this->cleanup($object);
@@ -24,15 +38,17 @@ class AfterRemoveHandler
                 }
             }
         }
+
         return [$object];
     }
-    private function cleanup(AbstractEntity $object)
+
+    private function cleanup(AbstractEntity $object): void
     {
         $table = Helper::getModelTable($object);
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_guard7_domain_model_data');
 
-        $connection->delete('tx_guard7_domain_model_data', ['tableuid'=>$object->getUid(),'tablename'=>$table]);
+        $connection->delete('tx_guard7_domain_model_data', ['tableuid'=>$object->getUid(), 'tablename'=>$table]);
     }
 }

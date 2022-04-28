@@ -1,0 +1,29 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+  Sudhaus7\Guard7\:
+    resource: '../Classes/*'
+  Sudhaus7\Guard7\Controller\AjaxController:
+    public: true
+  Sudhaus7\Guard7\Controller\ToolbarController:
+    public: true
+  Sudhaus7\Guard7\Commands\CreatekeypairCommand:
+    tags:
+      - name: 'console.command'
+        command: 'guard7:createkeypair'
+        description: 'Create a Keypair'
+        schedulable: false
+  Sudhaus7\Guard7\Commands\DblocktableCommand:
+    tags:
+      - name: 'console.command'
+        command: 'guard7:db:lock'
+        description: 'Lock tables'
+        schedulable: false
+  Sudhaus7\Guard7\Commands\DbunlocktableCommand:
+    tags:
+      - name: 'console.command'
+        command: 'guard7:db:unlock'
+        description: 'Unlock tables'
+        schedulable: false

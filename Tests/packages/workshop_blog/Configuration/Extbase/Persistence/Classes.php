@@ -12,8 +12,8 @@
  * @author Frank Berger <fberger@b-factor.de>
  */
 
-namespace Sudhaus7\Guard7\Tests\Unit\Tools;
-
-final class EncoderTest
-{
-}
+return [
+    'WORKSHOP\WorkshopBlog\Domain\Model\Comment' => [
+        'properties' => ['tstamp' => ['fieldName' => 'tstamp']],
+    ],
+];

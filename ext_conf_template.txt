@@ -1,13 +1,13 @@
-# cat=basic//01; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateLibraries->render]; label=Default encoding library
+# cat=basic//01; type=user[Sudhaus7\Guard7\Hooks\Backend\ExttemplateLibraries->render]; label=Default encoding library
 defaultcryptlibrary = Openssl
 
-# cat=basic//02; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateMethods->render]; label=Default encoding algorithm  - check openssl_get_cipher_methods()
+# cat=basic//02; type=user[Sudhaus7\Guard7\Hooks\Backend\ExttemplateMethods->render]; label=Default encoding algorithm  - check openssl_get_cipher_methods()
 defaultmethod = RC4
 
 # cat=basic//03; type=int; label=Default key size
 defaultkeysize = 2048
 
-# cat=basic//04; type=user[SUDHAUS7\Guard7\Hooks\Backend\ExttemplateKeygenerator->render]; label=The Public part of a Master key
+# cat=basic//04; type=user[Sudhaus7\Guard7\Hooks\Backend\ExttemplateKeygenerator->render]; label=The Public part of a Master key
 masterkeypublic =
 
 # cat=basic//10; type=boolean; label=Use javascript decoding in Backend. (more secure)

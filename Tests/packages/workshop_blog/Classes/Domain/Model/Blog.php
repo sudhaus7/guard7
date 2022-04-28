@@ -1,47 +1,45 @@
 <?php
 
+/*
+ * This file is part of the TYPO3 project.
+ * (c) 2022 B-Factor GmbH
+ *          Sudhaus7
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ * The TYPO3 project - inspiring people to share!
+ * @copyright 2022 B-Factor GmbH https://b-factor.de/
+ * @author Frank Berger <fberger@b-factor.de>
+ */
 
 namespace WORKSHOP\WorkshopBlog\Domain\Model;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-class Blog extends AbstractEntity
+final class Blog extends AbstractEntity
 {
-    
+
+    private ?int $tstamp = null;
+
+    private ?string $title = null;
+
     /**
-     * @var int
+     * @var DateTime|DateTimeImmutable|null
      */
-    protected $tstamp;
-    
-    /**
-     * @var string
-     */
-    protected $title;
-    
-    /**
-     * @var \DateTime
-     */
-    protected $date;
-    
-    /**
-     * @var string
-     */
-    protected $teaser;
-    
-    /**
-     * @var string
-     */
-    protected $bodytext;
-    
-    
-    /**
-     * @return string|null
-     */
+    private ?DateTimeInterface $date = null;
+
+    private ?string $teaser = null;
+
+    private ?string $bodytext = null;
+
     public function getTitle(): ?string
     {
         return $this->title;
     }
-    
+
     /**
      * @param string $title
      */
@@ -49,31 +47,28 @@ class Blog extends AbstractEntity
     {
         $this->title = $title;
     }
-    
+
     /**
-     * @return \DateTime|null
+     * @return DateTime|DateTimeImmutable
      */
-    public function getDate(): ?\DateTime
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
-    
+
     /**
-     * @param \DateTime $date
+     * @param DateTime $date
      */
-    public function setDate(\DateTime $date): void
+    public function setDate( DateTimeInterface $date): void
     {
         $this->date = $date;
     }
-    
-    /**
-     * @return string|null
-     */
+
     public function getTeaser(): ?string
     {
         return $this->teaser;
     }
-    
+
     /**
      * @param string $teaser
      */
@@ -81,15 +76,12 @@ class Blog extends AbstractEntity
     {
         $this->teaser = $teaser;
     }
-    
-    /**
-     * @return string|null
-     */
+
     public function getBodytext(): ?string
     {
         return $this->bodytext;
     }
-    
+
     /**
      * @param string $bodytext
      */
@@ -97,15 +89,12 @@ class Blog extends AbstractEntity
     {
         $this->bodytext = $bodytext;
     }
-    
-    /**
-     * @return int
-     */
-    public function getTstamp(): int
+
+    public function getTstamp(): ?int
     {
         return $this->tstamp;
     }
-    
+
     /**
      * @param int $tstamp
      */
